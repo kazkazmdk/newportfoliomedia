@@ -1,7 +1,15 @@
-import { buildCatalog, launchReport } from "@penta/catalog";
-import { opportunityScore } from "@penta/quality-gate";
+import {
+  AI_USAGE_AUDIT,
+  PROVIDER_HEALTH,
+  coverageReport,
+  demandBreakdown,
+  freshnessBuckets,
+  launchReport,
+  opportunityQueue,
+} from "@penta/catalog";
 import { pageMeta } from "@/lib/seo";
 import { PROVIDERS } from "@penta/tripcost";
+import { EntityInspector } from "./entity-inspector";
 
 export const metadata = pageMeta({
   title: "Ops console",
@@ -11,81 +19,94 @@ export const metadata = pageMeta({
 });
 
 export default function OpsPage() {
-  const store = buildCatalog();
   const report = launchReport();
-  const pages = [...store.pages.values()].sort((a, b) => b.quality_score - a.quality_score);
+  const coverage = coverageReport();
+  const g = report.graph;
+  const fresh = freshnessBuckets();
+  const demand = demandBreakdown();
   return (
     <main className="mx-auto max-w-6xl px-5 py-10 font-[family-name:var(--font-geist-sans)]">
       <p className="text-xs tracking-[0.2em] uppercase">Internal</p>
       <h1 className="mt-2 text-4xl">Ops</h1>
       <p className="mt-2 max-w-2xl text-sm leading-6 text-[#555]">
-        Entities, sources, pages, quality, SEO state. Prelaunch remains globally noindex until PUBLIC_SITE_LIVE=true.
+        Graph depth, provenance, quality hard gates. PUBLIC_SITE_LIVE={String(report.public_site_live)}. Global noindex={String(report.global_noindex)}. INDEXABLE is not LIVE.
       </p>
+      <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+        <article className="border p-4">
+          <p>Entities</p>
+          <p className="text-2xl">{g.entities}</p>
+        </article>
+        <article className="border p-4">
+          <p>Relations</p>
+          <p className="text-2xl">{g.relations}</p>
+          <p className="mt-1">{g.decision_relevant_relations} decision · {g.verified_relations} verified · {g.inferred_relations} inferred</p>
+        </article>
+        <article className="border p-4">
+          <p>Indexable pages</p>
+          <p className="text-2xl">{g.indexable}</p>
+          <p className="mt-1">{g.relations_per_indexable_page} rel/page · {g.relations_per_entity} rel/entity</p>
+        </article>
+        <article className="border p-4">
+          <p>Connectivity</p>
+          <p className="mt-1">orphan {report.connectivity.ORPHAN} · low {report.connectivity.LOW_DEPTH} · connected {report.connectivity.CONNECTED} · rich {report.connectivity.RICH}</p>
+        </article>
+      </section>
       <section className="mt-8 grid gap-4 md:grid-cols-5">
         {Object.entries(report.bySite).map(([site, stats]) => (
           <article key={site} className="border border-[#ddd] p-4">
             <h2 className="capitalize">{site}</h2>
             <p className="mt-2 text-sm">
-              {stats.entities} entities · {stats.relations} rel · {stats.indexable} indexable · {stats.noindex_product} product · {stats.graph_only} graph-only
+              {stats.entities} entities · {stats.relations} rel ({stats.decision_relevant_relations} decision) · {stats.indexable} indexable
             </p>
           </article>
         ))}
       </section>
-      <section className="mt-10 overflow-x-auto">
-        <h2 className="text-xl">Pages</h2>
-        <table className="mt-4 w-full min-w-[900px] text-left text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2">URL</th>
-              <th>Site</th>
-              <th>Family</th>
-              <th>Quality</th>
-              <th>Demand</th>
-              <th>State</th>
-              <th>Batch</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pages.map((p) => (
-              <tr key={p.id} className="border-b border-[#eee]">
-                <td className="py-2">
-                  <a className="underline" href={p.url}>
-                    {p.url}
-                  </a>
-                </td>
-                <td>{p.site}</td>
-                <td>{p.family}</td>
-                <td>{p.quality_score}</td>
-                <td>{p.search_demand}</td>
-                <td>{p.index_state}</td>
-                <td>{p.batch}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <section className="mt-8 grid gap-4 md:grid-cols-2 text-sm">
+        <article className="border p-4">
+          <h2 className="text-lg">Coverage</h2>
+          <pre className="mt-2 overflow-auto text-xs">{JSON.stringify(coverage, null, 2)}</pre>
+        </article>
+        <article className="border p-4">
+          <h2 className="text-lg">Freshness / demand</h2>
+          <p className="mt-2">fresh {fresh.fresh} · aging {fresh.aging} · stale {fresh.stale} · expired {fresh.expired}</p>
+          <p className="mt-2">Demand on INDEXABLE: editorial {demand.EDITORIAL_JUDGMENT} · GSC {demand.GSC_OBSERVED} (none until GSC is connected)</p>
+          <p className="mt-2">Quality avg {report.average_indexable_quality} · min {report.minimum_indexable_quality}</p>
+        </article>
       </section>
-      <section className="mt-10">
-        <h2 className="text-xl">Opportunity ranking (seed)</h2>
-        <p className="mt-2 text-sm">
-          Example FixCode 4C:{" "}
-          {opportunityScore({
-            search_demand: 92,
-            data_completeness: 90,
-            monetization_potential: 70,
-            product_utility: 95,
-            competition_difficulty: 55,
-          })}
-        </p>
+      <EntityInspector />
+      <section className="mt-10 text-sm">
+        <h2 className="text-xl">Opportunity queue (do not auto-create pages)</h2>
+        <ul className="mt-3 grid gap-2">
+          {opportunityQueue().map((row) => (
+            <li key={row.query} className="border p-3">
+              {row.site}: {row.query} · score {row.score} · {row.action}
+            </li>
+          ))}
+        </ul>
       </section>
       <section className="mt-8 text-sm">
-        <h2 className="text-xl">External dependency risk</h2>
+        <h2 className="text-xl">AI usage</h2>
         <ul className="mt-3 grid gap-1">
+          {AI_USAGE_AUDIT.map((row) => (
+            <li key={`${row.site}-${row.fn}`}>
+              {row.classification} · {row.site} · {row.fn} — {row.status}
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="mt-8 text-sm">
+        <h2 className="text-xl">Provider health</h2>
+        <ul className="mt-3 grid gap-1">
+          {PROVIDER_HEALTH.map((row) => (
+            <li key={row.provider}>
+              {row.provider}: last success {row.last_success ?? "never"} · {row.notes}
+            </li>
+          ))}
           {Object.entries(PROVIDERS).map(([name, meta]) => (
             <li key={name}>
               {name}: replaceability {meta.replaceability}/100 — {meta.notes}
             </li>
           ))}
-          <li>Open-Meteo forecast (WearThere): replaceability 70 — optional, climate normals remain.</li>
         </ul>
       </section>
     </main>

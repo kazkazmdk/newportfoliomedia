@@ -1,7 +1,7 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
-import { climate } from "./climate";
+import { climate, type MonthClimate } from "./climate";
 import { MORE_DESTINATIONS } from "./destinations-more";
 import type { Destination } from "./types";
 
@@ -22,11 +22,17 @@ export type ClothingPiece = {
   name: string;
   category: string;
   warmth: number;
+  breathability: number;
   water_resistance: number;
-  formal: number;
+  wind_resistance: number;
+  formality: number;
+  activity: string[];
+  layer: "base" | "mid" | "shell" | "bottom" | "shoes" | "extra";
   volume_l: number;
   weight_kg: number;
   colors: string[];
+  /** @deprecated use formality */
+  formal: number;
 };
 
 const RETRIEVED = "2026-01-15T00:00:00.000Z";
@@ -240,19 +246,19 @@ export function indexedMonths(dest: Destination): number[] {
 }
 
 export const WARDROBE_SEED: ClothingPiece[] = [
-  { id: "tee", name: "Crew T-shirt", category: "top", warmth: 2, water_resistance: 0, formal: 1, volume_l: 1.2, weight_kg: 0.18, colors: ["white", "navy"] },
-  { id: "shirt", name: "Oxford shirt", category: "top", warmth: 2, water_resistance: 0, formal: 3, volume_l: 1.6, weight_kg: 0.25, colors: ["blue"] },
-  { id: "knit", name: "Merino knit", category: "knit", warmth: 4, water_resistance: 1, formal: 2, volume_l: 3.2, weight_kg: 0.35, colors: ["camel"] },
-  { id: "hoodie", name: "Hoodie", category: "knit", warmth: 4, water_resistance: 1, formal: 0, volume_l: 4.5, weight_kg: 0.5, colors: ["grey"] },
-  { id: "overshirt", name: "Overshirt", category: "layer", warmth: 3, water_resistance: 1, formal: 2, volume_l: 3.8, weight_kg: 0.45, colors: ["olive"] },
-  { id: "raincoat", name: "Packable rain shell", category: "shell", warmth: 2, water_resistance: 5, formal: 1, volume_l: 2.2, weight_kg: 0.28, colors: ["black"] },
-  { id: "wool-coat", name: "Wool coat", category: "coat", warmth: 6, water_resistance: 2, formal: 4, volume_l: 8, weight_kg: 1.2, colors: ["charcoal"] },
-  { id: "trousers", name: "Chinos", category: "bottom", warmth: 3, water_resistance: 0, formal: 3, volume_l: 3, weight_kg: 0.4, colors: ["stone"] },
-  { id: "jeans", name: "Jeans", category: "bottom", warmth: 3, water_resistance: 0, formal: 1, volume_l: 3.4, weight_kg: 0.55, colors: ["indigo"] },
-  { id: "shorts", name: "Shorts", category: "bottom", warmth: 1, water_resistance: 0, formal: 0, volume_l: 1.5, weight_kg: 0.2, colors: ["navy"] },
-  { id: "sneakers", name: "Leather sneakers", category: "shoes", warmth: 2, water_resistance: 1, formal: 2, volume_l: 4.5, weight_kg: 0.7, colors: ["white"] },
-  { id: "boots", name: "Chelsea boots", category: "shoes", warmth: 4, water_resistance: 2, formal: 3, volume_l: 5, weight_kg: 0.9, colors: ["black"] },
-  { id: "umbrella", name: "Compact umbrella", category: "extra", warmth: 0, water_resistance: 5, formal: 2, volume_l: 0.8, weight_kg: 0.25, colors: ["black"] },
+  { id: "tee", name: "Crew T-shirt", category: "top", warmth: 2, breathability: 5, water_resistance: 0, wind_resistance: 0, formality: 1, formal: 1, activity: ["walk", "transit"], layer: "base", volume_l: 1.2, weight_kg: 0.18, colors: ["white", "navy"] },
+  { id: "shirt", name: "Oxford shirt", category: "top", warmth: 2, breathability: 4, water_resistance: 0, wind_resistance: 0, formality: 3, formal: 3, activity: ["dinner", "museum"], layer: "base", volume_l: 1.6, weight_kg: 0.25, colors: ["blue"] },
+  { id: "knit", name: "Merino knit", category: "knit", warmth: 4, breathability: 4, water_resistance: 1, wind_resistance: 2, formality: 2, formal: 2, activity: ["walk", "dinner"], layer: "mid", volume_l: 3.2, weight_kg: 0.35, colors: ["camel"] },
+  { id: "hoodie", name: "Hoodie", category: "knit", warmth: 4, breathability: 3, water_resistance: 1, wind_resistance: 2, formality: 0, formal: 0, activity: ["walk", "transit"], layer: "mid", volume_l: 4.5, weight_kg: 0.5, colors: ["grey"] },
+  { id: "overshirt", name: "Overshirt", category: "layer", warmth: 3, breathability: 3, water_resistance: 1, wind_resistance: 2, formality: 2, formal: 2, activity: ["walk"], layer: "mid", volume_l: 3.8, weight_kg: 0.45, colors: ["olive"] },
+  { id: "raincoat", name: "Packable rain shell", category: "shell", warmth: 2, breathability: 2, water_resistance: 5, wind_resistance: 4, formality: 1, formal: 1, activity: ["walk", "transit"], layer: "shell", volume_l: 2.2, weight_kg: 0.28, colors: ["black"] },
+  { id: "wool-coat", name: "Wool coat", category: "coat", warmth: 6, breathability: 2, water_resistance: 2, wind_resistance: 3, formality: 4, formal: 4, activity: ["walk", "dinner"], layer: "shell", volume_l: 8, weight_kg: 1.2, colors: ["charcoal"] },
+  { id: "trousers", name: "Chinos", category: "bottom", warmth: 3, breathability: 3, water_resistance: 0, wind_resistance: 1, formality: 3, formal: 3, activity: ["dinner", "museum"], layer: "bottom", volume_l: 3, weight_kg: 0.4, colors: ["stone"] },
+  { id: "jeans", name: "Jeans", category: "bottom", warmth: 3, breathability: 2, water_resistance: 0, wind_resistance: 1, formality: 1, formal: 1, activity: ["walk"], layer: "bottom", volume_l: 3.4, weight_kg: 0.55, colors: ["indigo"] },
+  { id: "shorts", name: "Shorts", category: "bottom", warmth: 1, breathability: 5, water_resistance: 0, wind_resistance: 0, formality: 0, formal: 0, activity: ["walk"], layer: "bottom", volume_l: 1.5, weight_kg: 0.2, colors: ["navy"] },
+  { id: "sneakers", name: "Leather sneakers", category: "shoes", warmth: 2, breathability: 3, water_resistance: 1, wind_resistance: 0, formality: 2, formal: 2, activity: ["walk", "transit"], layer: "shoes", volume_l: 4.5, weight_kg: 0.7, colors: ["white"] },
+  { id: "boots", name: "Chelsea boots", category: "shoes", warmth: 4, breathability: 2, water_resistance: 2, wind_resistance: 1, formality: 3, formal: 3, activity: ["walk", "dinner"], layer: "shoes", volume_l: 5, weight_kg: 0.9, colors: ["black"] },
+  { id: "umbrella", name: "Compact umbrella", category: "extra", warmth: 0, breathability: 0, water_resistance: 5, wind_resistance: 0, formality: 2, formal: 2, activity: ["walk"], layer: "extra", volume_l: 0.8, weight_kg: 0.25, colors: ["black"] },
 ];
 
 export type AirlineRule = {
@@ -301,6 +307,25 @@ export function weatherSourceLabel(input: { hasForecast: boolean; daysAhead: num
     kind: "TYPICAL",
     label: "Typical weather for this month — not a forecast",
   };
+}
+
+export const PACKING_RULE_VERSION = "packing-v1";
+
+export function packingCoverage(
+  pieces: ClothingPiece[],
+  tmin: number,
+  rainDays: number,
+  activities: string[],
+) {
+  const warmthNeed = neededWarmth(tmin);
+  const warmthHave = pieces.reduce((s, p) => s + p.warmth, 0);
+  const weather_coverage = Math.min(100, Math.round((warmthHave / Math.max(1, warmthNeed * 1.4)) * 70 + (rainDays >= 8 ? (pieces.some((p) => p.water_resistance >= 4) ? 30 : 0) : 30)));
+  const covered = activities.filter((act) => pieces.some((p) => p.activity.includes(act)));
+  const activity_coverage = activities.length ? Math.round((covered.length / activities.length) * 100) : 100;
+  const tops = pieces.filter((i) => i.layer === "base" || i.category === "top" || i.category === "knit").length;
+  const bottoms = pieces.filter((i) => i.layer === "bottom" || i.category === "bottom").length;
+  const outfit_combinations = Math.max(tops * bottoms, pieces.length);
+  return { weather_coverage, activity_coverage, outfit_combinations, rule_version: PACKING_RULE_VERSION };
 }
 
 function neededWarmth(tmin: number): number {
@@ -360,8 +385,10 @@ export function capsuleFor(
     remove_hint: underused[0]
       ? `You can remove this ${underused[0].name.toLowerCase()}: a second knit is only covering one cool evening.`
       : undefined,
+    coverage: packingCoverage(unique, w.tmin_c, w.rain_days, dest.activities_default),
     confidence: "HIGH" as ConfidenceLevel,
     weather_kind: "TYPICAL" as const,
+    rule_version: PACKING_RULE_VERSION,
   };
 }
 
@@ -417,6 +444,9 @@ export function allWeartherePages(): PageRecord[] {
       freshness_days: 200,
       freshness_ttl_days: 400,
       provenance_valid: true,
+      hub_necessity: true,
+      distinct_reason: dest.slug,
+      forecast_as_climate: false,
     });
     pages.push({
       id: dest.id,
@@ -427,7 +457,7 @@ export function allWeartherePages(): PageRecord[] {
       title: `What to wear in ${dest.city}`,
       meta_description: `Month-by-month typical weather and capsule packing for ${dest.city}.`,
       entity_ids: [dest.id],
-      structured_payload: { city: dest.city, months: dest.climate.length },
+      structured_payload: { city: dest.city, months: dest.climate.length, distinct_reason: dest.slug },
       quality_score: hubQ.score,
       search_demand: dest.demand,
       index_state: hubQ.index_state,
@@ -459,6 +489,8 @@ export function allWeartherePages(): PageRecord[] {
         freshness_days: 200,
         freshness_ttl_days: 400,
         provenance_valid: true,
+        distinct_reason: `${dest.slug}-${month}`,
+        forecast_as_climate: false,
       });
       const slug = MONTHS[month - 1];
       pages.push({
@@ -470,7 +502,7 @@ export function allWeartherePages(): PageRecord[] {
         title: `What to Wear in ${dest.city} in ${slug[0].toUpperCase()}${slug.slice(1)}`,
         meta_description: `Typical ${dest.city} ${slug}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
         entity_ids: [dest.id],
-        structured_payload: { ...w, city: dest.city, slug: dest.slug },
+    structured_payload: { ...w, city: dest.city, slug: dest.slug, distinct_reason: `${dest.slug}-${month}`, kind: "HISTORICAL_CLIMATE" },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: dest.demand }),
         index_state: quality.index_state,

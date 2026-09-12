@@ -32,7 +32,7 @@ export function GarageApp() {
   );
 
   if (!vehicle) {
-    return <p>We don't have verified data for that vehicle yet.</p>;
+    return <p>We don&apos;t have verified data for that vehicle yet.</p>;
   }
 
   const due = nextService(vehicle, km, 48);

@@ -45,6 +45,9 @@ function qualityInputForError(profile: ErrorProfile): PageQualityInput {
     freshness_days: 30,
     freshness_ttl_days: 365,
     provenance_valid: profile.provenance.length > 0,
+    distinct_reason: profile.id,
+    causes_without_source: profile.provenance.length === 0,
+    llm_safety_claim: false,
     site_rules: () => {
       const blockers: string[] = [];
       if (present < 8) blockers.push("Error page missing required diagnostic fields");
@@ -66,6 +69,7 @@ export function errorPage(profile: ErrorProfile): PageRecord {
     code: profile.code,
     meaning: profile.meaning,
     causes: profile.causes.map((cause) => cause.id),
+    distinct_reason: profile.id,
   };
   const quality = evaluatePageQuality(qualityInputForError(profile));
   const demand = searchDemandScore({ seed_research: profile.search_demand });
@@ -99,6 +103,7 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
     appliance: profile.appliance,
     symptom: profile.symptom,
     causes: profile.causes.map((cause) => cause.id),
+    distinct_reason: profile.id,
   };
   const quality = evaluatePageQuality({
     site: "fixcode",
@@ -119,6 +124,8 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
     freshness_days: 40,
     freshness_ttl_days: 180,
     provenance_valid: profile.provenance.length > 0,
+    distinct_reason: profile.id,
+    causes_without_source: profile.provenance.length === 0,
   });
   return {
     id: profile.id,
@@ -149,7 +156,7 @@ export function hubPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const brand of BRANDS) {
     const errors = ALL_ERRORS.filter((item) => item.brand_slug === brand.slug);
-    const payload = { brand: brand.slug, codes: errors.map((item) => item.code) };
+    const payload = { brand: brand.slug, codes: errors.map((item) => item.code), distinct_reason: `hub-${brand.slug}` };
     const quality = evaluatePageQuality({
       site: "fixcode",
       family: "brand-hub",
@@ -169,6 +176,8 @@ export function hubPages(): PageRecord[] {
       freshness_days: 30,
       freshness_ttl_days: 365,
       provenance_valid: true,
+      hub_necessity: true,
+      distinct_reason: `hub-${brand.slug}`,
     });
     pages.push({
       id: `fix:hub:${brand.slug}`,
@@ -198,7 +207,7 @@ export function hubPages(): PageRecord[] {
         (item) => item.brand_slug === brand.slug && item.appliance_slug === appliance,
       );
       const name = APPLIANCES.find((item) => item.slug === appliance)?.name ?? appliance;
-      const payload = { brand: brand.slug, appliance, codes: errors.map((item) => item.code) };
+      const payload = { brand: brand.slug, appliance, codes: errors.map((item) => item.code), distinct_reason: `hub-${brand.slug}-${appliance}` };
       const quality = evaluatePageQuality({
         site: "fixcode",
         family: "appliance-hub",
@@ -218,6 +227,8 @@ export function hubPages(): PageRecord[] {
         freshness_days: 30,
         freshness_ttl_days: 365,
         provenance_valid: true,
+        hub_necessity: true,
+        distinct_reason: `hub-${brand.slug}-${appliance}`,
       });
       pages.push({
         id: `fix:hub:${brand.slug}:${appliance}`,

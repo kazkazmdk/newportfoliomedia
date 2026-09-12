@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CABLES, CHARGERS, compatibility, getCharger, getDevice } from "@penta/chargematch";
+import { CABLES, compatibility, getCharger, getDevice } from "@penta/chargematch";
 import { allChargematchPages } from "@penta/chargematch";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
@@ -41,14 +41,15 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
       </Link>
       <p className="cm-mono mt-4 text-sm">{result.tag.replaceAll("_", " ")}</p>
       <h1 className="mt-2 text-4xl md:text-5xl">{result.match}</h1>
+      <p className="mt-3 max-w-xl text-sm leading-6 text-[#555]">{result.safety_note}</p>
       <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="cm-box p-4">
           <dt className="text-sm">Compatible</dt>
           <dd className="cm-mono mt-1 text-2xl">{result.compatible ? "YES" : "NO"}</dd>
         </div>
         <div className="cm-box p-4">
-          <dt className="text-sm">Fast charging</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.fast ? "YES" : "NO"}</dd>
+          <dt className="text-sm">Certified path</dt>
+          <dd className="cm-mono mt-1 text-2xl">{result.safe ? "YES" : "UNKNOWN"}</dd>
         </div>
         <div className="cm-box p-4">
           <dt className="text-sm">Expected max</dt>
@@ -80,6 +81,10 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
         </ul>
       </section>
       <p className="mt-6 max-w-xl leading-7">{result.explanation} Wattage is negotiated, not measured, unless a lab row exists.</p>
+      <section className="mt-6 text-xs leading-6 text-[#666]">
+        <p>Trace {result.rule_version}</p>
+        <p>{result.trace.facts.join(" · ")}</p>
+      </section>
       <ExpertToggle chargerName={charger.name} pd={charger.pd_version} ports={charger.ports} />
       <Link className="cm-cta mt-8 inline-block" href="/chargematch/kit">
         Add to My Power Kit

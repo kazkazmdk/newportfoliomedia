@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { applyAnswer, diagnose, getError, getSymptom, initialState } from "@penta/fixcode";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  const limited = rateLimit(`fixcode:${clientKey(request)}`, 40);
+  if (!limited.ok) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const body = (await request.json()) as {
     brand?: string;
     appliance?: string;
@@ -26,7 +29,8 @@ export async function POST(request: Request) {
     causes: result.causes.map((c) => ({
       id: c.id,
       name: c.name,
-      probability: c.probability,
+      likelihood_label: c.likelihood_label,
+      probability: result.display_probabilities ? c.probability : null,
       safety: c.safety,
     })),
     next_question: result.next_question
@@ -34,5 +38,8 @@ export async function POST(request: Request) {
       : null,
     risk: result.safety_ceiling,
     confidence: result.confidence_level,
+    rule_version: result.rule_version,
+    display_probabilities: result.display_probabilities,
+    trace: result.trace,
   });
 }

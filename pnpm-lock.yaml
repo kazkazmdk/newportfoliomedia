@@ -179,12 +179,18 @@ importers:
 
   packages/catalog:
     dependencies:
+      '@penta/ai-core':
+        specifier: workspace:*
+        version: link:../ai-core
       '@penta/autospec':
         specifier: workspace:*
         version: link:../../apps/autospec
       '@penta/chargematch':
         specifier: workspace:*
         version: link:../../apps/chargematch
+      '@penta/data-provenance':
+        specifier: workspace:*
+        version: link:../data-provenance
       '@penta/fixcode':
         specifier: workspace:*
         version: link:../../apps/fixcode

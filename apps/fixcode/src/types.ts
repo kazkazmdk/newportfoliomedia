@@ -1,6 +1,6 @@
 import type { ProvenanceRecord, ConfidenceLevel } from "@penta/data-provenance";
 
-export type SafetyClass = "SAFE_USER_CHECK" | "CAUTION" | "PROFESSIONAL_ONLY";
+export type SafetyClass = "SAFE_USER_CHECK" | "CAUTION" | "PROFESSIONAL_ONLY" | "STOP_USE";
 
 export type FixCause = {
   id: string;
@@ -77,6 +77,23 @@ export type DiagnosisState = {
 
 export type RankedCause = FixCause & {
   probability: number;
+  likelihood_label: "High likelihood" | "Medium likelihood" | "Possible";
+  probability_is_calibrated: boolean;
+};
+
+export type OutcomeId =
+  | "cleaned_filter"
+  | "replaced_valve"
+  | "hose_issue"
+  | "technician_repair"
+  | "other";
+
+export type OutcomeRecord = {
+  profile_id: string;
+  cause_id?: string;
+  outcome: OutcomeId;
+  status: "REPORTED" | "VERIFIED" | "AGGREGATED";
+  at: string;
 };
 
 export type DiagnosisResult = {
@@ -89,4 +106,12 @@ export type DiagnosisResult = {
   why_this_question?: string;
   unknown: boolean;
   safety_ceiling: SafetyClass;
+  rule_version: string;
+  display_probabilities: boolean;
+  trace: {
+    facts: string[];
+    relations: string[];
+    rules: string[];
+    sources: string[];
+  };
 };

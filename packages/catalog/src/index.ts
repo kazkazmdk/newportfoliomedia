@@ -1,239 +1,25 @@
-import { GraphStore, type GraphEntity, type GraphRelation, type PageRecord } from "@penta/graph-core";
-import { structuredSimilarity } from "@penta/quality-gate";
-import { ALL_ERRORS, ALL_SYMPTOMS, allFixcodePages } from "@penta/fixcode";
-import { VEHICLES, allAutospecPages } from "@penta/autospec";
-import { DESTINATIONS, allWeartherePages } from "@penta/wearthere";
-import { DEVICES, CHARGERS, CABLES, allChargematchPages } from "@penta/chargematch";
-import { ROUTES, allTripcostPages } from "@penta/tripcost";
-import type { ConfidenceLevel } from "@penta/data-provenance";
-
-function entity(
-  partial: Omit<GraphEntity, "created_at" | "updated_at" | "provenance"> & { provenance?: GraphEntity["provenance"] },
-): GraphEntity {
-  return {
-    provenance: [],
-    created_at: "2026-09-01T00:00:00.000Z",
-    updated_at: "2026-09-01T00:00:00.000Z",
-    ...partial,
-  };
-}
-
-function rel(partial: GraphRelation): GraphRelation {
-  return partial;
-}
+import { GraphStore, type PageRecord } from "@penta/graph-core";
+import { classifyDemand, intentSimilarity, opportunityScore, type DemandSourceKind } from "@penta/quality-gate";
+import { allFixcodePages } from "@penta/fixcode";
+import { allAutospecPages } from "@penta/autospec";
+import { allWeartherePages } from "@penta/wearthere";
+import { allChargematchPages } from "@penta/chargematch";
+import { allTripcostPages } from "@penta/tripcost";
+import { globalNoindex } from "@penta/publishing-core";
+import { SITE_AI_TOOLS } from "@penta/ai-core";
+import { isFresh } from "@penta/data-provenance";
+import { populateDecisionGraph } from "./graph-depth";
 
 let cached: GraphStore | null = null;
+
+export function resetCatalogCache() {
+  cached = null;
+}
 
 export function buildCatalog(): GraphStore {
   if (cached) return cached;
   const store = new GraphStore();
-
-  for (const profile of ALL_ERRORS) {
-    store.addEntity(
-      entity({
-        id: profile.id,
-        site: "fixcode",
-        type: "error_code",
-        slug: `${profile.brand_slug}/${profile.appliance_slug}/${profile.code_slug}`,
-        name: `${profile.brand} ${profile.appliance} ${profile.code}`,
-        properties: { meaning: profile.meaning, models: profile.models },
-        provenance: profile.provenance,
-        confidence: profile.confidence,
-      }),
-    );
-    for (const cause of profile.causes) {
-      const id = `${profile.id}:cause:${cause.id}`;
-      store.addEntity(
-        entity({
-          id,
-          site: "fixcode",
-          type: "cause",
-          slug: cause.id,
-          name: cause.name,
-          properties: { prior: cause.prior, safety: cause.safety },
-          confidence: profile.confidence,
-        }),
-      );
-      store.addRelation(
-        rel({
-          id: `${profile.id}->${cause.id}`,
-          site: "fixcode",
-          type: "has_cause",
-          from_id: profile.id,
-          to_id: id,
-          properties: { prior: cause.prior },
-          provenance: profile.provenance,
-          confidence: profile.confidence,
-          index_eligible: true,
-        }),
-      );
-    }
-  }
-  for (const symptom of ALL_SYMPTOMS) {
-    store.addEntity(
-      entity({
-        id: symptom.id,
-        site: "fixcode",
-        type: "symptom",
-        slug: symptom.symptom_slug,
-        name: `${symptom.brand} ${symptom.appliance} ${symptom.symptom}`,
-        properties: { likely_codes: symptom.likely_codes },
-        provenance: symptom.provenance,
-        confidence: symptom.confidence,
-      }),
-    );
-  }
-
-  for (const vehicle of VEHICLES) {
-    store.addEntity(
-      entity({
-        id: vehicle.id,
-        site: "autospec",
-        type: "vehicle",
-        slug: `${vehicle.make_slug}/${vehicle.generation_slug}/${vehicle.variant_slug}`,
-        name: `${vehicle.make} ${vehicle.model} ${vehicle.generation} ${vehicle.variant}`,
-        properties: { engine: vehicle.engine_code, years: vehicle.years },
-        confidence: vehicle.confidence,
-      }),
-    );
-    store.addRelation(
-      rel({
-        id: `${vehicle.id}->oil`,
-        site: "autospec",
-        type: "requires_fluid",
-        from_id: vehicle.id,
-        to_id: vehicle.id,
-        properties: vehicle.oil,
-        provenance: [],
-        confidence: vehicle.confidence,
-        index_eligible: vehicle.oil.capacity_liters > 0,
-      }),
-    );
-  }
-
-  for (const dest of DESTINATIONS) {
-    store.addEntity(
-      entity({
-        id: dest.id,
-        site: "wearthere",
-        type: "destination",
-        slug: dest.slug,
-        name: dest.city,
-        properties: { country: dest.country, lat: dest.lat, lon: dest.lon },
-        confidence: "HIGH",
-      }),
-    );
-    for (const month of dest.climate) {
-      store.addRelation(
-        rel({
-          id: `${dest.id}:climate:${month.month}`,
-          site: "wearthere",
-          type: "typical_climate",
-          from_id: dest.id,
-          to_id: dest.id,
-          properties: { month: month.month, tmin: month.tmin_c, tmax: month.tmax_c, rain_days: month.rain_days },
-          provenance: [],
-          confidence: "HIGH",
-          index_eligible: dest.demand >= 50,
-        }),
-      );
-    }
-  }
-
-  for (const device of DEVICES) {
-    store.addEntity(
-      entity({
-        id: device.id,
-        site: "chargematch",
-        type: "device",
-        slug: device.slug,
-        name: device.name,
-        properties: { max_watts: device.max_watts },
-        confidence: "HIGH",
-      }),
-    );
-  }
-  for (const charger of CHARGERS) {
-    store.addEntity(
-      entity({
-        id: charger.id,
-        site: "chargematch",
-        type: "charger",
-        slug: charger.slug,
-        name: charger.name,
-        properties: { total_watts: charger.total_watts },
-        confidence: charger.tag === "PROTOCOL_INFERRED" ? "MEDIUM" : "HIGH",
-      }),
-    );
-  }
-  for (const cable of CABLES) {
-    store.addEntity(
-      entity({
-        id: cable.id,
-        site: "chargematch",
-        type: "cable",
-        slug: cable.slug,
-        name: cable.name,
-        properties: { max_watts: cable.max_watts, e_marker: cable.e_marker },
-        confidence: (cable.tag === "UNKNOWN" ? "UNKNOWN" : "HIGH") as ConfidenceLevel,
-      }),
-    );
-  }
-  for (const device of DEVICES) {
-    for (const charger of CHARGERS) {
-      store.addRelation(
-        rel({
-          id: `${device.id}~${charger.id}`,
-          site: "chargematch",
-          type: "can_charge",
-          from_id: charger.id,
-          to_id: device.id,
-          properties: { graph_only: true },
-          provenance: [],
-          confidence: "MEDIUM",
-          index_eligible: false,
-        }),
-      );
-    }
-  }
-
-  for (const route of ROUTES) {
-    store.addEntity(
-      entity({
-        id: route.id,
-        site: "tripcost",
-        type: "route",
-        slug: `${route.from.slug}-to-${route.to.slug}`,
-        name: `${route.from.name} → ${route.to.name}`,
-        properties: { km: route.km },
-        confidence: "MEDIUM",
-      }),
-    );
-    for (const mode of ["car", "ev", "train", "bus", "flight", "rideshare"] as const) {
-      const available =
-        mode === "car" ||
-        mode === "ev" ||
-        (mode === "train" && route.train_eur_pp > 0) ||
-        (mode === "bus" && route.bus_eur_pp > 0) ||
-        (mode === "flight" && route.flight_eur_pp > 0) ||
-        (mode === "rideshare" && route.rideshare_eur > 0);
-      if (!available) continue;
-      store.addRelation(
-        rel({
-          id: `${route.id}:${mode}`,
-          site: "tripcost",
-          type: "has_mode",
-          from_id: route.id,
-          to_id: route.id,
-          properties: { mode, graph_only: true },
-          provenance: [],
-          confidence: "MEDIUM",
-          index_eligible: false,
-        }),
-      );
-    }
-  }
-
+  populateDecisionGraph(store);
   const pages = [
     ...allFixcodePages(),
     ...allAutospecPages(),
@@ -246,6 +32,58 @@ export function buildCatalog(): GraphStore {
   return store;
 }
 
+export type DuplicateAction = "KEEP" | "MERGE" | "NOINDEX";
+
+export function duplicateReport(threshold = 0.8) {
+  const store = buildCatalog();
+  const pages = [...store.pages.values()];
+  const rows: Array<{
+    a: string;
+    b: string;
+    similarity: number;
+    distinct_a?: string;
+    distinct_b?: string;
+    action: DuplicateAction;
+  }> = [];
+  for (let i = 0; i < pages.length; i++) {
+    for (let j = i + 1; j < pages.length; j++) {
+      if (pages[i].site !== pages[j].site) continue;
+      const sim = intentSimilarity(pages[i], pages[j]);
+      if (sim < threshold) continue;
+      const distinct_a = String(pages[i].structured_payload.distinct_reason ?? "");
+      const distinct_b = String(pages[j].structured_payload.distinct_reason ?? "");
+      const hasDistinct = Boolean(distinct_a || distinct_b);
+      rows.push({
+        a: pages[i].url,
+        b: pages[j].url,
+        similarity: Math.round(sim * 1000) / 1000,
+        distinct_a: distinct_a || undefined,
+        distinct_b: distinct_b || undefined,
+        action: hasDistinct ? "KEEP" : sim >= 0.92 ? "MERGE" : "NOINDEX",
+      });
+    }
+  }
+  return rows;
+}
+
+function connectivity(store: GraphStore) {
+  const degree = new Map<string, number>();
+  for (const id of store.entities.keys()) degree.set(id, 0);
+  for (const rel of store.relations.values()) {
+    degree.set(rel.from_id, (degree.get(rel.from_id) ?? 0) + 1);
+    degree.set(rel.to_id, (degree.get(rel.to_id) ?? 0) + 1);
+  }
+  const buckets = { ORPHAN: 0, LOW_DEPTH: 0, CONNECTED: 0, RICH: 0 };
+  for (const entity of store.entities.values()) {
+    const n = degree.get(entity.id) ?? 0;
+    if (n === 0) buckets.ORPHAN += 1;
+    else if (n === 1) buckets.LOW_DEPTH += 1;
+    else if (n < 6) buckets.CONNECTED += 1;
+    else buckets.RICH += 1;
+  }
+  return buckets;
+}
+
 export function launchReport() {
   const store = buildCatalog();
   const sites = ["fixcode", "autospec", "wearthere", "chargematch", "tripcost"] as const;
@@ -255,22 +93,20 @@ export function launchReport() {
   const avg =
     indexable.reduce((s, p) => s + p.quality_score, 0) / Math.max(1, indexable.length);
   const min = Math.min(...indexable.map((p) => p.quality_score), 100);
-  const duplicates: Array<[PageRecord, PageRecord, number]> = [];
-  for (let i = 0; i < pages.length; i++) {
-    for (let j = i + 1; j < pages.length; j++) {
-      if (pages[i].site !== pages[j].site) continue;
-      const sim = structuredSimilarity(pages[i].structured_payload, pages[j].structured_payload);
-      if (sim >= 0.92 && pages[i].canonical !== pages[j].canonical) {
-        duplicates.push([pages[i], pages[j], sim]);
-      }
-    }
-  }
+  const dups = duplicateReport(0.85);
+  const stale = [...store.relations.values()].filter((rel) => {
+    const until = rel.provenance[0]?.valid_until;
+    return until ? new Date(until).getTime() < Date.now() : false;
+  }).length;
   return {
     graph: store.stats(),
     bySite,
+    connectivity: connectivity(store),
     average_indexable_quality: Math.round(avg * 10) / 10,
     minimum_indexable_quality: min,
-    duplicate_candidates: duplicates.length,
+    duplicate_candidates: dups.length,
+    duplicates_without_distinct_reason: dups.filter((row) => row.action !== "KEEP").length,
+    stale_relations: stale,
     families: Object.fromEntries(
       sites.map((site) => {
         const fam: Record<string, number> = {};
@@ -280,6 +116,38 @@ export function launchReport() {
         return [site, fam];
       }),
     ),
+    public_site_live: process.env.PUBLIC_SITE_LIVE === "true",
+    global_noindex: globalNoindex(),
+  };
+}
+
+export function pageExplainability(page: PageRecord) {
+  return {
+    url: page.url,
+    why_indexable:
+      page.index_state === "INDEXABLE"
+        ? "Hard gates passed, unique structured facts, product CTA, provenance present. Demand may still be editorial."
+        : page.index_state,
+    quality_score: page.quality_score,
+    demand: page.search_demand,
+    entity_ids: page.entity_ids,
+    distinct_reason: page.structured_payload.distinct_reason ?? null,
+    freshness: page.freshness,
+  };
+}
+
+export function entityInspector(id: string) {
+  const store = buildCatalog();
+  const entity = store.get(id);
+  if (!entity) return null;
+  const incoming = [...store.relations.values()].filter((rel) => rel.to_id === id);
+  const outgoing = [...store.relations.values()].filter((rel) => rel.from_id === id);
+  const pages = [...store.pages.values()].filter((page) => page.entity_ids.includes(id));
+  return {
+    entity,
+    incoming,
+    outgoing,
+    pages: pages.map((page) => ({ url: page.url, index_state: page.index_state, quality_score: page.quality_score })),
   };
 }
 
@@ -287,6 +155,7 @@ export function programmaticSeoIssues() {
   const store = buildCatalog();
   const issues: string[] = [];
   const titles = new Map<string, string>();
+  const canonicals = new Map<string, string>();
   for (const page of store.pages.values()) {
     if (page.index_state !== "INDEXABLE") continue;
     if (page.quality_score < 75) issues.push(`${page.url} quality ${page.quality_score} < 75`);
@@ -294,10 +163,267 @@ export function programmaticSeoIssues() {
     const prev = titles.get(page.title);
     if (prev) issues.push(`Duplicate title "${page.title}" on ${prev} and ${page.url}`);
     titles.set(page.title, page.url);
+    const seenCanon = canonicals.get(page.canonical);
+    if (seenCanon && seenCanon !== page.url) issues.push(`Duplicate canonical ${page.canonical}`);
+    canonicals.set(page.canonical, page.url);
     if (page.canonical.includes("localhost") || page.canonical.includes("vercel.app")) {
       issues.push(`${page.url} preview canonical`);
     }
     if (!page.freshness) issues.push(`${page.url} missing freshness`);
+    if (page.noindex) issues.push(`${page.url} INDEXABLE but noindex flag`);
+  }
+  if (!globalNoindex() && process.env.PUBLIC_SITE_LIVE !== "true") {
+    issues.push("PUBLIC_SITE_LIVE unexpectedly true");
   }
   return issues;
 }
+
+export function coverageReport() {
+  const store = buildCatalog();
+  return {
+    fixcode: {
+      brands: store.byType("fixcode", "brand").length,
+      models: store.byType("fixcode", "model_family").length,
+      error_codes: store.byType("fixcode", "error_code").length,
+      symptoms: store.byType("fixcode", "symptom").length,
+      causes: store.byType("fixcode", "cause").length,
+      tests: store.byType("fixcode", "test").length,
+      fixes: store.byType("fixcode", "fix").length,
+      outcomes: store.byType("fixcode", "outcome").length,
+    },
+    autospec: {
+      models: store.byType("autospec", "model").length,
+      generations: store.byType("autospec", "generation").length,
+      configurations: store.byType("autospec", "vehicle_configuration").length,
+      engines: store.byType("autospec", "engine").length,
+      fluids: store.byType("autospec", "fluid_spec").length,
+      services: store.byType("autospec", "service").length,
+      components: store.byType("autospec", "component").length,
+      markets: store.byType("autospec", "market").length,
+      fitments: [...store.relations.values()].filter((r) => r.site === "autospec" && r.type === "FITS").length,
+      recalls: store.byType("autospec", "recall").length,
+    },
+    wearthere: {
+      destinations: store.byType("wearthere", "destination").length,
+      climate_records: store.byType("wearthere", "historical_climate").length,
+      garments: store.byType("wearthere", "garment").length,
+      packing_relations: [...store.relations.values()].filter((r) => r.site === "wearthere" && r.type === "PACKS").length,
+    },
+    chargematch: {
+      devices: store.byType("chargematch", "device").length,
+      chargers: store.byType("chargematch", "charger").length,
+      ports: store.byType("chargematch", "charger_port").length,
+      cables: store.byType("chargematch", "cable").length,
+      protocols: store.byType("chargematch", "protocol").length,
+      compatibility: [...store.relations.values()].filter((r) => r.site === "chargematch" && r.type === "CAN_CHARGE").length,
+      expected_power: [...store.relations.values()].filter((r) => r.site === "chargematch" && r.type === "EXPECTED_POWER").length,
+      lab_measurements: [...store.relations.values()].filter((r) => r.site === "chargematch" && r.type === "MEASURED_AT" && r.properties.lab === true).length,
+    },
+    tripcost: {
+      corridors: store.byType("tripcost", "corridor").length,
+      modes: store.byType("tripcost", "mode").length,
+      cost_components: store.byType("tripcost", "cost_component").length,
+    },
+  };
+}
+
+export type AiUsageClass = "NECESSARY" | "OPTIONAL" | "SHOULD_BE_DETERMINISTIC";
+
+export const AI_USAGE_AUDIT: Array<{ fn: string; site: string; classification: AiUsageClass; status: string }> = [
+  { fn: "oil / capacity lookup", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "deterministic graph lookup; no LLM" },
+  { fn: "fitment", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "OEM row only; LOW/UNKNOWN never shown as compatible" },
+  { fn: "VIN decode", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "MockVinProvider stub — not a licensed VIN API" },
+  { fn: "climate normals", site: "wearthere", classification: "SHOULD_BE_DETERMINISTIC", status: "compiled monthly normals" },
+  { fn: "Open-Meteo forecast", site: "wearthere", classification: "OPTIONAL", status: "live HTTP optional; never mixed into historical climate" },
+  { fn: "packing optimizer", site: "wearthere", classification: "SHOULD_BE_DETERMINISTIC", status: "packing-v1 property rules" },
+  { fn: "USB-PD compatibility", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "compatibility-v2 min(device,port,cable)" },
+  { fn: "lab watt measurement", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "not present; EXPECTED_POWER is inferred overlap, not MEASURED_AT" },
+  { fn: "route compare", site: "tripcost", classification: "SHOULD_BE_DETERMINISTIC", status: "tripcost-v1 seed fares + door-to-door buffers" },
+  { fn: "diagnose()", site: "fixcode", classification: "SHOULD_BE_DETERMINISTIC", status: "diagnostic-v3 document priors; % hidden until VERIFIED outcomes" },
+  { fn: "explainDiagnosis", site: "fixcode", classification: "OPTIONAL", status: "template over ranked causes; no model call in this pass" },
+  { fn: "visionGuard / scan", site: "fixcode", classification: "NECESSARY", status: "upload gated; vision not executed without confirmation" },
+];
+
+export const DATA_LICENSING = [
+  { source_id: "fixcode-support-corpus", commercial_reuse: "restricted-compilation", caching: "allowed", redistribution: "no-verbatim-manuals", attribution: "manufacturer support URLs" },
+  { source_id: "oem-handbook", commercial_reuse: "facts-only", caching: "allowed", redistribution: "no-scan-of-handbook", attribution: "manufacturer" },
+  { source_id: "oem-power-specs", commercial_reuse: "facts-only", caching: "months", redistribution: "no-datasheet-dump", attribution: "manufacturer PDO tables" },
+  { source_id: "climate-normals-compiled", commercial_reuse: "compiled-normals", caching: "long", redistribution: "aggregates-ok", attribution: "climate normals compilation" },
+  { source_id: "seed-transport-snapshot", commercial_reuse: "estimates-only", caching: "hours-when-live", redistribution: "not-live-tickets", attribution: "snapshot, not a GDS" },
+  { source_id: "open-meteo", commercial_reuse: "check-terms-before-prod", caching: "hours", redistribution: "provider-terms", attribution: "Open-Meteo if forecast used" },
+];
+
+export const PROVIDER_HEALTH = [
+  { provider: "Open-Meteo", last_success: null as string | null, last_failure: null as string | null, error_rate: null as number | null, latency_ms: null as number | null, quota: "fair-use", notes: "Optional forecast only. Not pinged at build." },
+  { provider: "MockVinProvider", last_success: "stub", last_failure: null, error_rate: null, latency_ms: 0, quota: "n/a", notes: "Not a licensed VIN decoder." },
+  { provider: "seed-transport-snapshot", last_success: "2026-09-01", last_failure: null, error_rate: 0, latency_ms: 0, quota: "n/a", notes: "Static fares/fuel. No live rail/flight API." },
+  { provider: "oem-power-specs", last_success: "2026-06-01", last_failure: null, error_rate: 0, latency_ms: 0, quota: "n/a", notes: "Compiled PDOs. No lab harness." },
+];
+
+export function freshnessBuckets() {
+  const store = buildCatalog();
+  const buckets = { fresh: 0, aging: 0, stale: 0, expired: 0 };
+  for (const rel of store.relations.values()) {
+    const rec = rel.provenance[0];
+    if (!rec) {
+      buckets.stale += 1;
+      continue;
+    }
+    if (rec.valid_until && !isFresh(rec)) {
+      buckets.expired += 1;
+      continue;
+    }
+    const ageDays = (Date.now() - new Date(rec.retrieved_at).getTime()) / 86400000;
+    if (ageDays < 45) buckets.fresh += 1;
+    else if (ageDays < 180) buckets.aging += 1;
+    else buckets.stale += 1;
+  }
+  return buckets;
+}
+
+export function demandBreakdown() {
+  const store = buildCatalog();
+  const counts: Record<DemandSourceKind, number> = {
+    GSC_OBSERVED: 0,
+    KEYWORD_PROVIDER: 0,
+    AUTOCOMPLETE: 0,
+    SERP_EXISTENCE: 0,
+    INTERNAL_SEARCH: 0,
+    EDITORIAL_JUDGMENT: 0,
+    UNKNOWN: 0,
+  };
+  for (const page of store.pages.values()) {
+    if (page.index_state !== "INDEXABLE") continue;
+    counts.EDITORIAL_JUDGMENT += 1;
+    void page;
+  }
+  return counts;
+}
+
+export function pageQualityReport() {
+  const store = buildCatalog();
+  const dups = duplicateReport(0.8);
+  return [...store.pages.values()].map((page) => {
+    const sibling = dups.find((row) => row.a === page.url || row.b === page.url);
+    const weakness =
+      page.index_state === "INDEXABLE" && page.quality_score >= 85
+        ? "STRONG"
+        : page.index_state === "INDEXABLE"
+          ? "OK"
+          : page.index_state === "NOINDEX_PRODUCT"
+            ? "WEAK"
+            : sibling && sibling.action !== "KEEP"
+              ? "DUPLICATE"
+              : "UNSUPPORTED";
+    return {
+      site: page.site,
+      url: page.url,
+      quality_score: page.quality_score,
+      index_state: page.index_state,
+      demand: page.search_demand,
+      demand_kind: "EDITORIAL_JUDGMENT" as DemandSourceKind,
+      structured_data_count: Object.keys(page.structured_payload).length,
+      closest_sibling: sibling ? (sibling.a === page.url ? sibling.b : sibling.a) : null,
+      similarity: sibling?.similarity ?? null,
+      source_count: page.entity_ids.length,
+      distinct_reason: page.structured_payload.distinct_reason ?? null,
+      weakness,
+    };
+  });
+}
+
+export function opportunityQueue() {
+  return [
+    {
+      site: "fixcode",
+      query: "Whirlpool washer F8 E1",
+      action: "DO_NOT_AUTO_CREATE — no verified brand dataset",
+      score: opportunityScore({
+        search_demand: 70,
+        data_completeness: 5,
+        monetization_potential: 70,
+        product_utility: 90,
+        competition_difficulty: 40,
+        data_gap: 95,
+        acquisition_cost: 80,
+      }),
+    },
+    {
+      site: "chargematch",
+      query: "independent lab watts for Anker 100W + Steam Deck",
+      action: "MEASURE — do not publish as independently tested",
+      score: opportunityScore({
+        search_demand: 75,
+        data_completeness: 40,
+        monetization_potential: 60,
+        product_utility: 90,
+        competition_difficulty: 45,
+        data_gap: 80,
+        acquisition_cost: 50,
+      }),
+    },
+    {
+      site: "tripcost",
+      query: "live SNCF Paris–Lyon fares",
+      action: "CONTRACT API — keep snapshot label until then",
+      score: opportunityScore({
+        search_demand: 88,
+        data_completeness: 30,
+        monetization_potential: 80,
+        product_utility: 85,
+        competition_difficulty: 55,
+        data_gap: 90,
+        acquisition_cost: 70,
+      }),
+    },
+  ].sort((a, b) => b.score - a.score);
+}
+
+export function publicationLayer(page: PageRecord) {
+  if (page.index_state === "GRAPH_ONLY") return "GRAPH_ONLY";
+  if (page.index_state === "NOINDEX_PRODUCT") return "PRODUCT_ONLY";
+  if (page.index_state === "INDEXABLE" && page.publish_state !== "PUBLISHED") return "SEO_CANDIDATE";
+  if (page.index_state === "INDEXABLE") return "INDEXABLE";
+  return page.index_state;
+}
+
+export function currentManifest() {
+  return [...buildCatalog().pages.values()].map((page) => page.url).sort();
+}
+
+export function staleGeneratedRoutes(previous: string[], current = currentManifest()) {
+  return previous.filter((url) => !current.includes(url));
+}
+
+export function sitemapConsistencyIssues() {
+  const live = process.env.PUBLIC_SITE_LIVE === "true";
+  if (!live) {
+    return { issues: [] as string[], note: "PUBLIC_SITE_LIVE=false — sitemap must stay empty; prelaunch noindex." };
+  }
+  const issues: string[] = [];
+  for (const page of buildCatalog().pages.values()) {
+    if (page.index_state === "INDEXABLE" && page.publish_state === "PUBLISHED" && !page.noindex) {
+      if (page.canonical !== page.url) issues.push(`${page.url} canonical mismatch`);
+    }
+  }
+  return { issues, note: "live mode" };
+}
+
+export function fullOpsPayload() {
+  return {
+    launch: launchReport(),
+    coverage: coverageReport(),
+    demand: demandBreakdown(),
+    freshness: freshnessBuckets(),
+    duplicates: duplicateReport(0.8).slice(0, 50),
+    opportunity: opportunityQueue(),
+    ai_usage: AI_USAGE_AUDIT,
+    licensing: DATA_LICENSING,
+    providers: PROVIDER_HEALTH,
+    tools_declared: SITE_AI_TOOLS,
+    sitemap: sitemapConsistencyIssues(),
+  };
+}
+
+export { populateDecisionGraph, entity, rel } from "./graph-depth";
+export { classifyDemand };

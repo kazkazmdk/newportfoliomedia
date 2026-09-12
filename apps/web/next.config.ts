@@ -17,6 +17,15 @@ const nextConfig: NextConfig = {
     "@penta/wearthere",
   ],
   images: { unoptimized: true },
+  async headers() {
+    if (process.env.PUBLIC_SITE_LIVE === "true") return [];
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

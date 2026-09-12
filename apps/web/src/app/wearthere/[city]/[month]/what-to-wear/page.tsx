@@ -31,30 +31,36 @@ export default async function WearMonthPage({ params }: { params: Promise<{ city
   const cap = capsuleFor(dest, monthIdx, "classic");
   return (
     <main>
-      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">Typical weather — not a forecast</p>
+      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">Typical {month} climate — not a forecast</p>
       <h1 className="mt-3 text-5xl md:text-6xl">
         What to Wear in {dest.city} in {month[0].toUpperCase() + month.slice(1)}
       </h1>
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <article className="wt-card p-6 md:col-span-2">
-          <p className="font-[family-name:var(--font-wt-serif)] text-5xl">
+      <div className="mt-8 grid gap-4 md:grid-cols-[1.4fr_1fr]">
+        <article className="wt-card p-6">
+          <p className="text-sm tracking-[0.14em] uppercase text-[#8a4b32]">Typical {month[0].toUpperCase() + month.slice(1)} climate</p>
+          <p className="mt-3 font-[family-name:var(--font-wt-serif)] text-5xl">
             {w.tmin_c}–{w.tmax_c}°C
           </p>
-          <p className="mt-3">About {w.rain_days} rain days · {w.rain_mm} mm</p>
-          <p className="mt-2 text-sm leading-6">
-            Historical climate for the month. If you already have dates, build a packing list from the actual forecast when it exists.
+          <p className="mt-3 text-lg">Range, not today / tomorrow</p>
+          <p className="mt-2">About {w.rain_days} rain days · {w.rain_mm} mm monthly normal</p>
+          <p className="mt-3 text-sm leading-6">
+            Historical climate for the month. No hourly forecast on this public page. Exact trip dates stay private.
           </p>
         </article>
         <article className="wt-card p-6">
-          <p className="text-sm">Capsule</p>
+          <p className="text-sm">Capsule · packing-v1</p>
           <p className="mt-2 font-[family-name:var(--font-wt-serif)] text-4xl">{cap.pieces.length} pieces</p>
-          <p>{cap.outfits} outfits</p>
+          <p>{cap.outfits} outfits · weather coverage {cap.coverage.weather_coverage}%</p>
+          <p className="mt-2 text-sm">Activity coverage {cap.coverage.activity_coverage}%</p>
         </article>
       </div>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {cap.pieces.map((p) => (
           <li key={p.id} className="wt-card p-4">
             <p className="font-[family-name:var(--font-wt-serif)] text-2xl">{p.name}</p>
+            <p className="mt-2 text-sm leading-6">
+              warmth {p.warmth} · rain {p.water_resistance} · wind {p.wind_resistance} · {p.layer}
+            </p>
           </li>
         ))}
       </ul>

@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { checkFitment, getVehicle, nextService } from "@penta/autospec";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  const limited = rateLimit(`autospec:${clientKey(request)}`, 40);
+  if (!limited.ok) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const body = (await request.json()) as {
     make?: string;
     model?: string;
@@ -24,6 +27,8 @@ export async function POST(request: Request) {
   }
   return NextResponse.json({
     vehicle: vehicle.id,
+    engine: vehicle.engine_code,
+    market: vehicle.market,
     schedule: nextService(vehicle, body.km ?? 0, 12),
   });
 }

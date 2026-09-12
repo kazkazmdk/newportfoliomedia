@@ -7,7 +7,9 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@penta/ai-core": "workspace:*",
     "@penta/autospec": "workspace:*",
+    "@penta/data-provenance": "workspace:*",
     "@penta/chargematch": "workspace:*",
     "@penta/fixcode": "workspace:*",
     "@penta/graph-core": "workspace:*",

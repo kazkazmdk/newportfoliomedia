@@ -85,12 +85,12 @@ export default async function ErrorPage({
         Start diagnosis
       </Link>
       <section className="mt-12">
-        <h2 className="text-sm tracking-[0.14em] uppercase">Most likely causes</h2>
+        <h2 className="text-sm tracking-[0.14em] uppercase">Common possibilities</h2>
         <ol className="mt-4 grid gap-3">
           {profile.causes.map((cause, index) => (
             <li key={cause.id} className="border border-[#e2ddd4] bg-[#fffcf7] p-4">
               <p>
-                {index + 1}. {cause.name} · {Math.round(cause.prior * 100)}% prior
+                {index + 1}. {cause.name}
               </p>
               <p className="mt-2 text-sm leading-6 text-[#555]">{cause.summary}</p>
               <p className="mt-2 text-sm">

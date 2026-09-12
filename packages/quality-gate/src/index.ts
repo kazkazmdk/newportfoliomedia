@@ -12,12 +12,49 @@ export type QualityDimension =
 
 export type QualityBreakdown = Record<QualityDimension, number>;
 
+export type DemandSourceKind =
+  | "GSC_OBSERVED"
+  | "KEYWORD_PROVIDER"
+  | "AUTOCOMPLETE"
+  | "SERP_EXISTENCE"
+  | "INTERNAL_SEARCH"
+  | "EDITORIAL_JUDGMENT"
+  | "UNKNOWN";
+
+export type DemandClassification = {
+  kind: DemandSourceKind;
+  score: number;
+  confidence: ConfidenceLevel;
+};
+
+export type HardGateId =
+  | "unique_structured_data"
+  | "valid_source"
+  | "no_critical_unknown"
+  | "not_duplicate"
+  | "valid_canonical_fields"
+  | "no_invented_claims"
+  | "no_safety_issue"
+  | "no_llm_filler"
+  | "not_year_only"
+  | "not_city_without_specifics"
+  | "not_obscure_without_demand"
+  | "not_forecast_as_climate"
+  | "not_llm_safety_claim"
+  | "not_stale_as_current"
+  | "engine_determined"
+  | "causes_sourced";
+
+export type HardGateResult = { id: HardGateId; passed: boolean; detail: string };
+
 export type QualityResult = {
   score: number;
   breakdown: QualityBreakdown;
   index_state: "INDEXABLE" | "NOINDEX_PRODUCT" | "GRAPH_ONLY";
   reasons: string[];
   blockers: string[];
+  hard_gates: HardGateResult[];
+  demand: DemandClassification;
 };
 
 export type SearchDemandEvidence = {
@@ -51,6 +88,13 @@ export type PageQualityInput = {
   freshness_days: number;
   freshness_ttl_days: number;
   provenance_valid: boolean;
+  hub_necessity?: boolean;
+  distinct_reason?: string;
+  forecast_as_climate?: boolean;
+  llm_safety_claim?: boolean;
+  stale_presented_as_current?: boolean;
+  engine_undetermined?: boolean;
+  causes_without_source?: boolean;
   site_rules?: (input: PageQualityInput) => { delta: number; reasons: string[]; blockers: string[] };
 };
 
@@ -64,29 +108,35 @@ const DIMENSION_MAX: QualityBreakdown = {
   freshness: 5,
 };
 
-export function searchDemandScore(evidence: SearchDemandEvidence): number {
-  const weights: Array<[keyof SearchDemandEvidence, number]> = [
-    ["gsc", 1.2],
-    ["internal_search", 1.1],
-    ["user_questions", 1.1],
-    ["autocomplete", 0.9],
-    ["keyword_provider", 0.8],
-    ["competitor_coverage", 0.7],
-    ["impression_discovery", 0.8],
-    ["related_queries", 0.6],
-    ["seed_research", 0.5],
-  ];
-  let weighted = 0;
-  let mass = 0;
-  for (const [key, weight] of weights) {
-    const value = evidence[key];
-    if (typeof value === "number") {
-      weighted += Math.max(0, Math.min(100, value)) * weight;
-      mass += weight;
-    }
+export function classifyDemand(evidence: SearchDemandEvidence): DemandClassification {
+  if (typeof evidence.gsc === "number") {
+    return { kind: "GSC_OBSERVED", score: clamp100(evidence.gsc), confidence: evidence.gsc >= 60 ? "HIGH" : "MEDIUM" };
   }
-  if (mass === 0) return 0;
-  return Math.round(weighted / mass);
+  if (typeof evidence.internal_search === "number" || typeof evidence.user_questions === "number") {
+    const score = clamp100(evidence.internal_search ?? evidence.user_questions ?? 0);
+    return { kind: "INTERNAL_SEARCH", score, confidence: score >= 60 ? "HIGH" : "MEDIUM" };
+  }
+  if (typeof evidence.keyword_provider === "number") {
+    return { kind: "KEYWORD_PROVIDER", score: clamp100(evidence.keyword_provider), confidence: "MEDIUM" };
+  }
+  if (typeof evidence.autocomplete === "number") {
+    return { kind: "AUTOCOMPLETE", score: clamp100(evidence.autocomplete), confidence: "MEDIUM" };
+  }
+  if (typeof evidence.competitor_coverage === "number") {
+    return { kind: "SERP_EXISTENCE", score: clamp100(evidence.competitor_coverage), confidence: "MEDIUM" };
+  }
+  if (typeof evidence.seed_research === "number") {
+    return {
+      kind: "EDITORIAL_JUDGMENT",
+      score: Math.min(40, Math.round(evidence.seed_research * 0.4)),
+      confidence: "LOW",
+    };
+  }
+  return { kind: "UNKNOWN", score: 0, confidence: "UNKNOWN" };
+}
+
+export function searchDemandScore(evidence: SearchDemandEvidence): number {
+  return classifyDemand(evidence).score;
 }
 
 export function opportunityScore(input: {
@@ -95,14 +145,20 @@ export function opportunityScore(input: {
   monetization_potential: number;
   product_utility: number;
   competition_difficulty: number;
+  data_gap?: number;
+  acquisition_cost?: number;
 }): number {
   const difficulty = Math.max(1, input.competition_difficulty);
+  const gap = input.data_gap ?? 50;
+  const acq = Math.max(1, input.acquisition_cost ?? 50);
   return Math.round(
     (input.search_demand *
       input.data_completeness *
       input.monetization_potential *
-      input.product_utility) /
+      input.product_utility *
+      gap) /
       difficulty /
+      acq /
       10000,
   );
 }
@@ -111,17 +167,74 @@ function clamp(value: number, max: number): number {
   return Math.max(0, Math.min(max, value));
 }
 
+function clamp100(value: number): number {
+  return Math.max(0, Math.min(100, value));
+}
+
+function gate(id: HardGateId, passed: boolean, detail: string): HardGateResult {
+  return { id, passed, detail };
+}
+
 export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   const reasons: string[] = [];
   const blockers: string[] = [];
+  const demand = classifyDemand(input.search_demand);
+  input = {
+    forecast_as_climate: false,
+    llm_safety_claim: false,
+    stale_presented_as_current: false,
+    engine_undetermined: false,
+    causes_without_source: false,
+    ...input,
+  };
+
+  const hard_gates: HardGateResult[] = [
+    gate("unique_structured_data", input.unique_fields >= 4, `${input.unique_fields} unique fields`),
+    gate("valid_source", input.provenance_valid, input.provenance_valid ? "provenance present" : "missing provenance"),
+    gate(
+      "no_critical_unknown",
+      demand.confidence !== "UNKNOWN" || Boolean(input.hub_necessity),
+      demand.kind,
+    ),
+    gate(
+      "not_duplicate",
+      !(input.near_duplicate && !input.distinct_reason),
+      input.distinct_reason ?? "no distinct_reason",
+    ),
+    gate("valid_canonical_fields", Boolean(input.family), input.family),
+    gate("no_invented_claims", !input.llm_filler, "llm_filler"),
+    gate("no_safety_issue", !input.llm_safety_claim, "llm safety claim"),
+    gate("no_llm_filler", !input.llm_filler, "filler"),
+    gate("not_year_only", !input.year_only_variant, "year-only variant"),
+    gate("not_city_without_specifics", !input.city_without_specifics, "city specifics"),
+    gate("not_obscure_without_demand", !input.obscure_without_demand, "obscure combo"),
+    gate("not_forecast_as_climate", !input.forecast_as_climate, "climate vs forecast"),
+    gate("not_llm_safety_claim", !input.llm_safety_claim, "safety"),
+    gate("not_stale_as_current", !input.stale_presented_as_current, "freshness claim"),
+    gate("engine_determined", !input.engine_undetermined, "engine identity"),
+    gate("causes_sourced", !input.causes_without_source, "cause sources"),
+  ];
+
+  for (const row of hard_gates) {
+    if (!row.passed) blockers.push(`HARD:${row.id}`);
+  }
+
+  if (input.llm_filler) blockers.push("LLM filler is forbidden");
+  if (!input.provenance_valid) blockers.push("Missing or invalid provenance");
+  if (input.year_only_variant) blockers.push("Year-only variant without technical change");
+  if (input.city_without_specifics) blockers.push("City page without destination-specific data");
+  if (input.obscure_without_demand) blockers.push("Obscure combination with unknown demand");
+  if (demand.kind === "EDITORIAL_JUDGMENT") {
+    reasons.push("Demand is editorial judgment — capped, not treated as observed search.");
+  }
+  if (demand.kind === "UNKNOWN") reasons.push("Search demand unknown — cannot auto-index");
 
   const unique = clamp(
     (input.unique_fields / 8) * DIMENSION_MAX.unique_structured_data,
     DIMENSION_MAX.unique_structured_data,
   );
-  const demand = searchDemandScore(input.search_demand);
   const intent = clamp(
-    (demand / 100) * DIMENSION_MAX.search_intent_evidence,
+    (demand.score / 100) * DIMENSION_MAX.search_intent_evidence,
     DIMENSION_MAX.search_intent_evidence,
   );
   let utility = input.product_cta ? 8 : 2;
@@ -134,6 +247,7 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   );
   let differentiation = input.distinct_from_parent ? 8 : 3;
   if (input.near_duplicate || input.year_only_variant) differentiation = 1;
+  if (input.distinct_reason) differentiation = Math.max(differentiation, 6);
   differentiation = clamp(differentiation, DIMENSION_MAX.differentiation);
 
   const confidenceScore =
@@ -150,13 +264,6 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     1 - input.freshness_days / Math.max(1, input.freshness_ttl_days * 2),
   );
   const freshness = clamp(freshnessRatio * 5, 5);
-
-  if (input.llm_filler) blockers.push("LLM filler is forbidden");
-  if (!input.provenance_valid) blockers.push("Missing or invalid provenance");
-  if (input.year_only_variant) blockers.push("Year-only variant without technical change");
-  if (input.city_without_specifics) blockers.push("City page without destination-specific data");
-  if (input.obscure_without_demand) blockers.push("Obscure combination with unknown demand");
-  if (demand === 0) reasons.push("Search demand unknown — cannot auto-index");
 
   const site = input.site_rules?.(input) ?? { delta: 0, reasons: [], blockers: [] };
   reasons.push(...site.reasons);
@@ -177,13 +284,13 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   );
   score = Math.max(0, Math.min(100, score));
 
+  const failedHard = hard_gates.some((g) => !g.passed) || site.blockers.length > 0;
   let index_state: QualityResult["index_state"] = "GRAPH_ONLY";
-  if (blockers.length === 0 && score >= 75) index_state = "INDEXABLE";
-  else if (blockers.length === 0 && score >= 60) index_state = "NOINDEX_PRODUCT";
+  if (!failedHard && score >= 75) index_state = "INDEXABLE";
+  else if (!failedHard && score >= 60) index_state = "NOINDEX_PRODUCT";
+  if (failedHard) index_state = "GRAPH_ONLY";
 
-  if (blockers.length > 0) index_state = "GRAPH_ONLY";
-
-  return { score, breakdown, index_state, reasons, blockers };
+  return { score, breakdown, index_state, reasons, blockers, hard_gates, demand };
 }
 
 function round1(value: number): number {
@@ -220,6 +327,12 @@ export function structuredSimilarity(
     if (JSON.stringify(a[key]) === JSON.stringify(b[key])) same += 1;
   }
   return same / keys.size;
+}
+
+export function intentSimilarity(a: PageRecord, b: PageRecord): number {
+  if (a.site !== b.site) return 0;
+  if (a.family !== b.family) return 0.2;
+  return structuredSimilarity(a.structured_payload, b.structured_payload);
 }
 
 export { confidenceLevelFromScore };

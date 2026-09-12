@@ -41,6 +41,11 @@ export type GraphRelation = {
   provenance: ProvenanceRecord[];
   confidence: ConfidenceLevel;
   index_eligible: boolean;
+  /** Used by a product engine to make a decision. Trivia links must stay false. */
+  decision_relevant: boolean;
+  inferred: boolean;
+  method?: string;
+  verified_at?: string;
 };
 
 export type PageFamily =
@@ -156,17 +161,43 @@ export class GraphStore {
     );
     const verifiedRelations = relations.filter(
       (relation) =>
-        relation.confidence === "HIGH" || relation.confidence === "MEDIUM",
+        !relation.inferred &&
+        (relation.confidence === "HIGH" || relation.confidence === "MEDIUM"),
     );
+    const inferredRelations = relations.filter((relation) => relation.inferred);
+    const unknownRelations = relations.filter((relation) => relation.confidence === "UNKNOWN");
+    const decisionRelations = relations.filter((relation) => relation.decision_relevant);
+    const degrees = new Map<string, number>();
+    for (const entity of entities) degrees.set(entity.id, 0);
+    for (const relation of relations) {
+      degrees.set(relation.from_id, (degrees.get(relation.from_id) ?? 0) + 1);
+      degrees.set(relation.to_id, (degrees.get(relation.to_id) ?? 0) + 1);
+    }
+    const orphanEntities = [...degrees.entries()].filter(([, n]) => n === 0).length;
+    const sourceCounts = entities.map((entity) => entity.provenance.length);
+    const relSourceCounts = relations.map((relation) => relation.provenance.length);
+    const avg = (nums: number[]) =>
+      nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 10) / 10 : 0;
+    const indexable = pages.filter((page) => page.index_state === "INDEXABLE").length;
     return {
       entities: entities.length,
       relations: relations.length,
       verified_relations: verifiedRelations.length,
+      inferred_relations: inferredRelations.length,
+      unknown_relations: unknownRelations.length,
+      decision_relevant_relations: decisionRelations.length,
+      relations_per_entity:
+        entities.length ? Math.round((relations.length / entities.length) * 100) / 100 : 0,
+      relations_per_indexable_page:
+        indexable ? Math.round((relations.length / indexable) * 100) / 100 : 0,
+      average_sources_per_entity: avg(sourceCounts),
+      average_sources_per_relation: avg(relSourceCounts),
+      orphan_entities: orphanEntities,
       low_confidence: [...entities, ...relations].filter(
         (item) => item.confidence === "LOW" || item.confidence === "UNKNOWN",
       ).length,
       pages: pages.length,
-      indexable: pages.filter((page) => page.index_state === "INDEXABLE").length,
+      indexable,
       noindex_product: pages.filter(
         (page) => page.index_state === "NOINDEX_PRODUCT",
       ).length,

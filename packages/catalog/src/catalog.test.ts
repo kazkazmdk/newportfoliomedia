@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { evaluatePageQuality, searchDemandScore, seoRecommendation, opportunityScore } from "@penta/quality-gate";
+import { evaluatePageQuality, searchDemandScore, seoRecommendation, classifyDemand } from "@penta/quality-gate";
 import { assertInferenceCannotBecomeOfficial } from "@penta/data-provenance";
-import { applyAnswer, diagnose, getError, initialState } from "@penta/fixcode";
-import { compatibility, getCharger, getDevice } from "@penta/chargematch";
+import { applyAnswer, diagnose, getError, getSymptom, initialState, likelihoodLabel, BRANDS } from "@penta/fixcode";
+import { allocate, compatibility, getCharger, getDevice } from "@penta/chargematch";
 import { compareRoute, getRoute, timeValueBreakEven } from "@penta/tripcost";
 import { capsuleFor, DESTINATIONS, weatherSourceLabel } from "@penta/wearthere";
-import { ownershipScore, VEHICLES } from "@penta/autospec";
-import { buildCatalog, launchReport, programmaticSeoIssues } from "@penta/catalog";
+import { checkFitment, ownershipScore, VEHICLES } from "@penta/autospec";
+import { buildCatalog, coverageReport, launchReport, programmaticSeoIssues } from "@penta/catalog";
 import { globalNoindex } from "@penta/publishing-core";
 import { routeAiTask } from "@penta/ai-core";
 
@@ -72,14 +72,38 @@ describe("PageQualityGate", () => {
     })).toBe("EXPAND_TOOL");
   });
 
-  it("computes opportunity score", () => {
-    expect(opportunityScore({
-      search_demand: 80,
-      data_completeness: 90,
-      monetization_potential: 70,
-      product_utility: 80,
-      competition_difficulty: 50,
-    })).toBeGreaterThan(0);
+  it("fails hard gates even with a high soft score shape", () => {
+    const fail = evaluatePageQuality({
+      site: "chargematch",
+      family: "can-charger-charge",
+      unique_fields: 20,
+      required_fields_present: 9,
+      required_fields_total: 9,
+      search_demand: { internal_search: 99 },
+      product_cta: true,
+      interactive: true,
+      distinct_from_parent: true,
+      near_duplicate: false,
+      year_only_variant: false,
+      city_without_specifics: false,
+      obscure_without_demand: false,
+      llm_filler: false,
+      confidence: "HIGH",
+      freshness_days: 1,
+      freshness_ttl_days: 180,
+      provenance_valid: true,
+      llm_safety_claim: true,
+    });
+    expect(fail.score).toBeGreaterThanOrEqual(75);
+    expect(fail.index_state).toBe("GRAPH_ONLY");
+    expect(fail.hard_gates.some((g) => g.id === "not_llm_safety_claim" && !g.passed)).toBe(true);
+  });
+
+  it("caps editorial demand and does not treat it as GSC", () => {
+    const d = classifyDemand({ seed_research: 90 });
+    expect(d.kind).toBe("EDITORIAL_JUDGMENT");
+    expect(d.score).toBeLessThanOrEqual(40);
+    expect(d.confidence).toBe("LOW");
   });
 });
 
@@ -90,7 +114,7 @@ describe("provenance", () => {
 });
 
 describe("FixCode engine", () => {
-  it("recalculates 4C after water-supply answers", () => {
+  it("recalculates 4C after water-supply answers without fake calibrated %", () => {
     const profile = getError("samsung", "washer", "4c");
     expect(profile).toBeTruthy();
     let state = initialState(profile!);
@@ -98,7 +122,27 @@ describe("FixCode engine", () => {
     const result = diagnose(profile!, state);
     expect(result.causes[0].id).not.toBe("");
     expect(result.next_question?.why).toBeTruthy();
-    expect(result.confidence_pct).toBeGreaterThan(0);
+    expect(result.display_probabilities).toBe(false);
+    expect(result.causes[0].likelihood_label).toMatch(/likelihood|Possible/);
+    expect(result.rule_version).toBe("diagnostic-v3");
+    expect(profile!.provenance.length).toBeGreaterThan(0);
+  });
+
+  it("covers Bosch dishwasher E15, LG washer OE, and not-draining", () => {
+    const e15 = getError("bosch", "dishwasher", "e15")!;
+    const oe = getError("lg", "washer", "oe")!;
+    const drain = getSymptom("samsung", "washer", "not-draining")!;
+    expect(e15.meaning.toLowerCase()).toMatch(/aqua|base|leak/);
+    expect(oe.meaning.toLowerCase()).toMatch(/drain/);
+    expect(drain.symptom.toLowerCase()).toMatch(/drain/);
+    expect(diagnose(e15, initialState(e15)).safety_ceiling).toBeTruthy();
+    expect(BRANDS).toHaveLength(4);
+  });
+
+  it("maps document priors to labels, not invented percents", () => {
+    expect(likelihoodLabel(0.4)).toBe("High likelihood");
+    expect(likelihoodLabel(0.2)).toBe("Medium likelihood");
+    expect(likelihoodLabel(0.05)).toBe("Possible");
   });
 });
 
@@ -107,9 +151,25 @@ describe("ChargeMatch", () => {
     const air = compatibility(getDevice("macbook-air-13-m3")!, getCharger("anker-65w")!);
     expect(air.compatible).toBe(true);
     expect(air.max_power).toBe(65);
+    expect(air.safe).toBe(false);
+    expect(air.safety_note.toLowerCase()).toMatch(/unknown|certif/);
     const deck = compatibility(getDevice("steam-deck")!, getCharger("apple-20w")!);
     expect(deck.compatible).toBe(true);
     expect(deck.match).toBe("SLOW");
+  });
+
+  it("does not treat 100W charger as 100W on every port", () => {
+    const chg = getCharger("anker-100w-2c")!;
+    const dual = allocate(chg, ["c1", "c2"]);
+    expect(dual.watts).toEqual([65, 30]);
+    const phone = compatibility(getDevice("iphone-16")!, chg);
+    const mba = compatibility(getDevice("macbook-air-13-m3")!, chg);
+    expect(phone.max_power).toBeLessThanOrEqual(25);
+    expect(mba.max_power).toBeLessThanOrEqual(70);
+    const deck100 = compatibility(getDevice("steam-deck")!, chg);
+    expect(deck100.max_power).toBe(45);
+    const split = compatibility(getDevice("macbook-air-13-m3")!, chg, undefined, ["c1", "c2"]);
+    expect(split.max_power).toBe(65);
   });
 });
 
@@ -125,6 +185,11 @@ describe("TripCost", () => {
     const car = four.modes.find((m) => m.mode === "car")!;
     const be = timeValueBreakEven(train, car);
     expect(be === null || be > 0).toBe(true);
+    expect(car.assumptions.some((a) => a.toLowerCase().includes("cash"))).toBe(true);
+    const flight = four.modes.find((m) => m.mode === "flight");
+    if (flight) expect(flight.minutes_door).toBeGreaterThan(flight.minutes_in_vehicle);
+    expect(car4.retrieved_at).toBeTruthy();
+    expect(car4.stale).toBe(false);
   });
 });
 
@@ -132,9 +197,12 @@ describe("WearThere", () => {
   it("never labels typical climate as a forecast", () => {
     expect(weatherSourceLabel({ hasForecast: false, daysAhead: 60 }).kind).toBe("TYPICAL");
     const tokyo = DESTINATIONS.find((d) => d.slug === "tokyo")!;
-    const cap = capsuleFor(tokyo, 11, "classic");
+    const cap = capsuleFor(tokyo, 1, "classic");
     expect(cap.weather_kind).toBe("TYPICAL");
+    expect(cap.weather.month).toBe(1);
     expect(cap.pieces.length).toBeGreaterThan(4);
+    expect(cap.coverage.weather_coverage).toBeGreaterThan(0);
+    expect(cap.pieces.some((p) => p.layer === "shell" || p.warmth >= 4)).toBe(true);
   });
 
   it("indexes january for high-demand cities", async () => {
@@ -147,8 +215,19 @@ describe("WearThere", () => {
 describe("AutoSpec", () => {
   it("canonicalizes G20 320d years onto one engine identity", () => {
     const v = VEHICLES.find((item) => item.variant_slug === "320d-b47")!;
+    expect(v.engine_code).toBe("B47D20");
     expect(v.years.length).toBeGreaterThan(1);
+    expect(v.market).toContain("EU");
     expect(v.oil.spec).toContain("Longlife-04");
+    expect(v.oil.capacity_liters).toBe(5);
+    expect(v.battery.type).toBe("AGM");
+    expect(v.tyres.pressure_bar_front).toBeGreaterThan(0);
+    expect(v.services.length).toBeGreaterThan(3);
+    expect(v.recalls.length).toBeGreaterThan(0);
+    const fit = checkFitment(v, "oil-ll04-5w30");
+    expect("compatible" in fit && fit.compatible).toBe(true);
+    const unknown = checkFitment(v, "made-up-filter");
+    expect(unknown.compatible).toBe(false);
     const score = ownershipScore({
       km: 87432,
       last_oil_km: 80000,
@@ -168,15 +247,27 @@ describe("catalog / SEO tests", () => {
     expect(issues).toEqual([]);
     const report = launchReport();
     expect(report.graph.indexable).toBeGreaterThan(20);
+    expect(report.graph.indexable).toBeLessThan(1200);
     expect(report.average_indexable_quality).toBeGreaterThanOrEqual(75);
     expect(globalNoindex()).toBe(true);
+    expect(report.public_site_live).toBe(false);
+    expect(report.global_noindex).toBe(true);
     expect(report.graph.entities).toBeGreaterThan(200);
+    expect(report.graph.relations).toBeGreaterThanOrEqual(2500);
+    expect(report.graph.decision_relevant_relations).toBeGreaterThan(2000);
+    expect(report.graph.relations_per_entity).toBeGreaterThan(2);
   });
 
   it("stores more graph relations than indexable URLs for ChargeMatch", () => {
     const store = buildCatalog();
     const stats = store.stats("chargematch");
     expect(stats.relations).toBeGreaterThan(stats.indexable);
+    expect(stats.relations).toBeGreaterThan(stats.pages);
+    const measured = [...store.relations.values()].filter((r) => r.site === "chargematch" && r.type === "MEASURED_AT" && r.properties.lab === true);
+    expect(measured.length).toBe(0);
+    const coverage = coverageReport();
+    expect(coverage.fixcode.brands).toBe(4);
+    expect(coverage.chargematch.lab_measurements).toBe(0);
   });
 });
 

@@ -44,25 +44,33 @@ Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe,
 
 ## Indexation
 
-- `INDEXABLE` si score ≥ 75, demande, données distinctes
-- `NOINDEX_PRODUCT` si 60–74
-- `GRAPH_ONLY` sinon — le graphe ChargeMatch peut contenir toutes les paires device×charger sans URL
+Hard gates first, then a soft score (max 100). A page with 95/100 still fails if a hard gate fails.
 
-Aucune page n’est créée parce qu’une combinaison existe. L’IA n’écrit pas 1 500 mots sur un mot-clé : elle explique des faits structurés.
+Hard gates: unique structured data, valid provenance, no critical unknown demand (unless hub necessity), not an unexplained duplicate, valid family, no invented LLM claims, no LLM safety claim, no year-only variant, not city-without-specifics, not obscure-without-demand, climate ≠ forecast, not stale-as-current, engine determined (AutoSpec), causes sourced (FixCode).
+
+Soft score dimensions: unique data 25, demand 20 (editorial seed is capped at 40 and labeled EDITORIAL_JUDGMENT), utility 15, completeness 15, differentiation 10, confidence 10, freshness 5. INDEXABLE if all hard gates pass and score ≥ 75.
+
+- `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex (meta, X-Robots-Tag, robots.txt, empty sitemap).
+- `NOINDEX_PRODUCT` / product-only tools (garage, trip, kit) stay private.
+- Demand in this pass is **editorial judgment**, not GSC.
 
 ## Données (catalog, honnête)
 
-Le graphe s’étend **en profondeur**, pas en pages creuses :
+Le graphe s’étend **en profondeur**, pas en pages creuses. Relations décisionnelles portent `decision_relevant`. Overlap ChargeMatch device×charger×cable is `EXPECTED_POWER` (inferred), **not** a lab `MEASURED_AT`.
 
-- FixCode : Samsung / LG / Bosch / Miele — familles de codes (fill, drain, heat, AquaStop…) avec arbres complets. Pas de Whirlpool inventé.
-- AutoSpec : identités moteur/génération (BMW, Toyota, VW, Tesla, Honda, Mercedes, Audi, Peugeot, Renault, Hyundai, Kia, Volvo, Ford, Nissan…). Pas de pages année marketing.
-- WearThere : villes à forte demande, **12 mois** de climat typique quand la demande le justifie
-- ChargeMatch : appareils et chargeurs populaires ; les paires obscures restent graph-only
-- TripCost : corridors européens à forte demande, tarifs **estimés** (pas un GDS live)
+- FixCode : Samsung / LG / Bosch / Miele — `Coverage: 4 brands verified`. Pas de Whirlpool inventé. Probabilités affichées comme High/Medium/Possible jusqu’à outcomes VERIFIED.
+- AutoSpec : identités moteur/génération, `market_scope`, fitment jamais via LLM. VIN = stub.
+- WearThere : climat typique ≠ prévision. Pages trip datées = noindex.
+- ChargeMatch : jamais « safe » parce que les watts suffisent. Certification inconnue.
+- TripCost : corridors ciblés, cash vs true cost, snapshot de tarifs, door-to-door.
 
 Open-Meteo (sans clé) est optionnel pour WearThere. S’il est indisponible, le climat typique reste affiché **comme climat**, jamais comme prévision.
 
+Voir `DATA_SOURCES.md`.
+
 ## APIs
+
+Rate-limited:
 
 - `POST /api/fixcode/diagnose`
 - `POST /api/autospec/vehicle`
@@ -70,10 +78,15 @@ Open-Meteo (sans clé) est optionnel pour WearThere. S’il est indisponible, le
 - `POST /api/chargematch/compatibility`
 - `POST /api/tripcost/compare`
 - `GET /api/ops/report`
+- `GET /api/ops/entity?id=`
 
 ## Tests
 
-`pnpm test` vérifie le quality gate, le diagnostic 4C, la compatibilité USB-PD, Paris→Lyon selon le nombre de voyageurs, le climat ≠ forecast, et que chaque URL indexable a un titre unique et un score ≥ 75.
+```bash
+pnpm test
+pnpm qa   # tests + seo-audit (exit 1 on duplicate canonical / preview indexable / etc.)
+pnpm report
+```
 
 ## Suite utile
 

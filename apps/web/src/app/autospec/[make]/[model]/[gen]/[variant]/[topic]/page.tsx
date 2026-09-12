@@ -55,6 +55,7 @@ export default async function TopicPage({
           <p className="text-3xl">{v.oil.viscosity}</p>
           <p className="mt-2">{v.oil.spec}</p>
           <p className="mt-2 text-lg">{v.oil.capacity_liters} L {v.oil.with_filter ? "with filter" : ""}</p>
+          <p className="mt-3 text-sm leading-6">Market may affect this specification. Scope on file: {v.market.join(", ")}.</p>
         </section>
       ) : null}
       {topic === "tyres" ? (

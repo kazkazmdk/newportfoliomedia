@@ -49,7 +49,7 @@ export default async function VehicleHub({
         {v.make} {v.model} {v.variant}
       </h1>
       <p className="mt-4 max-w-xl text-lg leading-8">
-        {v.years[0]}–{v.years.at(-1)} marketing years share this engine/generation. They are not split into thin year URLs.
+        {v.years[0]}–{v.years.at(-1)} marketing years share this engine/generation. They are not split into thin year URLs. Market on file: {v.market.join(", ")}. Market may affect this specification.
       </p>
       <Link
         href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`}

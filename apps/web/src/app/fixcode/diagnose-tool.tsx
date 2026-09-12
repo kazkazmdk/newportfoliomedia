@@ -22,7 +22,7 @@ export function DiagnoseTool() {
   if (!profile) {
     return (
       <div className="border border-[#e2ddd4] bg-[#fffcf7] p-6">
-        <h1 className="text-3xl">We don't have verified data yet.</h1>
+        <h1 className="text-3xl">We don&apos;t have verified data yet.</h1>
         <p className="mt-3 max-w-md leading-7">
           {brand} {appliance} {code} is not in the launch set. We will not invent a repair procedure. This query is stored for demand scoring.
         </p>
@@ -50,8 +50,14 @@ export function DiagnoseTool() {
       ) : null}
 
       <p className="text-sm text-[#6a6a64]">
-        {"code" in profile ? `${profile.brand} ${profile.appliance}` : profile.appliance} · confidence {result.confidence_level.toLowerCase()} · {result.confidence_pct}%
+        {"code" in profile ? `${profile.brand} ${profile.appliance}` : profile.appliance} · {result.confidence_level.toLowerCase()} confidence · {result.rule_version}
+        {result.display_probabilities ? "" : " · common possibilities, not calibrated %"}
       </p>
+      {result.safety_ceiling === "STOP_USE" ? (
+        <p className="mt-3 border border-[var(--danger)] bg-[#fff6f4] p-3 text-sm text-[var(--danger)]">
+          Stop using the appliance. Burning smell, smoke, or shock risk is not a DIY path.
+        </p>
+      ) : null}
       <h1 className="mt-3 text-4xl">
         {"code" in profile ? `Error ${profile.code}` : "symptom" in profile ? profile.symptom : "Diagnosis"}
       </h1>
@@ -66,7 +72,7 @@ export function DiagnoseTool() {
               <p>
                 {index + 1}. {cause.name}
               </p>
-              <p className="text-sm">{cause.probability}%</p>
+              <p className="text-sm">{cause.likelihood_label}</p>
             </div>
             <p className="mt-2 text-sm leading-6 text-[#555]">{cause.summary}</p>
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
@@ -102,7 +108,7 @@ export function DiagnoseTool() {
 
       {result.next_question ? (
         <section className="mt-10 border-t border-[#e2ddd4] pt-8">
-          <p className="text-sm text-[#6a6a64]">Why we're asking this</p>
+            <p className="text-sm text-[#6a6a64]">Why we&apos;re asking this</p>
           <p className="mt-1 text-sm leading-6">{result.why_this_question}</p>
           <h2 className="mt-4 text-2xl">{result.next_question.text}</h2>
           <div className="mt-4 flex flex-wrap gap-2">

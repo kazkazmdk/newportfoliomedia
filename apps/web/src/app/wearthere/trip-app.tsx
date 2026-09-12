@@ -13,7 +13,8 @@ export function TripApp() {
   const style = (params.get("style") ?? "classic") as StyleId;
   const dest = DESTINATIONS.find((d) => d.slug === city);
   const month = Number(start.slice(5, 7));
-  const daysAhead = Math.round((new Date(start).getTime() - Date.now()) / 86400000);
+  const [now] = useState(() => Date.now());
+  const daysAhead = Math.round((new Date(start).getTime() - now) / 86400000);
   const [forecast, setForecast] = useState<string | null>(null);
 
   const capsule = useMemo(() => (dest ? capsuleFor(dest, month, style) : null), [dest, month, style]);

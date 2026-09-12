@@ -1,13 +1,6 @@
 import type { ConfidenceLevel } from "@penta/data-provenance";
 import { explainStructured, recordToolCall, routeAiTask } from "@penta/ai-core";
-import type {
-  DiagnosisResult,
-  DiagnosisState,
-  ErrorProfile,
-  RankedCause,
-  SafetyClass,
-  SymptomProfile,
-} from "./types";
+import type { DiagnosisResult, DiagnosisState, ErrorProfile, RankedCause, SafetyClass, SymptomProfile, OutcomeId } from "./types";
 import { ERRORS } from "./data-samsung";
 import { MORE_ERRORS } from "./data-more";
 import { SYMPTOMS as SEED_SYMPTOMS } from "./data-symptoms";
@@ -37,7 +30,21 @@ const SAFETY_RANK: Record<SafetyClass, number> = {
   SAFE_USER_CHECK: 0,
   CAUTION: 1,
   PROFESSIONAL_ONLY: 2,
+  STOP_USE: 3,
 };
+
+export const RULE_VERSION = "diagnostic-v3";
+
+export function likelihoodLabel(priorOrPct: number, asPercent = false): RankedCause["likelihood_label"] {
+  const p = asPercent ? priorOrPct / 100 : priorOrPct;
+  if (p >= 0.35) return "High likelihood";
+  if (p >= 0.18) return "Medium likelihood";
+  return "Possible";
+}
+
+export function detectStopUse(text: string): boolean {
+  return /\b(burn|burning|smoke|spark|shock|electrocute|gas leak)\b/i.test(text);
+}
 
 export function getError(brand: string, appliance: string, code: string) {
   const codeNorm = code.toLowerCase().replace(/-error$/, "");
@@ -107,11 +114,13 @@ export function applyAnswer(
   };
 }
 
-function ranked(profile: ErrorProfile | SymptomProfile, state: DiagnosisState): RankedCause[] {
+function ranked(profile: ErrorProfile | SymptomProfile, state: DiagnosisState, calibrated: boolean): RankedCause[] {
   return profile.causes
     .map((cause) => ({
       ...cause,
       probability: Math.round((state.priors[cause.id] ?? 0) * 1000) / 10,
+      likelihood_label: likelihoodLabel(state.priors[cause.id] ?? 0),
+      probability_is_calibrated: calibrated,
     }))
     .sort((a, b) => b.probability - a.probability);
 }
@@ -143,7 +152,8 @@ export function diagnose(
   profile: ErrorProfile | SymptomProfile,
   state: DiagnosisState,
 ): DiagnosisResult {
-  const causes = ranked(profile, state);
+  const calibrated = outcomeCounts(profile.id).__verified > 0;
+  const causes = ranked(profile, state, calibrated);
   const question = nextQuestion(profile, state);
   const { pct, level } = confidenceFromSpread(causes);
   const safety_ceiling = causes.reduce<SafetyClass>((max, cause) => {
@@ -169,6 +179,14 @@ export function diagnose(
     why_this_question: question?.why,
     unknown: causes.length === 0,
     safety_ceiling,
+    rule_version: RULE_VERSION,
+    display_probabilities: calibrated,
+    trace: {
+      facts: causes.slice(0, 3).map((c) => `${c.id}:${c.likelihood_label}`),
+      relations: [`MAY_BE_CAUSED_BY`, `TESTED_BY`, `RISK_LEVEL`],
+      rules: [RULE_VERSION, "bayes_document_priors"],
+      sources: profile.provenance.map((p) => p.source_id),
+    },
   };
 }
 
@@ -183,7 +201,7 @@ export function explainDiagnosis(result: DiagnosisResult): string {
   const top = result.causes.slice(0, 3);
   const facts = top.map(
     (cause) =>
-      `${cause.name} is estimated at ${cause.probability}% (${cause.safety.replaceAll("_", " ").toLowerCase()}).`,
+      `${cause.name} is a ${cause.likelihood_label.toLowerCase()} (${cause.safety.replaceAll("_", " ").toLowerCase()}).`,
   );
   if (result.next_question) {
     facts.push(`Next check: ${result.next_question.text}`);
@@ -199,26 +217,22 @@ export function explainDiagnosis(result: DiagnosisResult): string {
 }
 
 export function isBlocked(cause: RankedCause): boolean {
-  return cause.safety === "PROFESSIONAL_ONLY";
+  return cause.safety === "PROFESSIONAL_ONLY" || cause.safety === "STOP_USE";
 }
 
-export type OutcomeId =
-  | "cleaned_filter"
-  | "replaced_valve"
-  | "hose_issue"
-  | "technician_repair"
-  | "other";
+const outcomes: Array<{ profile_id: string; outcome: OutcomeId; status: "REPORTED" | "VERIFIED" | "AGGREGATED"; cause_id?: string; at: string }> = [];
 
-const outcomes: Array<{ profile_id: string; outcome: OutcomeId }> = [];
-
-export function reportOutcome(profile_id: string, outcome: OutcomeId): void {
-  outcomes.push({ profile_id, outcome });
+export function reportOutcome(profile_id: string, outcome: OutcomeId, cause_id?: string): void {
+  outcomes.push({ profile_id, outcome, cause_id, status: "REPORTED", at: new Date().toISOString() });
 }
 
 export function outcomeCounts(profile_id: string): Record<string, number> {
   const rows = outcomes.filter((row) => row.profile_id === profile_id);
-  const counts: Record<string, number> = {};
-  for (const row of rows) counts[row.outcome] = (counts[row.outcome] ?? 0) + 1;
+  const counts: Record<string, number> = { __verified: 0 };
+  for (const row of rows) {
+    counts[row.outcome] = (counts[row.outcome] ?? 0) + 1;
+    if (row.status === "VERIFIED") counts.__verified += 1;
+  }
   return counts;
 }
 

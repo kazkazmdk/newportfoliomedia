@@ -4,9 +4,11 @@ import type { PageRecord } from "@penta/graph-core";
 import { MORE_CHARGERS, MORE_DEVICES, MORE_PAIRS } from "./catalog-more";
 
 export type ConfidenceTag =
-  | "MANUFACTURER_VERIFIED"
+  |   "MANUFACTURER_VERIFIED"
   | "INDEPENDENTLY_TESTED"
+  | "CERTIFICATION_VERIFIED"
   | "PROTOCOL_INFERRED"
+  | "USER_OBSERVED"
   | "COMMUNITY_OBSERVED"
   | "UNKNOWN";
 
@@ -185,7 +187,9 @@ export const CABLES: CableProfile[] = [
 
 export type CompatibilityResult = {
   compatible: boolean;
+  /** True only with independent test or certification. Wattage overlap is not safety. */
   safe: boolean;
+  safety_note: string;
   fast: boolean;
   match: "EXCELLENT MATCH" | "WORKS" | "SLOW" | "UNKNOWN" | "INCOMPATIBLE";
   max_power: number | null;
@@ -197,7 +201,16 @@ export type CompatibilityResult = {
   tag: ConfidenceTag;
   explanation: string;
   theoretical: boolean;
+  rule_version: string;
+  trace: {
+    facts: string[];
+    relations: string[];
+    rules: string[];
+    sources: string[];
+  };
 };
+
+export const RULE_VERSION = "compatibility-v2";
 
 export function allocate(charger: ChargerProfile, usedPorts: string[]): Allocation {
   const key = [...usedPorts].sort().join("+");
@@ -216,7 +229,8 @@ export function compatibility(
   if (device.connector === "Watch") {
     return {
       compatible: false,
-      safe: true,
+      safe: false,
+      safety_note: "Will not charge. Not a safety certification claim.",
       fast: false,
       match: "INCOMPATIBLE",
       max_power: null,
@@ -228,12 +242,18 @@ export function compatibility(
       tag: "MANUFACTURER_VERIFIED",
       explanation: "The charger may be fine for phones. It will not charge an Apple Watch by USB-C alone.",
       theoretical: false,
+      rule_version: RULE_VERSION,
+      trace: {
+        facts: ["connector=Watch", "needs puck"],
+        relations: ["INCOMPATIBLE_CONNECTOR"],
+        rules: [RULE_VERSION],
+        sources: ["oem-power-specs"],
+      },
     };
   }
   const ports = extraPorts.length ? extraPorts : [charger.ports[0].id];
   const alloc = allocate(charger, ports);
   const portWatts = alloc.watts[0] ?? charger.ports[0].watts;
-  const cableCap = cable?.max_watts ?? 60;
   const cableOk = !cable || cable.max_watts >= Math.min(device.max_watts, portWatts) || cable.tag === "UNKNOWN";
   const theoretical = Math.min(device.max_watts, portWatts, cable?.max_watts ?? portWatts);
   let bottleneck = "none";
@@ -259,9 +279,19 @@ export function compatibility(
   const confidence: ConfidenceLevel =
     tag === "UNKNOWN" ? "UNKNOWN" : tag === "PROTOCOL_INFERRED" ? "MEDIUM" : "HIGH";
 
+  const certified =
+    charger.tag === "INDEPENDENTLY_TESTED" ||
+    charger.tag === "CERTIFICATION_VERIFIED" ||
+    device.tag === "INDEPENDENTLY_TESTED" ||
+    device.tag === "CERTIFICATION_VERIFIED";
+  const safety_note = certified
+    ? "Independently tested or certified path."
+    : "Compatibility expected from published PDOs. Safety certification of this exact combo is unknown.";
+
   return {
     compatible,
-    safe: compatible && (cable ? cable.max_volts >= 20 || theoretical <= 60 : true),
+    safe: certified,
+    safety_note,
     fast,
     match,
     max_power: Number.isFinite(theoretical) ? theoretical : null,
@@ -275,9 +305,21 @@ export function compatibility(
       match === "UNKNOWN"
         ? "The unmarked cable is the unknown. We will not invent a wattage."
         : device.connector === "Lightning"
-          ? `${device.name} is Lightning PD. This USB-C brick can supply power; you still need a USB-C to Lightning cable. Expected max is ${theoretical} W.`
-          : `${device.name} can take up to ${device.max_watts} W. This port offers ${portWatts} W before cable limits. Expected max is ${theoretical} W (${tag.replaceAll("_", " ").toLowerCase()}).`,
+          ? `${device.name} is Lightning PD. This USB-C brick can supply power; you still need a USB-C to Lightning cable. Expected max is ${theoretical} W. ${safety_note}`
+          : `${device.name} can take up to ${device.max_watts} W. This port offers ${portWatts} W before cable limits. Expected max is ${theoretical} W (${tag.replaceAll("_", " ").toLowerCase()}). ${safety_note}`,
     theoretical: true,
+    rule_version: RULE_VERSION,
+    trace: {
+      facts: [
+        `device_max=${device.max_watts}`,
+        `port_watts=${portWatts}`,
+        `cable=${cable?.max_watts ?? "assumed-60"}`,
+        `overlap=${theoretical}`,
+      ],
+      relations: ["MAX_INPUT", "MAX_OUTPUT", "HAS_POWER_ALLOCATION", "SUPPORTS_PROTOCOL"],
+      rules: [RULE_VERSION, "min(device,port,cable)"],
+      sources: ["oem-power-specs"],
+    },
   };
 }
 
@@ -362,6 +404,9 @@ export function allChargematchPages(): PageRecord[] {
       freshness_days: 90,
       freshness_ttl_days: 180,
       provenance_valid: true,
+      hub_necessity: device.demand >= 70,
+      distinct_reason: device.slug,
+      llm_safety_claim: false,
     });
     pages.push({
       id: device.id,
@@ -372,7 +417,7 @@ export function allChargematchPages(): PageRecord[] {
       title: `${device.name} charging wattage`,
       meta_description: `${device.name} takes ${device.min_watts}–${device.max_watts} W (${device.tag.replaceAll("_", " ")}). Check a charger.`,
       entity_ids: [device.id],
-      structured_payload: { slug: device.slug, min: device.min_watts, max: device.max_watts, pd: device.pd_version },
+      structured_payload: { slug: device.slug, min: device.min_watts, max: device.max_watts, pd: device.pd_version, distinct_reason: device.slug },
       quality_score: q.score,
       search_demand: device.demand,
       index_state: q.index_state,
@@ -410,6 +455,8 @@ export function allChargematchPages(): PageRecord[] {
       freshness_days: 90,
       freshness_ttl_days: 180,
       provenance_valid: true,
+      distinct_reason: `${d}-${c}`,
+      llm_safety_claim: false,
     });
     pages.push({
       id: `pair:${d}:${c}`,
@@ -420,7 +467,7 @@ export function allChargematchPages(): PageRecord[] {
       title: `Can I use a ${charger.name} with ${device.name}?`,
       meta_description: `${result.match}. Expected max ${result.max_power ?? "unknown"} W. ${result.tag.replaceAll("_", " ")}.`,
       entity_ids: [device.id, charger.id],
-      structured_payload: { ...result, device: d, charger: c },
+      structured_payload: { match: result.match, max_power: result.max_power, device: d, charger: c, distinct_reason: `${d}-${c}`, theoretical: result.theoretical, tag: result.tag },
       quality_score: q.score,
       search_demand: searchDemandScore({ seed_research: demand }),
       index_state: q.index_state,

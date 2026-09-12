@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { launchReport } from "@penta/catalog";
+import { fullOpsPayload } from "@penta/catalog";
 
 export async function GET() {
-  return NextResponse.json(launchReport());
+  return NextResponse.json(fullOpsPayload());
 }

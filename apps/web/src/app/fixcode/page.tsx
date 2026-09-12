@@ -14,9 +14,9 @@ export default function FixcodeHome() {
   return (
     <main>
       <p className="text-sm text-[#6a6a64]">Appliance diagnostic engine</p>
-      <h1 className="mt-4 text-5xl leading-[1.05] md:text-6xl">What's wrong?</h1>
+      <h1 className="mt-4 text-5xl leading-[1.05] md:text-6xl">What&apos;s wrong?</h1>
       <p className="mt-4 max-w-md text-[17px] leading-7 text-[#4f4f49]">
-        Show us the code, the screen, or the symptom. We rank likely causes. We will say when we don't know.
+        Show us the code, the screen, or the symptom. We rank likely causes. We will say when we don&apos;t know.
       </p>
       <HomeForm />
       <section className="mt-16">
@@ -46,7 +46,7 @@ export default function FixcodeHome() {
         ))}
       </section>
       <p className="mt-10 text-sm text-[#6a6a64]">
-        Verified brands in this batch: {BRANDS.map((b) => b.name).join(", ")}. Missing brands are not invented.
+        Coverage: {BRANDS.length} brands verified ({BRANDS.map((b) => b.name).join(", ")}). Missing brands are not invented.
       </p>
     </main>
   );

@@ -73,16 +73,25 @@ export function ownershipScore(input: {
   return { score: Math.max(0, score), factors };
 }
 
+export const RULE_VERSION = "maintenance-v1";
+
 export function checkFitment(
   vehicle: VehicleIdentity,
   componentId: string,
-): Fitment | { compatible: false; confidence: "UNKNOWN"; reason: string } {
+): Fitment | { compatible: false; confidence: ConfidenceLevel; reason: string } {
   const hit = vehicle.fitment.find((item) => item.component_id === componentId);
   if (!hit) {
     return {
       compatible: false,
       confidence: "UNKNOWN",
       reason: "No verified fitment row. Similarity is not used as compatibility.",
+    };
+  }
+  if (hit.confidence === "LOW" || hit.confidence === "UNKNOWN") {
+    return {
+      compatible: false,
+      confidence: hit.confidence,
+      reason: "Possible or unknown fitment is not displayed as compatible.",
     };
   }
   return hit;
@@ -164,6 +173,8 @@ export function allAutospecPages(): PageRecord[] {
       engine: vehicle.engine_code,
       years: vehicle.years,
       generation: vehicle.generation,
+      market_scope: vehicle.market,
+      distinct_reason: vehicle.id,
     };
     const hubQ = evaluatePageQuality({
       site: "autospec",
@@ -184,6 +195,9 @@ export function allAutospecPages(): PageRecord[] {
       freshness_days: 60,
       freshness_ttl_days: 365,
       provenance_valid: true,
+      hub_necessity: true,
+      distinct_reason: vehicle.engine_code,
+      engine_undetermined: !vehicle.engine_code,
     });
     pages.push({
       id: vehicle.id,
@@ -209,14 +223,14 @@ export function allAutospecPages(): PageRecord[] {
       if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) continue;
       const payload =
         topic.slug === "oil"
-          ? { vehicle: vehicle.id, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters }
+          ? { vehicle: vehicle.id, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-oil` }
           : topic.slug === "tyres"
-            ? { vehicle: vehicle.id, ...vehicle.tyres }
+            ? { vehicle: vehicle.id, ...vehicle.tyres, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-tyres` }
             : topic.slug === "battery"
-              ? { vehicle: vehicle.id, ...vehicle.battery }
+              ? { vehicle: vehicle.id, ...vehicle.battery, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-battery` }
               : topic.slug === "maintenance"
-                ? { vehicle: vehicle.id, items: vehicle.services.map((s) => s.id) }
-                : { vehicle: vehicle.id, issues: vehicle.issues.map((i) => i.id) };
+                ? { vehicle: vehicle.id, items: vehicle.services.map((s) => s.id), market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-maint` }
+                : { vehicle: vehicle.id, issues: vehicle.issues.map((i) => i.id), market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-issues` };
       const quality = evaluatePageQuality({
         site: "autospec",
         family: topic.family,
@@ -236,6 +250,8 @@ export function allAutospecPages(): PageRecord[] {
         freshness_days: 60,
         freshness_ttl_days: topic.slug === "problems" ? 90 : 365,
         provenance_valid: true,
+        distinct_reason: `${vehicle.engine_code}:${topic.slug}`,
+        engine_undetermined: !vehicle.engine_code,
         site_rules: () => ({
           delta: 0,
           reasons: [`Canonical engine page — years ${vehicle.years.join(", ")} are not split.`],

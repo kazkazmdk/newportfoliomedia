@@ -9,5 +9,6 @@ export {
   nextService,
   ownershipScore,
   vehicleUrl,
+  RULE_VERSION,
 } from "./engine";
 export type { VehicleIdentity } from "./data";

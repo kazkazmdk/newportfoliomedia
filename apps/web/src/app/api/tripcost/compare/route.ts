@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { compareRoute, getRoute } from "@penta/tripcost";
+import { clientKey, rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  const limited = rateLimit(`tripcost:${clientKey(request)}`, 40);
+  if (!limited.ok) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   const body = (await request.json()) as {
     origin?: string;
     destination?: string;

@@ -17,6 +17,11 @@ export type ModeQuote = {
   assumptions: string[];
   confidence: ConfidenceLevel;
   available: boolean;
+  retrieved_at: string;
+  valid_until?: string | null;
+  stale: boolean;
+  currency: "EUR";
+  source_id: string;
 };
 
 export type RouteRecord = {
@@ -262,6 +267,8 @@ export const PROVIDERS: Record<string, ProviderMeta> = {
   FuelPriceProvider: { id: "seed-fuel", replaceability: 50, notes: "Snapshot €/L, not a live pump feed." },
 };
 
+export const RULE_VERSION = "tripcost-v1";
+
 function round(n: number) {
   return Math.round(n);
 }
@@ -286,6 +293,14 @@ export function compareRoute(
         route.city_transfer_minutes
       : 0;
 
+  const priceMeta = {
+    retrieved_at: PRICE_PROVENANCE.retrieved_at,
+    valid_until: PRICE_PROVENANCE.valid_until,
+    stale: PRICE_PROVENANCE.valid_until ? new Date(PRICE_PROVENANCE.valid_until).getTime() < Date.now() : false,
+    currency: "EUR" as const,
+    source_id: PRICE_PROVENANCE.source_id,
+  };
+
   const allModes: ModeQuote[] = [
     {
       mode: "car",
@@ -295,13 +310,15 @@ export function compareRoute(
       minutes_in_vehicle: carMinutes,
       per_person_cash: round(carCash / travellers),
       assumptions: [
+        `Cash: fuel + tolls + parking. True cost adds wear at ${route.wear_eur_per_km} €/km.`,
         `${route.fuel_l_per_100} L/100 km`,
-        `${route.fuel_eur_per_l.toFixed(2)} €/L snapshot`,
+        `${route.fuel_eur_per_l.toFixed(2)} €/L snapshot ${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}`,
         `Tolls ${route.tolls_eur} €`,
         `Parking ${route.parking_eur} €`,
       ],
       confidence: "MEDIUM",
       available: true,
+      ...priceMeta,
     },
     {
       mode: "ev",
@@ -317,6 +334,7 @@ export function compareRoute(
       ],
       confidence: "LOW",
       available: true,
+      ...priceMeta,
     },
     {
       mode: "train",
@@ -325,9 +343,12 @@ export function compareRoute(
       minutes_door: route.train_minutes + 40,
       minutes_in_vehicle: route.train_minutes,
       per_person_cash: round(route.train_eur_pp),
-      assumptions: ["Advance-purchase typical fare, not a live ticket."],
+      assumptions: [
+        `Last observed typical fare ${route.train_eur_pp} €/person (${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}). Not a live ticket.`,
+      ],
       confidence: "MEDIUM",
       available: route.train_eur_pp > 0,
+      ...priceMeta,
     },
     {
       mode: "bus",
@@ -336,9 +357,10 @@ export function compareRoute(
       minutes_door: route.bus_minutes + 30,
       minutes_in_vehicle: route.bus_minutes,
       per_person_cash: round(route.bus_eur_pp),
-      assumptions: ["Coach typical fare."],
+      assumptions: [`Coach typical fare ${route.bus_eur_pp} €/person, snapshot ${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}.`],
       confidence: "MEDIUM",
       available: route.bus_eur_pp > 0,
+      ...priceMeta,
     },
     {
       mode: "flight",
@@ -348,11 +370,12 @@ export function compareRoute(
       minutes_in_vehicle: route.flight_minutes,
       per_person_cash: round(route.flight_eur_pp),
       assumptions: [
-        "Door-to-door includes airport access, security buffer, flight, city transfer.",
+        `Door-to-door ${flightDoor} min = access ${route.airport_access_minutes} + security ${route.security_buffer_minutes} + block ${route.flight_minutes} + city ${route.city_transfer_minutes}.`,
         "Block time alone is not the comparison.",
       ],
       confidence: "MEDIUM",
       available: route.flight_eur_pp > 0,
+      ...priceMeta,
     },
     {
       mode: "rideshare",
@@ -364,6 +387,7 @@ export function compareRoute(
       assumptions: ["Point estimate. Live Uber/Bolt not connected."],
       confidence: "LOW",
       available: route.rideshare_eur > 0,
+      ...priceMeta,
     },
   ];
 
@@ -418,6 +442,9 @@ export function allTripcostPages(): PageRecord[] {
       freshness_days: 20,
       freshness_ttl_days: 30,
       provenance_valid: true,
+      hub_necessity: true,
+      distinct_reason: `${route.id}-compare`,
+      stale_presented_as_current: false,
       site_rules: () => ({
         delta: comparison.modes.length >= 2 ? 0 : -40,
         reasons: ["Multiple modes or meaningful driving cost required."],
@@ -443,6 +470,8 @@ export function allTripcostPages(): PageRecord[] {
       freshness_days: 20,
       freshness_ttl_days: 30,
       provenance_valid: true,
+      distinct_reason: `${route.id}-driving`,
+      stale_presented_as_current: false,
     });
     const base = `/tripcost/${route.from.slug}/to/${route.to.slug}`;
     return [
@@ -455,7 +484,7 @@ export function allTripcostPages(): PageRecord[] {
         title: `${route.from.name} to ${route.to.name}: car vs train${route.flight_eur_pp > 0 ? " vs flight" : ""}`,
         meta_description: `${route.from.name} → ${route.to.name}, 4 travellers. Driving cash cost and door-to-door times from structured assumptions.`,
         entity_ids: [route.id],
-        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, modes: comparison.modes.map((m) => m.mode) },
+        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, modes: comparison.modes.map((m) => m.mode), distinct_reason: `${route.id}-compare` },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: route.demand }),
         index_state: quality.index_state,
@@ -475,7 +504,7 @@ export function allTripcostPages(): PageRecord[] {
         title: `${route.from.name} to ${route.to.name} driving cost: fuel + tolls`,
         meta_description: `${route.km} km, tolls ${route.tolls_eur} €, fuel snapshot ${route.fuel_eur_per_l.toFixed(2)} €/L.`,
         entity_ids: [route.id],
-        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, fuel: route.fuel_eur_per_l },
+        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, fuel: route.fuel_eur_per_l, distinct_reason: `${route.id}-driving` },
         quality_score: driving.score,
         search_demand: route.demand - 5,
         index_state: driving.index_state,
