@@ -1,0 +1,15 @@
+{
+  "name": "@penta/autospec",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@penta/ai-core": "workspace:*",
+    "@penta/data-provenance": "workspace:*",
+    "@penta/graph-core": "workspace:*",
+    "@penta/quality-gate": "workspace:*"
+  }
+}

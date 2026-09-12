@@ -1,0 +1,19 @@
+{
+  "name": "penta",
+  "private": true,
+  "packageManager": "pnpm@10.33.3",
+  "scripts": {
+    "dev": "pnpm --filter web dev --port 43121",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start --port 43121",
+    "lint": "pnpm --filter web lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "report": "tsx scripts/launch-report.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

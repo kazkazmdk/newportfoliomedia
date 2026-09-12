@@ -1,0 +1,19 @@
+{
+  "name": "@penta/catalog",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@penta/autospec": "workspace:*",
+    "@penta/chargematch": "workspace:*",
+    "@penta/fixcode": "workspace:*",
+    "@penta/graph-core": "workspace:*",
+    "@penta/publishing-core": "workspace:*",
+    "@penta/quality-gate": "workspace:*",
+    "@penta/tripcost": "workspace:*",
+    "@penta/wearthere": "workspace:*"
+  }
+}

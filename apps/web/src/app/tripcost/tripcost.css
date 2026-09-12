@@ -1,0 +1,22 @@
+.tripcost h1 {
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+
+.tc-card {
+  background: white;
+  border: 1px solid #c5d0dc;
+}
+
+.tc-cta {
+  background: #0b3a6a;
+  color: white;
+  border: 0;
+  padding: 0.85rem 1.2rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tc-mono {
+  font-family: var(--font-tc-mono), ui-monospace, monospace;
+}

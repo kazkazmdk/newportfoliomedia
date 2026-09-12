@@ -1,0 +1,19 @@
+.wearthere h1, .wearthere h2 {
+  font-family: var(--font-wt-serif), serif;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.wt-card {
+  background: #fff7f0;
+  border: 1px solid #ead7c8;
+}
+
+.wt-cta {
+  background: #8a4b32;
+  color: #fff7f0;
+  border: 0;
+  padding: 0.9rem 1.3rem;
+  font: inherit;
+  cursor: pointer;
+}

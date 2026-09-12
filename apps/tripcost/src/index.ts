@@ -1,0 +1,498 @@
+import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
+import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
+import type { PageRecord } from "@penta/graph-core";
+
+export type Place = { id: string; name: string; slug: string; country: string };
+
+export type ModeId = "car" | "ev" | "train" | "bus" | "flight" | "rideshare";
+
+export type ModeQuote = {
+  mode: ModeId;
+  cash_eur: number;
+  true_eur: number;
+  minutes_door: number;
+  minutes_in_vehicle: number;
+  per_person_cash: number;
+  assumptions: string[];
+  confidence: ConfidenceLevel;
+  available: boolean;
+};
+
+export type RouteRecord = {
+  id: string;
+  from: Place;
+  to: Place;
+  km: number;
+  demand: number;
+  tolls_eur: number;
+  fuel_l_per_100: number;
+  fuel_eur_per_l: number;
+  parking_eur: number;
+  wear_eur_per_km: number;
+  ev_kwh_per_100: number;
+  ev_eur_per_kwh: number;
+  ev_charge_stops: number;
+  ev_charge_minutes: number;
+  train_eur_pp: number;
+  train_minutes: number;
+  bus_eur_pp: number;
+  bus_minutes: number;
+  flight_eur_pp: number;
+  flight_minutes: number;
+  airport_access_minutes: number;
+  city_transfer_minutes: number;
+  security_buffer_minutes: number;
+  rideshare_eur: number;
+};
+
+export const PLACES: Place[] = [
+  { id: "paris", name: "Paris", slug: "paris", country: "FR" },
+  { id: "lyon", name: "Lyon", slug: "lyon", country: "FR" },
+  { id: "barcelona", name: "Barcelona", slug: "barcelona", country: "ES" },
+  { id: "london", name: "London", slug: "london", country: "UK" },
+  { id: "amsterdam", name: "Amsterdam", slug: "amsterdam", country: "NL" },
+  { id: "berlin", name: "Berlin", slug: "berlin", country: "DE" },
+  { id: "munich", name: "Munich", slug: "munich", country: "DE" },
+  { id: "milan", name: "Milan", slug: "milan", country: "IT" },
+  { id: "brussels", name: "Brussels", slug: "brussels", country: "BE" },
+];
+
+export const ROUTES: RouteRecord[] = [
+  {
+    id: "paris-lyon",
+    from: PLACES[0],
+    to: PLACES[1],
+    km: 465,
+    demand: 92,
+    tolls_eur: 36,
+    fuel_l_per_100: 7.2,
+    fuel_eur_per_l: 1.79,
+    parking_eur: 12,
+    wear_eur_per_km: 0.08,
+    ev_kwh_per_100: 18,
+    ev_eur_per_kwh: 0.39,
+    ev_charge_stops: 1,
+    ev_charge_minutes: 25,
+    train_eur_pp: 68,
+    train_minutes: 118,
+    bus_eur_pp: 22,
+    bus_minutes: 340,
+    flight_eur_pp: 95,
+    flight_minutes: 70,
+    airport_access_minutes: 55,
+    city_transfer_minutes: 45,
+    security_buffer_minutes: 90,
+    rideshare_eur: 280,
+  },
+  {
+    id: "paris-barcelona",
+    from: PLACES[0],
+    to: PLACES[2],
+    km: 1030,
+    demand: 88,
+    tolls_eur: 82,
+    fuel_l_per_100: 7.0,
+    fuel_eur_per_l: 1.79,
+    parking_eur: 20,
+    wear_eur_per_km: 0.08,
+    ev_kwh_per_100: 18.5,
+    ev_eur_per_kwh: 0.42,
+    ev_charge_stops: 3,
+    ev_charge_minutes: 90,
+    train_eur_pp: 110,
+    train_minutes: 400,
+    bus_eur_pp: 45,
+    bus_minutes: 760,
+    flight_eur_pp: 85,
+    flight_minutes: 110,
+    airport_access_minutes: 55,
+    city_transfer_minutes: 50,
+    security_buffer_minutes: 90,
+    rideshare_eur: 620,
+  },
+  {
+    id: "london-paris",
+    from: PLACES[3],
+    to: PLACES[0],
+    km: 460,
+    demand: 90,
+    tolls_eur: 0,
+    fuel_l_per_100: 7.4,
+    fuel_eur_per_l: 1.72,
+    parking_eur: 25,
+    wear_eur_per_km: 0.09,
+    ev_kwh_per_100: 19,
+    ev_eur_per_kwh: 0.45,
+    ev_charge_stops: 1,
+    ev_charge_minutes: 35,
+    train_eur_pp: 120,
+    train_minutes: 140,
+    bus_eur_pp: 35,
+    bus_minutes: 480,
+    flight_eur_pp: 70,
+    flight_minutes: 80,
+    airport_access_minutes: 60,
+    city_transfer_minutes: 50,
+    security_buffer_minutes: 90,
+    rideshare_eur: 0,
+  },
+  {
+    id: "berlin-munich",
+    from: PLACES[5],
+    to: PLACES[6],
+    km: 585,
+    demand: 76,
+    tolls_eur: 0,
+    fuel_l_per_100: 6.8,
+    fuel_eur_per_l: 1.74,
+    parking_eur: 10,
+    wear_eur_per_km: 0.08,
+    ev_kwh_per_100: 17.5,
+    ev_eur_per_kwh: 0.4,
+    ev_charge_stops: 1,
+    ev_charge_minutes: 30,
+    train_eur_pp: 55,
+    train_minutes: 240,
+    bus_eur_pp: 28,
+    bus_minutes: 420,
+    flight_eur_pp: 70,
+    flight_minutes: 70,
+    airport_access_minutes: 50,
+    city_transfer_minutes: 40,
+    security_buffer_minutes: 75,
+    rideshare_eur: 320,
+  },
+  {
+    id: "paris-amsterdam",
+    from: PLACES[0],
+    to: PLACES[4],
+    km: 505,
+    demand: 80,
+    tolls_eur: 22,
+    fuel_l_per_100: 7.1,
+    fuel_eur_per_l: 1.79,
+    parking_eur: 18,
+    wear_eur_per_km: 0.08,
+    ev_kwh_per_100: 18,
+    ev_eur_per_kwh: 0.41,
+    ev_charge_stops: 1,
+    ev_charge_minutes: 30,
+    train_eur_pp: 85,
+    train_minutes: 200,
+    bus_eur_pp: 30,
+    bus_minutes: 400,
+    flight_eur_pp: 75,
+    flight_minutes: 80,
+    airport_access_minutes: 55,
+    city_transfer_minutes: 40,
+    security_buffer_minutes: 90,
+    rideshare_eur: 340,
+  },
+  {
+    id: "paris-brussels",
+    from: PLACES[0],
+    to: PLACES[8],
+    km: 312,
+    demand: 74,
+    tolls_eur: 18,
+    fuel_l_per_100: 7.0,
+    fuel_eur_per_l: 1.79,
+    parking_eur: 14,
+    wear_eur_per_km: 0.08,
+    ev_kwh_per_100: 17,
+    ev_eur_per_kwh: 0.4,
+    ev_charge_stops: 0,
+    ev_charge_minutes: 0,
+    train_eur_pp: 55,
+    train_minutes: 82,
+    bus_eur_pp: 18,
+    bus_minutes: 240,
+    flight_eur_pp: 0,
+    flight_minutes: 0,
+    airport_access_minutes: 55,
+    city_transfer_minutes: 35,
+    security_buffer_minutes: 90,
+    rideshare_eur: 210,
+  },
+  {
+    id: "milan-munich",
+    from: PLACES[7],
+    to: PLACES[6],
+    km: 430,
+    demand: 62,
+    tolls_eur: 40,
+    fuel_l_per_100: 7.5,
+    fuel_eur_per_l: 1.81,
+    parking_eur: 12,
+    wear_eur_per_km: 0.09,
+    ev_kwh_per_100: 19,
+    ev_eur_per_kwh: 0.43,
+    ev_charge_stops: 1,
+    ev_charge_minutes: 35,
+    train_eur_pp: 70,
+    train_minutes: 460,
+    bus_eur_pp: 32,
+    bus_minutes: 420,
+    flight_eur_pp: 80,
+    flight_minutes: 65,
+    airport_access_minutes: 50,
+    city_transfer_minutes: 45,
+    security_buffer_minutes: 75,
+    rideshare_eur: 0,
+  },
+];
+
+export type ProviderMeta = {
+  id: string;
+  replaceability: number;
+  notes: string;
+};
+
+export const PROVIDERS: Record<string, ProviderMeta> = {
+  RailProvider: { id: "seed-rail", replaceability: 80, notes: "Seed fares, not a live GDS. Swap later." },
+  FlightProvider: { id: "seed-flight", replaceability: 70, notes: "Door-to-door uses buffers, not block time alone." },
+  BusProvider: { id: "seed-bus", replaceability: 85, notes: "Typical coach fares." },
+  RoutingProvider: { id: "seed-km", replaceability: 75, notes: "Fixed km table for launch routes." },
+  TollProvider: { id: "seed-toll", replaceability: 60, notes: "Typical class 1 tolls. Recheck before a trip." },
+  FuelPriceProvider: { id: "seed-fuel", replaceability: 50, notes: "Snapshot €/L, not a live pump feed." },
+};
+
+function round(n: number) {
+  return Math.round(n);
+}
+
+export function compareRoute(
+  route: RouteRecord,
+  travellers: number,
+  trueCost = false,
+): { modes: ModeQuote[]; best: ModeId; cheaper_from?: { vs: ModeId; from_travellers: number } } {
+  const fuel = (route.km * route.fuel_l_per_100) / 100 * route.fuel_eur_per_l;
+  const carCash = fuel + route.tolls_eur + route.parking_eur;
+  const carTrue = carCash + route.km * route.wear_eur_per_km;
+  const evCash =
+    (route.km * route.ev_kwh_per_100) / 100 * route.ev_eur_per_kwh + route.tolls_eur + route.parking_eur;
+  const evTrue = evCash + route.km * 0.05;
+  const carMinutes = Math.round((route.km / 95) * 60);
+  const flightDoor =
+    route.flight_minutes > 0
+      ? route.airport_access_minutes +
+        route.security_buffer_minutes +
+        route.flight_minutes +
+        route.city_transfer_minutes
+      : 0;
+
+  const allModes: ModeQuote[] = [
+    {
+      mode: "car",
+      cash_eur: round(carCash),
+      true_eur: round(carTrue),
+      minutes_door: carMinutes,
+      minutes_in_vehicle: carMinutes,
+      per_person_cash: round(carCash / travellers),
+      assumptions: [
+        `${route.fuel_l_per_100} L/100 km`,
+        `${route.fuel_eur_per_l.toFixed(2)} €/L snapshot`,
+        `Tolls ${route.tolls_eur} €`,
+        `Parking ${route.parking_eur} €`,
+      ],
+      confidence: "MEDIUM",
+      available: true,
+    },
+    {
+      mode: "ev",
+      cash_eur: round(evCash),
+      true_eur: round(evTrue),
+      minutes_door: carMinutes + route.ev_charge_minutes,
+      minutes_in_vehicle: carMinutes,
+      per_person_cash: round(evCash / travellers),
+      assumptions: [
+        `${route.ev_kwh_per_100} kWh/100 km`,
+        `${route.ev_eur_per_kwh.toFixed(2)} €/kWh public mix`,
+        `${route.ev_charge_stops} charge stops, +${route.ev_charge_minutes} min`,
+      ],
+      confidence: "LOW",
+      available: true,
+    },
+    {
+      mode: "train",
+      cash_eur: round(route.train_eur_pp * travellers),
+      true_eur: round(route.train_eur_pp * travellers),
+      minutes_door: route.train_minutes + 40,
+      minutes_in_vehicle: route.train_minutes,
+      per_person_cash: round(route.train_eur_pp),
+      assumptions: ["Advance-purchase typical fare, not a live ticket."],
+      confidence: "MEDIUM",
+      available: route.train_eur_pp > 0,
+    },
+    {
+      mode: "bus",
+      cash_eur: round(route.bus_eur_pp * travellers),
+      true_eur: round(route.bus_eur_pp * travellers),
+      minutes_door: route.bus_minutes + 30,
+      minutes_in_vehicle: route.bus_minutes,
+      per_person_cash: round(route.bus_eur_pp),
+      assumptions: ["Coach typical fare."],
+      confidence: "MEDIUM",
+      available: route.bus_eur_pp > 0,
+    },
+    {
+      mode: "flight",
+      cash_eur: round(route.flight_eur_pp * travellers),
+      true_eur: round(route.flight_eur_pp * travellers),
+      minutes_door: flightDoor,
+      minutes_in_vehicle: route.flight_minutes,
+      per_person_cash: round(route.flight_eur_pp),
+      assumptions: [
+        "Door-to-door includes airport access, security buffer, flight, city transfer.",
+        "Block time alone is not the comparison.",
+      ],
+      confidence: "MEDIUM",
+      available: route.flight_eur_pp > 0,
+    },
+    {
+      mode: "rideshare",
+      cash_eur: round(route.rideshare_eur),
+      true_eur: round(route.rideshare_eur),
+      minutes_door: carMinutes,
+      minutes_in_vehicle: carMinutes,
+      per_person_cash: route.rideshare_eur ? round(route.rideshare_eur / travellers) : 0,
+      assumptions: ["Point estimate. Live Uber/Bolt not connected."],
+      confidence: "LOW",
+      available: route.rideshare_eur > 0,
+    },
+  ];
+
+  const modes = allModes.filter((mode) => mode.available);
+
+  const metric = (m: ModeQuote) => (trueCost ? m.true_eur : m.cash_eur);
+  const best = [...modes].sort((a, b) => metric(a) - metric(b))[0]?.mode ?? "car";
+
+  let cheaper_from: { vs: ModeId; from_travellers: number } | undefined;
+  const train = modes.find((m) => m.mode === "train");
+  if (train) {
+    for (let n = 1; n <= 5; n++) {
+      if (carCash / n < train.per_person_cash) {
+        cheaper_from = { vs: "train", from_travellers: n };
+        break;
+      }
+    }
+  }
+  return { modes, best, cheaper_from };
+}
+
+export function timeValueBreakEven(a: ModeQuote, b: ModeQuote): number | null {
+  const extraCash = a.cash_eur - b.cash_eur;
+  const savedHours = (b.minutes_door - a.minutes_door) / 60;
+  if (savedHours <= 0) return null;
+  return Math.round((extraCash / savedHours) * 10) / 10;
+}
+
+export function getRoute(from: string, to: string) {
+  return ROUTES.find((r) => r.from.slug === from && r.to.slug === to);
+}
+
+export function allTripcostPages(): PageRecord[] {
+  return ROUTES.flatMap((route) => {
+    const comparison = compareRoute(route, 4);
+    const quality = evaluatePageQuality({
+      site: "tripcost",
+      family: "route-car-vs-train",
+      unique_fields: 12,
+      required_fields_present: 9,
+      required_fields_total: 9,
+      search_demand: { seed_research: route.demand },
+      product_cta: true,
+      interactive: true,
+      distinct_from_parent: true,
+      near_duplicate: false,
+      year_only_variant: false,
+      city_without_specifics: false,
+      obscure_without_demand: route.demand < 40,
+      llm_filler: false,
+      confidence: "MEDIUM",
+      freshness_days: 20,
+      freshness_ttl_days: 30,
+      provenance_valid: true,
+      site_rules: () => ({
+        delta: comparison.modes.length >= 2 ? 0 : -40,
+        reasons: ["Multiple modes or meaningful driving cost required."],
+        blockers: comparison.modes.length < 2 ? ["Single mode only"] : [],
+      }),
+    });
+    const driving = evaluatePageQuality({
+      site: "tripcost",
+      family: "route-driving",
+      unique_fields: 8,
+      required_fields_present: 8,
+      required_fields_total: 8,
+      search_demand: { seed_research: route.demand - 5 },
+      product_cta: true,
+      interactive: true,
+      distinct_from_parent: true,
+      near_duplicate: false,
+      year_only_variant: false,
+      city_without_specifics: false,
+      obscure_without_demand: false,
+      llm_filler: false,
+      confidence: "MEDIUM",
+      freshness_days: 20,
+      freshness_ttl_days: 30,
+      provenance_valid: true,
+    });
+    const base = `/tripcost/${route.from.slug}/to/${route.to.slug}`;
+    return [
+      {
+        id: route.id,
+        site: "tripcost" as const,
+        family: "route-car-vs-train" as const,
+        url: base,
+        canonical: base,
+        title: `${route.from.name} to ${route.to.name}: car vs train vs flight`,
+        meta_description: `${route.from.name} → ${route.to.name}, 4 travellers. Driving cash cost and door-to-door times from structured assumptions.`,
+        entity_ids: [route.id],
+        structured_payload: { km: route.km, tolls: route.tolls_eur, modes: comparison.modes.map((m) => m.mode) },
+        quality_score: quality.score,
+        search_demand: searchDemandScore({ seed_research: route.demand }),
+        index_state: quality.index_state,
+        noindex: quality.index_state !== "INDEXABLE",
+        similarity_hash: route.id,
+        freshness: "2026-09-01T00:00:00.000Z",
+        review_required: false,
+        batch: "tripcost-batch-1",
+        publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
+      },
+      {
+        id: `${route.id}:driving`,
+        site: "tripcost" as const,
+        family: "route-driving" as const,
+        url: `${base}/driving-cost`,
+        canonical: `${base}/driving-cost`,
+        title: `${route.from.name} to ${route.to.name} driving cost: fuel + tolls`,
+        meta_description: `${route.km} km, tolls ${route.tolls_eur} €, fuel snapshot ${route.fuel_eur_per_l.toFixed(2)} €/L.`,
+        entity_ids: [route.id],
+        structured_payload: { km: route.km, tolls: route.tolls_eur, fuel: route.fuel_eur_per_l },
+        quality_score: driving.score,
+        search_demand: route.demand - 5,
+        index_state: driving.index_state,
+        noindex: driving.index_state !== "INDEXABLE",
+        similarity_hash: `${route.id}-drive`,
+        freshness: "2026-09-01T00:00:00.000Z",
+        review_required: false,
+        batch: "tripcost-batch-1",
+        publish_state: driving.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
+      },
+    ];
+  });
+}
+
+export const PRICE_PROVENANCE = provenance({
+  source_id: "seed-transport-snapshot",
+  source_type: "THIRD_PARTY",
+  retrieved_at: "2026-09-01T00:00:00.000Z",
+  valid_until: "2026-10-01T00:00:00.000Z",
+  confidence: 60,
+  raw_value: "typical fares and fuel snapshot",
+  normalized_value: "EUR",
+  verification_method: "HEURISTIC",
+  notes: "Estimates. Live fares are not connected in batch 1.",
+});

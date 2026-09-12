@@ -1,0 +1,22 @@
+.chargematch h1 {
+  letter-spacing: -0.05em;
+  font-weight: 500;
+}
+
+.cm-box {
+  border: 1px solid #cfcfc9;
+  background: #fafaf7;
+}
+
+.cm-cta {
+  background: #111;
+  color: #f3f3f0;
+  border: 0;
+  padding: 0.8rem 1.1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.cm-mono {
+  font-family: var(--font-cm-mono), ui-monospace, monospace;
+}
