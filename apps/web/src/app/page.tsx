@@ -73,7 +73,7 @@ export default function HubPage() {
           </Link>
         ))}
         <section className="rounded-sm border border-[#d7d2c8] bg-white p-6 md:col-span-2">
-          <h2 className="text-sm tracking-[0.16em] uppercase">Launch graph (batch 1)</h2>
+          <h2 className="text-sm tracking-[0.16em] uppercase">Launch graph</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f4c45]">
             Indexable URLs are quality-gated. ChargeMatch stores charger×device relations in the graph without publishing every pair.
           </p>

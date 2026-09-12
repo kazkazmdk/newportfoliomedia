@@ -4,8 +4,8 @@ import {
   searchDemandScore,
   type PageQualityInput,
 } from "@penta/quality-gate";
-import { ALL_ERRORS } from "./engine";
-import { APPLIANCES, BRANDS, SYMPTOMS } from "./data-symptoms";
+import { ALL_ERRORS, ALL_SYMPTOMS } from "./engine";
+import { APPLIANCES, BRANDS } from "./data-symptoms";
 import type { ErrorProfile, SymptomProfile } from "./types";
 
 function requiredFields(profile: ErrorProfile): string[] {
@@ -86,7 +86,7 @@ export function errorPage(profile: ErrorProfile): PageRecord {
     similarity_hash: hashPayload(payload),
     freshness: profile.provenance[0]?.retrieved_at ?? "",
     review_required: profile.causes.some((cause) => cause.safety === "PROFESSIONAL_ONLY"),
-    batch: "fixcode-batch-1",
+    batch: "fixcode-batch-2",
     publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
   };
 }
@@ -140,7 +140,7 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
     similarity_hash: hashPayload(payload),
     freshness: profile.provenance[0]?.retrieved_at ?? "",
     review_required: true,
-    batch: "fixcode-batch-1",
+    batch: "fixcode-batch-2",
     publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
   };
 }
@@ -187,7 +187,7 @@ export function hubPages(): PageRecord[] {
       similarity_hash: hashPayload(payload),
       freshness: "2026-08-12T00:00:00.000Z",
       review_required: false,
-      batch: "fixcode-batch-1",
+      batch: "fixcode-batch-2",
       publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
     });
   }
@@ -236,7 +236,7 @@ export function hubPages(): PageRecord[] {
         similarity_hash: hashPayload(payload),
         freshness: "2026-08-12T00:00:00.000Z",
         review_required: false,
-        batch: "fixcode-batch-1",
+        batch: "fixcode-batch-2",
         publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
       });
     }
@@ -247,7 +247,7 @@ export function hubPages(): PageRecord[] {
 export function allFixcodePages(): PageRecord[] {
   return [
     ...ALL_ERRORS.map(errorPage),
-    ...SYMPTOMS.map(symptomPage),
+    ...ALL_SYMPTOMS.map(symptomPage),
     ...hubPages(),
   ];
 }

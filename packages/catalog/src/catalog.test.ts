@@ -136,6 +136,12 @@ describe("WearThere", () => {
     expect(cap.weather_kind).toBe("TYPICAL");
     expect(cap.pieces.length).toBeGreaterThan(4);
   });
+
+  it("indexes january for high-demand cities", async () => {
+    const { allWeartherePages } = await import("@penta/wearthere");
+    const jan = allWeartherePages().find((p) => p.url === "/wearthere/tokyo/january/what-to-wear");
+    expect(jan?.index_state).toBe("INDEXABLE");
+  });
 });
 
 describe("AutoSpec", () => {
@@ -164,6 +170,7 @@ describe("catalog / SEO tests", () => {
     expect(report.graph.indexable).toBeGreaterThan(20);
     expect(report.average_indexable_quality).toBeGreaterThanOrEqual(75);
     expect(globalNoindex()).toBe(true);
+    expect(report.graph.entities).toBeGreaterThan(200);
   });
 
   it("stores more graph relations than indexable URLs for ChargeMatch", () => {

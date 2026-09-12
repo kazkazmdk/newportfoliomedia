@@ -10,7 +10,7 @@ export const metadata = pageMeta({
 });
 
 export default function FixcodeHome() {
-  const popular = ALL_ERRORS.slice(0, 6);
+  const popular = [...ALL_ERRORS].sort((a, b) => b.search_demand - a.search_demand).slice(0, 8);
   return (
     <main>
       <p className="text-sm text-[#6a6a64]">Appliance diagnostic engine</p>

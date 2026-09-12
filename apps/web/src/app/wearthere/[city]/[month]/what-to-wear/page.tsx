@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DESTINATIONS, MONTHS, allWeartherePages, capsuleFor } from "@penta/wearthere";
+import { DESTINATIONS, MONTHS, allWeartherePages, capsuleFor, indexedMonths } from "@penta/wearthere";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
 
 export function generateStaticParams() {
-  const months = [3, 4, 5, 6, 7, 9, 10, 11];
-  return DESTINATIONS.flatMap((d) => months.map((m) => ({ city: d.slug, month: MONTHS[m - 1] })));
+  return DESTINATIONS.flatMap((d) =>
+    indexedMonths(d).map((m) => ({ city: d.slug, month: MONTHS[m - 1] })),
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ city: string; month: string }> }) {

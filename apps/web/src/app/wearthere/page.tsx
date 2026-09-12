@@ -9,6 +9,8 @@ export const metadata = pageMeta({
 });
 
 export default function WearthereHome() {
+  const featured = [...DESTINATIONS].sort((a, b) => b.demand - a.demand).slice(0, 8);
+  const rest = [...DESTINATIONS].sort((a, b) => b.demand - a.demand).slice(8);
   return (
     <main>
       <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
@@ -21,7 +23,7 @@ export default function WearthereHome() {
           <TripForm />
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {DESTINATIONS.map((d, i) => (
+          {featured.map((d, i) => (
             <a
               key={d.id}
               href={`/wearthere/${d.slug}`}
@@ -33,6 +35,18 @@ export default function WearthereHome() {
           ))}
         </div>
       </div>
+      {rest.length > 0 ? (
+        <ul className="mt-12 grid gap-2 sm:grid-cols-3 md:grid-cols-4">
+          {rest.map((d) => (
+            <li key={d.id}>
+              <a className="wt-card block px-4 py-3" href={`/wearthere/${d.slug}`}>
+                <p className="text-sm">{d.country}</p>
+                <p className="font-[family-name:var(--font-wt-serif)] text-xl">{d.city}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </main>
   );
 }

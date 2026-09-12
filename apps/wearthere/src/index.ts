@@ -1,29 +1,12 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
+import { climate } from "./climate";
+import { MORE_DESTINATIONS } from "./destinations-more";
+import type { Destination } from "./types";
 
-export type MonthClimate = {
-  month: number;
-  tmin_c: number;
-  tmax_c: number;
-  rain_days: number;
-  rain_mm: number;
-  humidity: number;
-  wind_kmh: number;
-  uv: number;
-};
-
-export type Destination = {
-  id: string;
-  city: string;
-  slug: string;
-  country: string;
-  lat: number;
-  lon: number;
-  demand: number;
-  climate: MonthClimate[];
-  activities_default: string[];
-};
+export type { MonthClimate } from "./climate";
+export type { Destination } from "./types";
 
 export type StyleId =
   | "minimal"
@@ -48,11 +31,7 @@ export type ClothingPiece = {
 
 const RETRIEVED = "2026-01-15T00:00:00.000Z";
 
-function climate(month: number, tmin: number, tmax: number, rain_days: number, rain_mm: number, humidity = 70, wind_kmh = 14, uv = 4): MonthClimate {
-  return { month, tmin_c: tmin, tmax_c: tmax, rain_days, rain_mm, humidity, wind_kmh, uv };
-}
-
-export const DESTINATIONS: Destination[] = [
+const CORE_DESTINATIONS: Destination[] = [
   {
     id: "dest:paris",
     city: "Paris",
@@ -247,10 +226,18 @@ export const DESTINATIONS: Destination[] = [
   },
 ];
 
+export const DESTINATIONS: Destination[] = [...CORE_DESTINATIONS, ...MORE_DESTINATIONS];
+
 export const MONTHS = [
   "january","february","march","april","may","june",
   "july","august","september","october","november","december",
 ];
+
+/** High-demand destinations get 12 typical-month pages; others keep the launch window. */
+export function indexedMonths(dest: Destination): number[] {
+  if (dest.demand >= 50) return dest.climate.map((row) => row.month);
+  return [3, 4, 5, 6, 7, 9, 10, 11];
+}
 
 export const WARDROBE_SEED: ClothingPiece[] = [
   { id: "tee", name: "Crew T-shirt", category: "top", warmth: 2, water_resistance: 0, formal: 1, volume_l: 1.2, weight_kg: 0.18, colors: ["white", "navy"] },
@@ -410,7 +397,6 @@ export async function fetchForecast(lat: number, lon: number, start: string, end
 
 export function allWeartherePages(): PageRecord[] {
   const pages: PageRecord[] = [];
-  const launchMonths = [3, 4, 5, 6, 7, 9, 10, 11];
   for (const dest of DESTINATIONS) {
     const hubQ = evaluatePageQuality({
       site: "wearthere",
@@ -449,10 +435,10 @@ export function allWeartherePages(): PageRecord[] {
       similarity_hash: dest.slug,
       freshness: RETRIEVED,
       review_required: false,
-      batch: "wearthere-batch-1",
+      batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
       publish_state: hubQ.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
     });
-    for (const month of launchMonths) {
+    for (const month of indexedMonths(dest)) {
       const w = dest.climate[month - 1];
       const quality = evaluatePageQuality({
         site: "wearthere",
@@ -484,7 +470,7 @@ export function allWeartherePages(): PageRecord[] {
         title: `What to Wear in ${dest.city} in ${slug[0].toUpperCase()}${slug.slice(1)}`,
         meta_description: `Typical ${dest.city} ${slug}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
         entity_ids: [dest.id],
-        structured_payload: { ...w, city: dest.city },
+        structured_payload: { ...w, city: dest.city, slug: dest.slug },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: dest.demand }),
         index_state: quality.index_state,
@@ -492,7 +478,7 @@ export function allWeartherePages(): PageRecord[] {
         similarity_hash: `${dest.slug}-${month}`,
         freshness: RETRIEVED,
         review_required: false,
-        batch: "wearthere-batch-1",
+        batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
         publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
       });
     }

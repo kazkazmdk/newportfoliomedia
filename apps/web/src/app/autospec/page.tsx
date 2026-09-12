@@ -20,9 +20,9 @@ export default function AutospecHome() {
         <GarageEntry />
       </div>
       <div className="as-panel relative min-h-[320px] p-8">
-        <p className="text-xs tracking-[0.16em] uppercase">Covered in batch 1</p>
+        <p className="text-xs tracking-[0.16em] uppercase">Covered identities</p>
         <ul className="mt-6 grid gap-4">
-          {VEHICLES.map((v) => (
+          {VEHICLES.slice(0, 8).map((v) => (
             <li key={v.id} className="flex items-baseline justify-between border-b border-[#d9d0c0] pb-3">
               <span>
                 {v.make} {v.model}
@@ -33,7 +33,11 @@ export default function AutospecHome() {
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm text-[#6a6258]">Other markets and models are not invented.</p>
+        {VEHICLES.length > 8 ? (
+          <p className="mt-6 text-sm text-[#6a6258]">{VEHICLES.length - 8} more generation/engine pages. Other markets are not invented.</p>
+        ) : (
+          <p className="mt-6 text-sm text-[#6a6258]">Other markets and models are not invented.</p>
+        )}
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
+import { MORE_PLACES, moreRoutes } from "./routes-more";
 
 export type Place = { id: string; name: string; slug: string; country: string };
 
@@ -45,7 +46,7 @@ export type RouteRecord = {
   rideshare_eur: number;
 };
 
-export const PLACES: Place[] = [
+export const CORE_PLACES: Place[] = [
   { id: "paris", name: "Paris", slug: "paris", country: "FR" },
   { id: "lyon", name: "Lyon", slug: "lyon", country: "FR" },
   { id: "barcelona", name: "Barcelona", slug: "barcelona", country: "ES" },
@@ -57,7 +58,9 @@ export const PLACES: Place[] = [
   { id: "brussels", name: "Brussels", slug: "brussels", country: "BE" },
 ];
 
-export const ROUTES: RouteRecord[] = [
+export const PLACES: Place[] = [...CORE_PLACES, ...MORE_PLACES];
+
+export const CORE_ROUTES: RouteRecord[] = [
   {
     id: "paris-lyon",
     from: PLACES[0],
@@ -241,6 +244,8 @@ export const ROUTES: RouteRecord[] = [
     rideshare_eur: 0,
   },
 ];
+
+export const ROUTES: RouteRecord[] = [...CORE_ROUTES, ...moreRoutes(PLACES)];
 
 export type ProviderMeta = {
   id: string;
@@ -447,10 +452,10 @@ export function allTripcostPages(): PageRecord[] {
         family: "route-car-vs-train" as const,
         url: base,
         canonical: base,
-        title: `${route.from.name} to ${route.to.name}: car vs train vs flight`,
+        title: `${route.from.name} to ${route.to.name}: car vs train${route.flight_eur_pp > 0 ? " vs flight" : ""}`,
         meta_description: `${route.from.name} → ${route.to.name}, 4 travellers. Driving cash cost and door-to-door times from structured assumptions.`,
         entity_ids: [route.id],
-        structured_payload: { km: route.km, tolls: route.tolls_eur, modes: comparison.modes.map((m) => m.mode) },
+        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, modes: comparison.modes.map((m) => m.mode) },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: route.demand }),
         index_state: quality.index_state,
@@ -470,7 +475,7 @@ export function allTripcostPages(): PageRecord[] {
         title: `${route.from.name} to ${route.to.name} driving cost: fuel + tolls`,
         meta_description: `${route.km} km, tolls ${route.tolls_eur} €, fuel snapshot ${route.fuel_eur_per_l.toFixed(2)} €/L.`,
         entity_ids: [route.id],
-        structured_payload: { km: route.km, tolls: route.tolls_eur, fuel: route.fuel_eur_per_l },
+        structured_payload: { route: route.id, km: route.km, tolls: route.tolls_eur, fuel: route.fuel_eur_per_l },
         quality_score: driving.score,
         search_demand: route.demand - 5,
         index_state: driving.index_state,

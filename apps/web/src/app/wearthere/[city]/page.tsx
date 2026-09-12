@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { DESTINATIONS, MONTHS } from "@penta/wearthere";
+import { DESTINATIONS, MONTHS, indexedMonths } from "@penta/wearthere";
 import { pageMeta } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -27,7 +27,9 @@ export default async function CityHub({ params }: { params: Promise<{ city: stri
       <h1 className="text-6xl">{dest.city}</h1>
       <p className="mt-3 max-w-lg text-lg">{dest.country}. Typical climate, then exact dates.</p>
       <ul className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {dest.climate.map((m) => (
+        {indexedMonths(dest).map((month) => {
+          const m = dest.climate[month - 1];
+          return (
           <li key={m.month}>
             <Link className="wt-card block p-4" href={`/wearthere/${city}/${MONTHS[m.month - 1]}/what-to-wear`}>
               <p className="capitalize">{MONTHS[m.month - 1]}</p>
@@ -36,7 +38,8 @@ export default async function CityHub({ params }: { params: Promise<{ city: stri
               </p>
             </Link>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </main>
   );

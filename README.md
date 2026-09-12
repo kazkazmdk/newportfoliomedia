@@ -50,14 +50,14 @@ Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe,
 
 Aucune page n’est créée parce qu’une combinaison existe. L’IA n’écrit pas 1 500 mots sur un mot-clé : elle explique des faits structurés.
 
-## Données (batch 1, honnête)
+## Données (catalog, honnête)
 
-Le batch 1 est **profond et étroit** :
+Le graphe s’étend **en profondeur**, pas en pages creuses :
 
-- FixCode : Samsung / LG / Bosch / Miele — codes avec arbres complets, pas Whirlpool inventé
-- AutoSpec : 5 identités moteur/génération (BMW 320d G20, Corolla, Golf, Model 3, Civic)
-- WearThere : 8 villes à forte demande, mois prioritaires
-- ChargeMatch : appareils et chargeurs populaires ; le reste est graph-only
+- FixCode : Samsung / LG / Bosch / Miele — familles de codes (fill, drain, heat, AquaStop…) avec arbres complets. Pas de Whirlpool inventé.
+- AutoSpec : identités moteur/génération (BMW, Toyota, VW, Tesla, Honda, Mercedes, Audi, Peugeot, Renault, Hyundai, Kia, Volvo, Ford, Nissan…). Pas de pages année marketing.
+- WearThere : villes à forte demande, **12 mois** de climat typique quand la demande le justifie
+- ChargeMatch : appareils et chargeurs populaires ; les paires obscures restent graph-only
 - TripCost : corridors européens à forte demande, tarifs **estimés** (pas un GDS live)
 
 Open-Meteo (sans clé) est optionnel pour WearThere. S’il est indisponible, le climat typique reste affiché **comme climat**, jamais comme prévision.
@@ -75,9 +75,8 @@ Open-Meteo (sans clé) est optionnel pour WearThere. S’il est indisponible, le
 
 `pnpm test` vérifie le quality gate, le diagnostic 4C, la compatibilité USB-PD, Paris→Lyon selon le nombre de voyageurs, le climat ≠ forecast, et que chaque URL indexable a un titre unique et un score ≥ 75.
 
-## Suite utile (prochain batch)
+## Suite utile
 
-1. FixCode : étendre les arbres Samsung/LG/Bosch (pas une explosion de marques vides)
-2. Brancher un VIN provider **licencié** par territoire
-3. Fares rail/flight avec contrat API et cache
-4. Console ops : INDEX / NOINDEX / MERGE / REFRESH persistés (Postgres/Supabase)
+1. Brancher un VIN provider **licencié** par territoire
+2. Fares rail/flight avec contrat API et cache
+3. Console ops : INDEX / NOINDEX / MERGE / REFRESH persistés (Postgres/Supabase)

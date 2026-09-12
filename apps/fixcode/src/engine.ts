@@ -10,10 +10,28 @@ import type {
 } from "./types";
 import { ERRORS } from "./data-samsung";
 import { MORE_ERRORS } from "./data-more";
-import { SYMPTOMS } from "./data-symptoms";
+import { SYMPTOMS as SEED_SYMPTOMS } from "./data-symptoms";
+import { BATCH2_ERRORS } from "./batch2";
+import { symptomsFromErrors } from "./families";
 
-export const ALL_ERRORS: ErrorProfile[] = [...ERRORS, ...MORE_ERRORS];
-export const ALL_SYMPTOMS = SYMPTOMS;
+function uniqueById<T extends { id: string }>(rows: T[]): T[] {
+  const map = new Map<string, T>();
+  for (const row of rows) {
+    if (!map.has(row.id)) map.set(row.id, row);
+  }
+  return [...map.values()];
+}
+
+export const ALL_ERRORS: ErrorProfile[] = uniqueById([
+  ...ERRORS,
+  ...MORE_ERRORS,
+  ...BATCH2_ERRORS,
+]);
+
+export const ALL_SYMPTOMS: SymptomProfile[] = uniqueById([
+  ...SEED_SYMPTOMS,
+  ...symptomsFromErrors(ALL_ERRORS),
+]);
 
 const SAFETY_RANK: Record<SafetyClass, number> = {
   SAFE_USER_CHECK: 0,

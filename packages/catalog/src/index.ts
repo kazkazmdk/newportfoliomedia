@@ -123,6 +123,21 @@ export function buildCatalog(): GraphStore {
         confidence: "HIGH",
       }),
     );
+    for (const month of dest.climate) {
+      store.addRelation(
+        rel({
+          id: `${dest.id}:climate:${month.month}`,
+          site: "wearthere",
+          type: "typical_climate",
+          from_id: dest.id,
+          to_id: dest.id,
+          properties: { month: month.month, tmin: month.tmin_c, tmax: month.tmax_c, rain_days: month.rain_days },
+          provenance: [],
+          confidence: "HIGH",
+          index_eligible: dest.demand >= 50,
+        }),
+      );
+    }
   }
 
   for (const device of DEVICES) {
@@ -194,6 +209,29 @@ export function buildCatalog(): GraphStore {
         confidence: "MEDIUM",
       }),
     );
+    for (const mode of ["car", "ev", "train", "bus", "flight", "rideshare"] as const) {
+      const available =
+        mode === "car" ||
+        mode === "ev" ||
+        (mode === "train" && route.train_eur_pp > 0) ||
+        (mode === "bus" && route.bus_eur_pp > 0) ||
+        (mode === "flight" && route.flight_eur_pp > 0) ||
+        (mode === "rideshare" && route.rideshare_eur > 0);
+      if (!available) continue;
+      store.addRelation(
+        rel({
+          id: `${route.id}:${mode}`,
+          site: "tripcost",
+          type: "has_mode",
+          from_id: route.id,
+          to_id: route.id,
+          properties: { mode, graph_only: true },
+          provenance: [],
+          confidence: "MEDIUM",
+          index_eligible: false,
+        }),
+      );
+    }
   }
 
   const pages = [

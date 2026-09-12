@@ -1,4 +1,5 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
+import { MORE_VEHICLES } from "./vehicles-more";
 
 export type ServiceItem = {
   id: string;
@@ -76,7 +77,7 @@ function mfr(raw: string, url: string, confidence: number) {
   });
 }
 
-export const VEHICLES: VehicleIdentity[] = [
+const CORE: VehicleIdentity[] = [
   {
     id: "veh:bmw:3-series:g20:320d-b47",
     make: "BMW",
@@ -410,6 +411,8 @@ export const VEHICLES: VehicleIdentity[] = [
   },
 ];
 
+export const VEHICLES: VehicleIdentity[] = [...CORE, ...MORE_VEHICLES];
+
 export const VEHICLE_PROVENANCE = [
   mfr("BMW 320d G20 oil LL-04", "https://www.bmw.com", 86),
   mfr("Toyota Corolla hybrid oil", "https://www.toyota.com", 84),
@@ -425,8 +428,18 @@ const WMI: Record<string, string> = {
   WBA: "BMW",
   WBS: "BMW M",
   WVW: "Volkswagen",
+  WAU: "Audi",
+  WDD: "Mercedes",
   JTD: "Toyota",
   JHM: "Honda",
+  VF3: "Peugeot",
+  VF1: "Renault",
+  KMH: "Hyundai",
+  U5Y: "Kia",
+  YV1: "Volvo",
+  WMW: "MINI",
+  JN1: "Nissan",
+  WF0: "Ford",
   "5YJ": "Tesla",
 };
 

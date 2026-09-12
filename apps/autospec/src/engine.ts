@@ -160,6 +160,7 @@ export function allAutospecPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const vehicle of VEHICLES) {
     const hubPayload = {
+      vehicle: vehicle.id,
       engine: vehicle.engine_code,
       years: vehicle.years,
       generation: vehicle.generation,
@@ -208,14 +209,14 @@ export function allAutospecPages(): PageRecord[] {
       if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) continue;
       const payload =
         topic.slug === "oil"
-          ? { spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters }
+          ? { vehicle: vehicle.id, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters }
           : topic.slug === "tyres"
-            ? vehicle.tyres
+            ? { vehicle: vehicle.id, ...vehicle.tyres }
             : topic.slug === "battery"
-              ? vehicle.battery
+              ? { vehicle: vehicle.id, ...vehicle.battery }
               : topic.slug === "maintenance"
-                ? { items: vehicle.services.map((s) => s.id) }
-                : { issues: vehicle.issues.map((i) => i.id) };
+                ? { vehicle: vehicle.id, items: vehicle.services.map((s) => s.id) }
+                : { vehicle: vehicle.id, issues: vehicle.issues.map((i) => i.id) };
       const quality = evaluatePageQuality({
         site: "autospec",
         family: topic.family,

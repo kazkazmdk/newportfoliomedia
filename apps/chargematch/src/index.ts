@@ -1,6 +1,7 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
+import { MORE_CHARGERS, MORE_DEVICES, MORE_PAIRS } from "./catalog-more";
 
 export type ConfidenceTag =
   | "MANUFACTURER_VERIFIED"
@@ -62,7 +63,7 @@ export type CableProfile = {
   tag: ConfidenceTag;
 };
 
-export const DEVICES: DeviceProfile[] = [
+export const CORE_DEVICES: DeviceProfile[] = [
   { id: "dev:iphone-16", name: "iPhone 16", slug: "iphone-16", brand: "Apple", connector: "USB-C", min_watts: 5, max_watts: 25, pd_version: "PD 3.0", pps: false, notes: "USB-C PD. Fast charge needs a capable USB-C charger and cable.", demand: 96, tag: "MANUFACTURER_VERIFIED" },
   { id: "dev:iphone-15", name: "iPhone 15", slug: "iphone-15", brand: "Apple", connector: "USB-C", min_watts: 5, max_watts: 20, pd_version: "PD 3.0", notes: "USB-C PD up to about 20W with a suitable brick.", demand: 90, tag: "MANUFACTURER_VERIFIED" },
   { id: "dev:mba-m3-13", name: "MacBook Air 13-inch (M3)", slug: "macbook-air-13-m3", brand: "Apple", connector: "USB-C", min_watts: 30, max_watts: 70, pd_version: "PD 3.0", notes: "Ships with 30W; 70W is supported for faster fill. MagSafe SKU differs — this row is USB-C in.", demand: 88, tag: "MANUFACTURER_VERIFIED" },
@@ -76,7 +77,9 @@ export const DEVICES: DeviceProfile[] = [
   { id: "dev:watch", name: "Apple Watch", slug: "apple-watch", brand: "Apple", connector: "Watch", min_watts: 5, max_watts: 5, notes: "Does not charge from a USB-C PD laptop cable alone. Needs the Watch puck.", demand: 55, tag: "MANUFACTURER_VERIFIED" },
 ];
 
-export const CHARGERS: ChargerProfile[] = [
+export const DEVICES: DeviceProfile[] = [...CORE_DEVICES, ...MORE_DEVICES];
+
+export const CORE_CHARGERS: ChargerProfile[] = [
   {
     id: "chg:apple-20w",
     name: "Apple 20W USB-C",
@@ -172,6 +175,8 @@ export const CHARGERS: ChargerProfile[] = [
   },
 ];
 
+export const CHARGERS: ChargerProfile[] = [...CORE_CHARGERS, ...MORE_CHARGERS];
+
 export const CABLES: CableProfile[] = [
   { id: "cab:apple-usbc-60w", name: "Apple USB-C 60W", slug: "apple-usbc-60w", e_marker: true, max_watts: 60, max_volts: 20, connector: "USB-C to USB-C", tag: "MANUFACTURER_VERIFIED" },
   { id: "cab:apple-usbc-240w", name: "Apple USB-C 240W", slug: "apple-usbc-240w", e_marker: true, max_watts: 240, max_volts: 48, connector: "USB-C to USB-C", tag: "MANUFACTURER_VERIFIED" },
@@ -236,7 +241,8 @@ export function compatibility(
   else if (portWatts < device.max_watts) bottleneck = "charger port allocation";
   else if (device.max_watts < portWatts) bottleneck = "device input limit";
 
-  const compatible = device.connector === "USB-C" && portWatts >= device.min_watts;
+  const pdIn = device.connector === "USB-C" || device.connector === "Lightning";
+  const compatible = pdIn && portWatts >= device.min_watts;
   const fast = theoretical >= device.max_watts * 0.8;
   const match = !compatible
     ? "INCOMPATIBLE"
@@ -268,7 +274,9 @@ export function compatibility(
     explanation:
       match === "UNKNOWN"
         ? "The unmarked cable is the unknown. We will not invent a wattage."
-        : `${device.name} can take up to ${device.max_watts} W. This port offers ${portWatts} W before cable limits. Expected max is ${theoretical} W (${tag.replaceAll("_", " ").toLowerCase()}).`,
+        : device.connector === "Lightning"
+          ? `${device.name} is Lightning PD. This USB-C brick can supply power; you still need a USB-C to Lightning cable. Expected max is ${theoretical} W.`
+          : `${device.name} can take up to ${device.max_watts} W. This port offers ${portWatts} W before cable limits. Expected max is ${theoretical} W (${tag.replaceAll("_", " ").toLowerCase()}).`,
     theoretical: true,
   };
 }
@@ -329,6 +337,7 @@ const POPULAR_PAIRS: Array<[string, string]> = [
   ["steam-deck", "apple-20w"],
   ["galaxy-s24", "anker-65w"],
   ["iphone-15", "apple-20w"],
+  ...MORE_PAIRS,
 ];
 
 export function allChargematchPages(): PageRecord[] {
@@ -363,7 +372,7 @@ export function allChargematchPages(): PageRecord[] {
       title: `${device.name} charging wattage`,
       meta_description: `${device.name} takes ${device.min_watts}–${device.max_watts} W (${device.tag.replaceAll("_", " ")}). Check a charger.`,
       entity_ids: [device.id],
-      structured_payload: { min: device.min_watts, max: device.max_watts, pd: device.pd_version },
+      structured_payload: { slug: device.slug, min: device.min_watts, max: device.max_watts, pd: device.pd_version },
       quality_score: q.score,
       search_demand: device.demand,
       index_state: q.index_state,
@@ -376,10 +385,12 @@ export function allChargematchPages(): PageRecord[] {
     });
   }
   for (const [d, c] of POPULAR_PAIRS) {
-    const device = getDevice(d)!;
-    const charger = getCharger(c)!;
+    const device = getDevice(d);
+    const charger = getCharger(c);
+    if (!device || !charger) continue;
     const result = compatibility(device, charger);
     const demand = Math.min(device.demand, charger.demand);
+    if (demand < 50) continue;
     const q = evaluatePageQuality({
       site: "chargematch",
       family: "can-charger-charge",
