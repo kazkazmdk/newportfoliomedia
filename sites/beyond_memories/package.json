@@ -48,12 +48,12 @@
     "postcss": "8.4.31"
   },
   "scripts": {
-    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --config ./bundler/webpack.prod.js",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --config ./bundler/webpack.prod.js && node scripts/assert-dist-media.js",
     "watch": "NODE_OPTIONS=--openssl-legacy-provider webpack --watch --config ./bundler/webpack.prod.js",
     "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --config ./bundler/webpack.dev.js --client-log-level warning",
     "lint": "eslint --ignore-path .eslintignore .",
     "lint:fix": "npm run lint -- --fix",
-    "test": "node --test src/js/Tools/loadTracker.test.js",
+    "test": "node --test src/js/Tools/loadTracker.test.js scripts/assert-dist-media.test.js",
     "check": "npm run lint && npm test && npm run build"
   },
   "author": "Lissandre Pasdeloup",

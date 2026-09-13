@@ -60,7 +60,17 @@ module.exports = {
         use: [
           {
             loader: 'html-loader',
-            options: { attributes: false },
+            options: {
+              // Process HTML audio/video so file-loader hashes them.
+              // Leave <img src="./assets/..."> alone: those files live in
+              // static/ and are copied by CopyWebpackPlugin.
+              attributes: {
+                list: [
+                  { tag: 'audio', attribute: 'src', type: 'src' },
+                  { tag: 'video', attribute: 'src', type: 'src' },
+                ],
+              },
+            },
           },
         ],
       },
