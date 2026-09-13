@@ -1,0 +1,39 @@
+.loading
+  background #000
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index 2000
+  &-circle
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & .wrapper
+      width: 346px;
+      height: 351px;
+    &-moving
+      z-index: 1;
+      position: absolute;
+    &-background
+      z-index: 2;
+      position: absolute;
+  &-title
+    width: 100vw;
+    height: 100vh;
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 2.6vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    & span
+      display: inline-block;
+      font-family Francesco

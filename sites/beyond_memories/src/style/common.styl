@@ -1,0 +1,87 @@
+* 
+  user-select: none
+
+html, body
+  margin 0
+  padding 0
+  overflow-y hidden
+  color: #fff
+
+canvas
+  width 100%
+  height 100%
+  outline none
+
+.mobile
+  height 100%
+  width 100%
+  position absolute
+  top 0
+  left 0
+  background #000
+  font-family Francesco
+  z-index 999
+  justify-content center
+  align-items center
+  font-size 24px
+  padding 0 4%
+  text-align center
+  box-sizing border-box
+  display none
+
+.visible
+  display flex
+
+.hide
+  overflow hidden
+
+.videoIntro,
+.videoOutro
+  
+  position: absolute
+  top: 50%
+  transform: translateY(-50%)
+  width: 100%
+  height: auto
+  pointer-events: none
+
+.videoContainer,
+.outroContainer
+  display none
+  position: absolute
+  width: 100%
+  height: 100%
+  background-color #000
+  transition: 1s ease-in-out 
+  z-index 400
+  opacity: 0 
+
+.videoButton
+  position: absolute
+  bottom: 5%
+  left: 50%
+  transform: translateX(-50%)
+  transition : opacity .6s cubic-bezier(0,.15,0,1)
+  transform-origin: center
+
+  &:hover
+    opacity:0.8
+
+.videoCta
+  position: relative
+  background-color transparent
+  border none
+  margin: 0
+  cursor: pointer
+  text-shadow: 0px 0px 20px rgba(38,38,38,0.5);
+
+
+.showedpicDiv
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  z-index: 200
+  transform: translate(-50%,-30%)
+
+.showedPicture
+  transform: rotate(-30deg) scale(0)
