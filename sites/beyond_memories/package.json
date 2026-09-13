@@ -45,12 +45,13 @@
     "webpack-merge": "^5.7.3"
   },
   "scripts": {
-    "build": "webpack --config ./bundler/webpack.prod.js",
-    "watch": "webpack --watch --config ./bundler/webpack.prod.js",
-    "dev": "webpack serve --config ./bundler/webpack.dev.js --client-log-level warning",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack --config ./bundler/webpack.prod.js",
+    "watch": "NODE_OPTIONS=--openssl-legacy-provider webpack --watch --config ./bundler/webpack.prod.js",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack serve --config ./bundler/webpack.dev.js --client-log-level warning",
     "lint": "eslint --ignore-path .eslintignore .",
     "lint:fix": "npm run lint -- --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test src/js/Tools/loadTracker.test.js",
+    "check": "npm run lint && npm test && npm run build"
   },
   "author": "Lissandre Pasdeloup",
   "license": "ISC",

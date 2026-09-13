@@ -29,6 +29,7 @@ import Stats from 'stats.js'
 import Sizes from '@tools/Sizes'
 import Time from '@tools/Time'
 import Assets from '@tools/Loader'
+import { resetHtmlMedia } from '@tools/loadTracker'
 
 import Camera from './Camera'
 import World from '@world/index'
@@ -127,18 +128,29 @@ export default class App {
     this.loadDiv = document.querySelector('.loading')
     const tl = gsap.timeline()
     const path = document.querySelector('.loading-circle-background svg path')
+    const status = document.querySelector('.loading-status')
+    const retry = document.querySelector('.loading-retry')
     const l = path.getTotalLength()
     path.style.strokeDashoffset = 100
     if (this.assets.total === 0) {
       this.loadDiv.remove()
     } else {
-      this.assets.on('ressourceLoad', () => {
-        path.style.strokeDashoffset = -(l / 100) * (Math.floor((this.assets.done / this.assets.total) * 100) + Math.floor((1 / this.assets.total) * this.assets.currentPercent))
+      this.assets.on('ressourceLoad', (snapshot) => {
+        const percent = snapshot && typeof snapshot.percent === 'number'
+          ? snapshot.percent
+          : Math.floor((this.assets.done / this.assets.total) * 100)
+        path.style.strokeDashoffset = -(l / 100) * percent
+        if (status) {
+          const loading = snapshot && snapshot.items
+            ? snapshot.items.find((item) => item.status === 'LOADING')
+            : null
+          const phase = loading && loading.phase === 'audio' ? 'audio' : 'monde'
+          status.textContent = `Chargement ${phase} ${this.assets.done}/${this.assets.total}`
+        }
 
         tl
           .set(path, {strokeDasharray:l})
           .fromTo('.loading-title span', {y:'50%', autoAlpha:0}, {y:'0%', autoAlpha:1, duration:1.2, ease:'power4.out', stagger:{each: 0.07, ease:'power2.in'}}, 0.6)
-          // .fromTo(path, {strokeDashoffset:l}, {strokeDashoffset: 0, duration:2, ease:'power4.out'}, '-=1.2')
       })
 
       this.assets.on('ressourcesReady', () => {
@@ -153,6 +165,20 @@ export default class App {
         setTimeout(() => {
           this.loadDiv.remove()
         }, 550)
+      })
+
+      this.assets.on('ressourcesFailed', () => {
+        if (status) {
+          status.textContent = 'Impossible de charger une ressource essentielle.'
+        }
+        if (retry) {
+          retry.hidden = false
+          retry.onclick = () => {
+            retry.hidden = true
+            if (status) status.textContent = 'Nouvel essai…'
+            this.assets.retryFailed()
+          }
+        }
       })
     }
   }
@@ -590,7 +616,7 @@ export default class App {
             }, 550)
             setTimeout(() => {
               this.introVideo.pause()
-              this.introVideo.currenTime = 0
+              resetHtmlMedia(this.introVideo)
               this.renderPass.camera = this.camera.camera
               this.gTimeline.to(this.introVideoContainer, {
                 duration: 1,
