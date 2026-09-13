@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
   Cylinder,
@@ -19,11 +19,7 @@ import { DoubleSide, type Mesh } from "three";
 
 export default function FolioScene() {
   const ring = useRef<Mesh>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-  }, []);
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
   useFrame(({ clock }) => {
     if (ring.current) {
@@ -63,7 +59,7 @@ export default function FolioScene() {
             temporalDistortion={0.1}
             transparent
           />
-          <Sparkles scale={0.5} threshold={15} color="#9d4b4b" />
+          <Sparkles scale={0.5} color="#9d4b4b" />
         </Sphere>
         <Cylinder
           ref={ring}
