@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import { FOLIO_DESCRIPTION, FOLIO_TITLE } from "@/lib/folio-metadata";
 import "./globals.css";
@@ -24,7 +25,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
     <html lang="en" className={`${inter.variable} ${inter.className} h-full`}>
       <body className="min-h-full">{children}</body>
