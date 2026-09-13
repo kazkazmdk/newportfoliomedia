@@ -1,12 +1,12 @@
 {
-  "title": "Vite React Tailwind Starter",
-  "features": "Fonctionnalités",
-  "modernstack": "Stack moderne et efficace",
-  "modernstack-desc": "Construit avec vite, react, tailwindcss, shadcnui et plus encore",
-  "i18nsupport": "Support i18n intégré",
-  "i18nsupport-desc": "Expédiez votre produit avec différentes langues nativement",
-  "linters": "Vérifier tous les codes à la sauvegarde",
-  "linters-desc": "Construit avec eslint, prettier, stylelint, commitlint",
-  "hero-title": "Créez des applications avec la meilleure expérience de développement que nous aimons",
-  "get-started": "Commencer"
+  "title": "Skat Designer",
+  "features": "Position",
+  "modernstack": "Raconter par le design",
+  "modernstack-desc": "Skat Designer est une position éditoriale : design, compétences créatives, AInnovation et [wo]mankind.",
+  "i18nsupport": "Textes bilingues",
+  "i18nsupport-desc": "Chaînes anglaises et françaises pour le site public",
+  "linters": "Contrôles qualité",
+  "linters-desc": "Typecheck, ESLint et build de production",
+  "hero-title": "On peut raconter des histoires par le design",
+  "get-started": "Explorer"
 }

@@ -1,12 +1,12 @@
 {
-  "title": "Vite React Tailwind Starter",
-  "features": "Features",
-  "modernstack": "Modern and efficient stack",
-  "modernstack-desc": "Built with Vite, React, Tailwind CSS, Shadcnui, and more",
-  "i18nsupport": "i18n support out of the box",
-  "i18nsupport-desc": "Ship your product with different languages natively",
-  "linters": "Lint all code at save",
-  "linters-desc": "Built with ESLint, Prettier, Stylelint, and Commitlint",
-  "hero-title": "Building Apps with the best DX we love",
-  "get-started": "Get Started"
+  "title": "Skat Designer",
+  "features": "Position",
+  "modernstack": "Stories through design",
+  "modernstack-desc": "Skat Designer is an editorial studio position: design, creative skills, AInnovation and [wo]mankind.",
+  "i18nsupport": "Bilingual copy",
+  "i18nsupport-desc": "English and French UI strings for the public site",
+  "linters": "Quality checks",
+  "linters-desc": "Typecheck, ESLint and production build",
+  "hero-title": "You can tell stories through design",
+  "get-started": "Explore"
 }

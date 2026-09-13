@@ -3,13 +3,12 @@ import { createHashRouter, RouteObject } from 'react-router-dom'
 import ErrorPage from './components/error-page'
 import { getDefaultLayout } from './components/layout'
 import HomePage from './pages/home'
+import { ROUTES } from './lib/site'
 
-export const routerObjects: RouteObject[] = [
-  {
-    path: '/',
-    Component: HomePage,
-  },
-]
+export const routerObjects: RouteObject[] = ROUTES.map((path) => ({
+  path,
+  Component: HomePage,
+}))
 
 export function createRouter(): ReturnType<typeof createHashRouter> {
   const routeWrappers = routerObjects.map((router) => {
