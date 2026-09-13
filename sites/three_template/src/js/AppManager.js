@@ -4,13 +4,15 @@ import { Pane } from 'tweakpane'
 
 import CameraManager from './CameraManager'
 import World from '@world/index'
+import { clampDevicePixelRatio } from '@tools/loadTracker'
 
 export default class AppManager {
   constructor(options) {
     this.time = options.time
     this.assets = options.assets
+    this._tick = this.update.bind(this)
+    this._onResize = this._handleResize.bind(this)
   }
-  // GETTERS
   get SCENE() {
     return this._scene
   }
@@ -23,7 +25,6 @@ export default class AppManager {
   get WORLD() {
     return this._world
   }
-  // PUBLIC
   setup(canvas = document.querySelector('#_canvas')) {
     this.canvas = canvas
     this._debug = this._setConfig()
@@ -35,9 +36,21 @@ export default class AppManager {
     this._setEvents()
   }
   update() {
+    if (!this._renderer || !this._cameraManager) return
     this._renderer.render(this._scene, this._cameraManager.CAMERA)
   }
-  // PRIVATE
+  destroy() {
+    gsap.ticker.remove(this._tick)
+    window.removeEventListener('resize', this._onResize)
+    if (this._debug && typeof this._debug.dispose === 'function') {
+      this._debug.dispose()
+    }
+    if (this._renderer) {
+      this._renderer.dispose()
+    }
+    this._debug = false
+    this._renderer = null
+  }
   _setScene() {
     const scene = new Scene()
     return scene
@@ -52,7 +65,7 @@ export default class AppManager {
     renderer.outputEncoding = sRGBEncoding
     renderer.gammaFactor = 2.2
     renderer.setClearColor(0x000000, 1)
-    renderer.setPixelRatio(window.devicePixelRatio)
+    renderer.setPixelRatio(clampDevicePixelRatio(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
     return renderer
   }
@@ -63,7 +76,6 @@ export default class AppManager {
     return cameraManager
   }
   _setWorld() {
-    // Create world instance
     const world = new World({
       debug: this._debug,
       assets: this.assets,
@@ -83,15 +95,15 @@ export default class AppManager {
   }
   _setTicker() {
     gsap.ticker.fps(60)
-    gsap.ticker.add(() => {this.update()})
+    gsap.ticker.add(this._tick)
   }
   _setEvents() {
-    window.addEventListener('resize', () => {
-      this._cameraManager.setSizes()
-      this._renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-      )
-    }, false)
+    window.addEventListener('resize', this._onResize, false)
+  }
+  _handleResize() {
+    if (!this._cameraManager || !this._renderer) return
+    this._cameraManager.setSizes()
+    this._renderer.setPixelRatio(clampDevicePixelRatio(window.devicePixelRatio, 2))
+    this._renderer.setSize(window.innerWidth, window.innerHeight)
   }
 }

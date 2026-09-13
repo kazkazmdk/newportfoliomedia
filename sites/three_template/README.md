@@ -1,50 +1,22 @@
-# THREE.js TEMPLATE
+# Three.js experimentation / reusable template
 
-## Requirements & Setup
-You need to have **node.js** installed. 
+This is **not a finished product**. It is a historical Three.js r134 webpack template used to bootstrap 3D experiments.
 
-Start with `npm run init`
-
-This command will init a git repository on your machine, install dependencies and remove useless files and directories for your project.
-After that, this command won't be available anymore.
-
-## Development
-Run the local webpack-dev-server with hotreload and autocompile on:
-- local: [http://localhost:8080/](http://localhost:8080/)
-- network: http://your-local-ip:8080/
+## Run
 
 ```sh
-$ npm run dev
+npm install
+npm run dev
 ```
 
-### Debug
-Go to your-url/#debug
+Debug overlay: add `#debug` to the URL.
 
-## Alias
-- **@**: `src/`
-- **@style**: `src/style/`
-- **@fonts**: `src/fonts/`
-- **@models**: `src/models/`
-- **@sounds**: `src/sounds/`
-- **@shaders**: `src/shaders/`
-- **@textures**: `src/textures/`
-- **@js**: `src/js/`
-- **@tools**: `src/js/Tools/`
-- **@world**: `src/js/World/`
+## Checks
 
-## Features
-- eslint
-- prettier
-- babel
-- stylus
-- Tweakpane
-- automatic models / textures / sounds / fonts.json import
-
-## Deployment
-Build the current application (default output in `dist/`).
 ```sh
-$ npm run build
+npm test
+npm run lint
+npm run build
 ```
 
-## Template link
-[https://github.com/Lissandre/three_template](https://github.com/Lissandre/three_template)
+Node 17+ needs the OpenSSL legacy provider, already set on the npm scripts.

@@ -24,6 +24,8 @@ export default class World {
     this.setLoader()
   }
   init() {
+    if (this._ready) return
+    this._ready = true
     this.setPointLight()
     this.setSuzanne()
   }
