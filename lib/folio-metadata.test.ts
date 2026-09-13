@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { FOLIO_DESCRIPTION, FOLIO_TITLE } from "./folio-metadata";
 
 describe("folio metadata", () => {

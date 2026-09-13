@@ -1,6 +1,5 @@
 import { Object3D } from 'three'
 import BoxObjectVanilla from './BoxObjectVanilla'
-import BoxObjectInteractif from './BoxObjectInteractif'
 
 export default class BoxObjectManager {
   constructor(options) {

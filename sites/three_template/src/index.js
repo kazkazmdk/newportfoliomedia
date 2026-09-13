@@ -1,4 +1,3 @@
-/* global module */
 import Assets from '@tools/Loader'
 import '@style/style.styl'
 import AppManager from '@js/AppManager'

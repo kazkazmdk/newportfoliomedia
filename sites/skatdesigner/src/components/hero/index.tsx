@@ -30,9 +30,7 @@ export const Hero = () => {
             </a>
           </h1>
           <SkatSeparator className="h-4 w-auto" />
-          <span className="px-4 text-center">
-            Skat Designer means scat music for intuition and cat for agility.
-          </span>
+          <span className="px-4 text-center">Skat Designer means scat music for intuition and cat for agility.</span>
         </div>
       </section>
     </div>

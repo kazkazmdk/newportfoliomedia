@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { clampDevicePixelRatio, subscribeMediaQuery } from "./media";
 
 describe("subscribeMediaQuery", () => {

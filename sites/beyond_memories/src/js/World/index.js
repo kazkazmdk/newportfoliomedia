@@ -1,4 +1,4 @@
-import { AudioListener, AxesHelper, Object3D } from 'three'
+import { AudioListener, Object3D } from 'three'
 import { Octree } from 'three/examples/jsm/math/Octree'
 import gsap from 'gsap'
 

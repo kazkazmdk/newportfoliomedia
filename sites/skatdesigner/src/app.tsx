@@ -1,26 +1,27 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from 'react-router-dom'
 import { createRouter } from './router'
 
-const Devtools = import.meta.env.DEV
-  ? React.lazy(() =>
-      import('@tanstack/react-query-devtools').then((mod) => ({
-        default: mod.ReactQueryDevtools,
-      })),
-    )
-  : null
-
 export default function App() {
   const queryClient = useMemo(() => new QueryClient({}), [])
+  const [Devtools, setDevtools] = useState<React.ComponentType | null>(null)
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    let cancelled = false
+    import('@tanstack/react-query-devtools').then((mod) => {
+      if (!cancelled) setDevtools(() => mod.ReactQueryDevtools)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={createRouter()} />
-      {Devtools ? (
-        <React.Suspense fallback={null}>
-          <Devtools />
-        </React.Suspense>
-      ) : null}
+      {Devtools ? <Devtools /> : null}
     </QueryClientProvider>
   )
 }

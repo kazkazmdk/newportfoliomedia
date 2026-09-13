@@ -48,7 +48,9 @@ const LanguageSelector = () => {
                 type="button"
                 key={locale}
                 onClick={() => languageChanged(locale)}
-                className={cn(`relative w-auto cursor-pointer select-none px-4 py-2 text-left text-black hover:bg-zinc-200`)}
+                className={cn(
+                  `relative w-auto cursor-pointer select-none px-4 py-2 text-left text-black hover:bg-zinc-200`,
+                )}
               >
                 <span className={cn(`block truncate`, isSelected && 'font-bold text-primary')}>{name}</span>
               </button>
