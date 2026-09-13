@@ -3,7 +3,9 @@ export const SOURCE_TYPES = [
   "MANUFACTURER",
   "REGULATORY",
   "TESTED",
+  "TRUSTED_THIRD_PARTY",
   "THIRD_PARTY",
+  "USER_OBSERVED",
   "USER_REPORTED",
   "AI_INFERRED",
 ] as const;
@@ -35,8 +37,10 @@ export type VerificationMethod = (typeof VERIFICATION_METHODS)[number];
 export type ProvenanceRecord = {
   source_id: string;
   source_type: SourceType;
+  source_name?: string;
   source_url?: string;
   retrieved_at: string;
+  verified_at?: string;
   valid_from?: string;
   valid_until?: string | null;
   confidence: number;
@@ -61,7 +65,9 @@ const SOURCE_RANK: Record<SourceType, number> = {
   MANUFACTURER: 90,
   REGULATORY: 88,
   TESTED: 80,
+  TRUSTED_THIRD_PARTY: 55,
   THIRD_PARTY: 50,
+  USER_OBSERVED: 32,
   USER_REPORTED: 30,
   AI_INFERRED: 10,
 };

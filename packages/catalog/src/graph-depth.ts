@@ -18,7 +18,7 @@ import {
   type ChargerProfile,
   type DeviceProfile,
 } from "@penta/chargematch";
-import { PRICE_PROVENANCE, ROUTES } from "@penta/tripcost";
+import { DISTANCE_PROVENANCE, PRICE_PROVENANCE, ROUTES } from "@penta/tripcost";
 
 const NOW = "2026-09-12T00:00:00.000Z";
 
@@ -35,11 +35,12 @@ export function entity(
 
 export function rel(
   partial: Omit<GraphRelation, "decision_relevant" | "inferred"> &
-    Partial<Pick<GraphRelation, "decision_relevant" | "inferred">>,
+    Partial<Pick<GraphRelation, "decision_relevant" | "inferred" | "estimated">>,
 ): GraphRelation {
   return {
     inferred: false,
     decision_relevant: true,
+    estimated: Boolean(partial.properties?.theoretical),
     ...partial,
   };
 }
@@ -104,16 +105,17 @@ function populateFixcode(store: GraphStore) {
       rel({
         id: `${brandId}->makes->${applianceId}`,
         site: "fixcode",
-        type: "MAKES_APPLIANCE",
-        from_id: brandId,
-        to_id: applianceId,
-        properties: {},
-        provenance: profile.provenance,
-        confidence: "HIGH",
-        index_eligible: false,
-        method: "MANUFACTURER_DOC",
-        verified_at: NOW,
-      }),
+          type: "MAKES_APPLIANCE",
+          from_id: brandId,
+          to_id: applianceId,
+          properties: {},
+          provenance: profile.provenance,
+          confidence: "HIGH",
+          index_eligible: false,
+          method: "MANUFACTURER_DOC",
+          verified_at: NOW,
+          decision_relevant: false,
+        }),
     );
     store.addEntity(
       entity({
@@ -181,6 +183,19 @@ function populateFixcode(store: GraphStore) {
           index_eligible: false,
         }),
       );
+      store.addRelation(
+        rel({
+          id: `${modelId}->HAS_ERROR->${profile.id}`,
+          site: "fixcode",
+          type: "HAS_ERROR",
+          from_id: modelId,
+          to_id: profile.id,
+          properties: { code: profile.code, index_eligible: false },
+          provenance: profile.provenance,
+          confidence: "MEDIUM",
+          index_eligible: false,
+        }),
+      );
     }
     for (const cause of profile.causes) {
       const causeId = `${profile.id}:cause:${cause.id}`;
@@ -234,6 +249,19 @@ function populateFixcode(store: GraphStore) {
           properties: {},
           provenance: profile.provenance,
           confidence: profile.confidence,
+          index_eligible: false,
+        }),
+      );
+      store.addRelation(
+        rel({
+          id: `${fixId}->SAFETY_CLASS->fix:safety:${cause.safety}`,
+          site: "fixcode",
+          type: "SAFETY_CLASS",
+          from_id: fixId,
+          to_id: `fix:safety:${cause.safety}`,
+          properties: { class: cause.safety, llm_cannot_override: true },
+          provenance: profile.provenance,
+          confidence: "HIGH",
           index_eligible: false,
         }),
       );
@@ -321,6 +349,34 @@ function populateFixcode(store: GraphStore) {
             confidence: profile.confidence,
             index_eligible: false,
             decision_relevant: true,
+          }),
+        );
+      }
+      for (const answer of question.answers) {
+        const resultId = `${testId}:result:${answer.id}`;
+        store.addEntity(
+          entity({
+            id: resultId,
+            site: "fixcode",
+            type: "test_result",
+            slug: answer.id,
+            name: answer.label,
+            properties: { likelihoods: answer.likelihoods },
+            provenance: profile.provenance,
+            confidence: profile.confidence,
+          }),
+        );
+        store.addRelation(
+          rel({
+            id: `${testId}->RETURNS->${resultId}`,
+            site: "fixcode",
+            type: "RETURNS",
+            from_id: testId,
+            to_id: resultId,
+            properties: { answer: answer.id },
+            provenance: profile.provenance,
+            confidence: profile.confidence,
+            index_eligible: false,
           }),
         );
       }
@@ -633,10 +689,20 @@ function populateAutospec(store: GraphStore) {
           from_id: vehicle.id,
           to_id: pid,
           properties: {
-            compatible: fit.compatible,
-            fitment_confidence: fit.confidence,
-            market: fit.market,
-            display: fit.confidence === "HIGH" || fit.confidence === "MEDIUM" ? "compatible" : "unknown",
+            fitment_status:
+              fit.confidence === "HIGH"
+                ? "VERIFIED"
+                : fit.confidence === "MEDIUM"
+                  ? "HIGH_CONFIDENCE"
+                  : fit.confidence === "LOW"
+                    ? "POSSIBLE"
+                    : "UNKNOWN",
+            display:
+              fit.confidence === "HIGH" || fit.confidence === "MEDIUM"
+                ? "compatible"
+                : fit.confidence === "LOW"
+                  ? "Possible fitment — verify."
+                  : "unknown",
           },
           provenance: [oem],
           confidence: fit.confidence,
@@ -671,6 +737,138 @@ function populateAutospec(store: GraphStore) {
         index_eligible: true,
       }),
     );
+    const transId = `${vehicle.id}:transmission`;
+    store.addEntity(
+      entity({
+        id: transId,
+        site: "autospec",
+        type: "transmission",
+        slug: vehicle.transmission.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        name: vehicle.transmission,
+        properties: { market_scope: vehicle.market },
+        provenance: [oem],
+        confidence: vehicle.confidence,
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${vehicle.id}->USES_TRANSMISSION->${transId}`,
+        site: "autospec",
+        type: "USES_TRANSMISSION",
+        from_id: vehicle.id,
+        to_id: transId,
+        properties: { market_scope: vehicle.market },
+        provenance: [oem],
+        confidence: vehicle.confidence,
+        index_eligible: false,
+      }),
+    );
+    const batId = `${vehicle.id}:battery`;
+    store.addEntity(
+      entity({
+        id: batId,
+        site: "autospec",
+        type: "component",
+        slug: "battery",
+        name: `${vehicle.battery.type} ${vehicle.battery.ah ?? ""}`.trim(),
+        properties: { ...vehicle.battery, market_scope: vehicle.market },
+        provenance: [oem],
+        confidence: vehicle.confidence,
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${vehicle.id}->HAS_BATTERY->${batId}`,
+        site: "autospec",
+        type: "HAS_BATTERY",
+        from_id: vehicle.id,
+        to_id: batId,
+        properties: { market_scope: vehicle.market },
+        provenance: [oem],
+        confidence: vehicle.confidence,
+        index_eligible: true,
+      }),
+    );
+    const wiperId = `${vehicle.id}:wipers`;
+    store.addEntity(
+      entity({
+        id: wiperId,
+        site: "autospec",
+        type: "component",
+        slug: "wipers",
+        name: "Wipers",
+        properties: vehicle.wipers,
+        provenance: [oem],
+        confidence: vehicle.confidence,
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${vehicle.id}->HAS_WIPERS->${wiperId}`,
+        site: "autospec",
+        type: "HAS_WIPERS",
+        from_id: vehicle.id,
+        to_id: wiperId,
+        properties: vehicle.wipers,
+        provenance: [oem],
+        confidence: vehicle.confidence,
+        index_eligible: false,
+      }),
+    );
+    const yearId = `${vehicle.id}:year-range`;
+    store.addEntity(
+      entity({
+        id: yearId,
+        site: "autospec",
+        type: "year_range",
+        slug: `${vehicle.years[0]}-${vehicle.years.at(-1)}`,
+        name: `${vehicle.years[0]}–${vehicle.years.at(-1)}`,
+        properties: { years: vehicle.years, not_split_into_year_pages: true },
+        provenance: [oem],
+        confidence: "HIGH",
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${vehicle.id}->COVERS_YEARS->${yearId}`,
+        site: "autospec",
+        type: "COVERS_YEARS",
+        from_id: vehicle.id,
+        to_id: yearId,
+        properties: { years: vehicle.years },
+        provenance: [oem],
+        confidence: "HIGH",
+        index_eligible: false,
+      }),
+    );
+    for (const issue of vehicle.issues) {
+      const iid = `${vehicle.id}:issue:${issue.id}`;
+      store.addEntity(
+        entity({
+          id: iid,
+          site: "autospec",
+          type: "issue",
+          slug: issue.id,
+          name: issue.title,
+          properties: { severity: issue.severity, summary: issue.summary },
+          provenance: [oem],
+          confidence: "MEDIUM",
+        }),
+      );
+      store.addRelation(
+        rel({
+          id: `${vehicle.id}->HAS_ISSUE->${iid}`,
+          site: "autospec",
+          type: "HAS_ISSUE",
+          from_id: vehicle.id,
+          to_id: iid,
+          properties: { severity: issue.severity },
+          provenance: [oem],
+          confidence: "MEDIUM",
+          index_eligible: true,
+        }),
+      );
+    }
   }
 }
 
@@ -690,10 +888,10 @@ function populateWearthere(store: GraphStore) {
           water_resistance: piece.water_resistance,
           wind_resistance: piece.wind_resistance,
           formality: piece.formality,
-          activity: piece.activity,
-          layer: piece.layer,
-          volume_l: piece.volume_l,
-          weight_kg: piece.weight_kg,
+          activity_fit: piece.activity,
+          layer_type: piece.layer,
+          estimated_weight: piece.weight_kg,
+          estimated_volume: piece.volume_l,
         },
         provenance: [CLIMATE_PROVENANCE],
         confidence: "MEDIUM",
@@ -737,7 +935,16 @@ function populateWearthere(store: GraphStore) {
           type: "historical_climate",
           slug: `${dest.slug}-${month.month}`,
           name: `${dest.city} month ${month.month} typical climate`,
-          properties: { ...month, kind: "HISTORICAL_CLIMATE", not: "FORECAST" },
+          properties: {
+            ...month,
+            kind: "CLIMATE_NORMAL",
+            not: "FORECAST",
+            period: "1991-2020",
+            aggregation: "monthly_mean",
+            sample_years: 30,
+            last_update: CLIMATE_PROVENANCE.retrieved_at,
+            data_type: "CLIMATE_NORMAL",
+          },
           provenance: [CLIMATE_PROVENANCE],
           confidence: "HIGH",
         }),
@@ -979,6 +1186,43 @@ function populateChargematch(store: GraphStore) {
         }),
       );
     }
+    const hasA = charger.ports.some((port) => port.id === "a");
+    const hasC1A = charger.allocations.some(
+      (row) => row.ports.length === 2 && row.ports.includes("c1") && row.ports.includes("a"),
+    );
+    if (hasA && !hasC1A) {
+      const unknownId = `${charger.id}:alloc:c1+a-unknown`;
+      store.addEntity(
+        entity({
+          id: unknownId,
+          site: "chargematch",
+          type: "allocation_profile",
+          slug: "c1-a-unknown",
+          name: `${charger.name} C1+A unpublished`,
+          properties: { ports: ["c1", "a"], watts: null, unknown: true },
+          provenance: [POWER_PROVENANCE],
+          confidence: "UNKNOWN",
+        }),
+      );
+      store.addRelation(
+        rel({
+          id: `${charger.id}->ALLOCATION_UNKNOWN->${unknownId}`,
+          site: "chargematch",
+          type: "ALLOCATION_UNKNOWN",
+          from_id: charger.id,
+          to_id: unknownId,
+          properties: {
+            ports: ["c1", "a"],
+            note: "No manufacturer split published. Linear division is forbidden.",
+          },
+          provenance: [POWER_PROVENANCE],
+          confidence: "UNKNOWN",
+          index_eligible: false,
+          inferred: true,
+          estimated: true,
+        }),
+      );
+    }
   }
   for (const cable of CABLES) {
     store.addEntity(
@@ -1024,6 +1268,9 @@ function populateChargematch(store: GraphStore) {
             match: result.match,
             max_power: result.max_power,
             theoretical: result.theoretical,
+            lab: false,
+            measured: false,
+            evidence: result.evidence === "MEASURED" ? "INFERRED" : result.evidence,
             rule_version: "compatibility-v2",
           },
           provenance: [POWER_PROVENANCE],
@@ -1049,6 +1296,7 @@ function populateChargematch(store: GraphStore) {
               theoretical: true,
               lab: false,
               measured: false,
+              evidence: "INFERRED",
               match: withCable.match,
               graph_only: true,
               note: "Protocol overlap, not a lab measurement.",
@@ -1101,14 +1349,15 @@ function populateTripcost(store: GraphStore) {
       rel({
         id: `${route.id}->FROM`,
         site: "tripcost",
-        type: "FROM_PLACE",
-        from_id: route.id,
-        to_id: `tc:place:${route.from.id}`,
-        properties: {},
-        provenance: [PRICE_PROVENANCE],
-        confidence: "HIGH",
-        index_eligible: false,
-      }),
+          type: "FROM_PLACE",
+          from_id: route.id,
+          to_id: `tc:place:${route.from.id}`,
+          properties: {},
+          provenance: [PRICE_PROVENANCE],
+          confidence: "HIGH",
+          index_eligible: false,
+          decision_relevant: false,
+        }),
     );
     store.addRelation(
       rel({
@@ -1121,21 +1370,75 @@ function populateTripcost(store: GraphStore) {
         provenance: [PRICE_PROVENANCE],
         confidence: "HIGH",
         index_eligible: false,
+        decision_relevant: false,
       }),
     );
-    const components: Array<[string, number, string]> = [
-      ["fuel", (route.km * route.fuel_l_per_100) / 100 * route.fuel_eur_per_l, "cash"],
-      ["toll", route.tolls_eur, "cash"],
-      ["parking", route.parking_eur, "cash"],
-      ["wear", route.km * route.wear_eur_per_km, "true_cost"],
-      ["ev_energy", (route.km * route.ev_kwh_per_100) / 100 * route.ev_eur_per_kwh, "cash"],
-      ["train_pp", route.train_eur_pp, "cash"],
-      ["bus_pp", route.bus_eur_pp, "cash"],
-      ["flight_pp", route.flight_eur_pp, "cash"],
+    const distanceId = `${route.id}:distance`;
+    store.addEntity(
+      entity({
+        id: distanceId,
+        site: "tripcost",
+        type: "distance",
+        slug: "km",
+        name: `${route.km} km`,
+        properties: { km: route.km, family: "EVERGREEN", road_type: "intercity" },
+        provenance: [DISTANCE_PROVENANCE],
+        confidence: "HIGH",
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${route.id}->HAS_DISTANCE->${distanceId}`,
+        site: "tripcost",
+        type: "HAS_DISTANCE",
+        from_id: route.id,
+        to_id: distanceId,
+        properties: { km: route.km, family: "EVERGREEN" },
+        provenance: [DISTANCE_PROVENANCE],
+        confidence: "HIGH",
+        index_eligible: false,
+      }),
+    );
+    const consumptionId = `${route.id}:consumption`;
+    store.addEntity(
+      entity({
+        id: consumptionId,
+        site: "tripcost",
+        type: "consumption",
+        slug: "l-100",
+        name: `${route.fuel_l_per_100} L/100 km`,
+        properties: { l_per_100: route.fuel_l_per_100, family: "EVERGREEN" },
+        provenance: [DISTANCE_PROVENANCE],
+        confidence: "MEDIUM",
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${route.id}->HAS_CONSUMPTION->${consumptionId}`,
+        site: "tripcost",
+        type: "HAS_CONSUMPTION",
+        from_id: route.id,
+        to_id: consumptionId,
+        properties: { l_per_100: route.fuel_l_per_100, family: "EVERGREEN" },
+        provenance: [DISTANCE_PROVENANCE],
+        confidence: "MEDIUM",
+        index_eligible: false,
+      }),
+    );
+    const components: Array<[string, number, string, string]> = [
+      ["fuel", (route.km * route.fuel_l_per_100) / 100 * route.fuel_eur_per_l, "cash", "VOLATILE"],
+      ["toll", route.tolls_eur, "cash", "VOLATILE"],
+      ["parking", route.parking_eur, "cash", "VOLATILE"],
+      ["wear", route.km * route.wear_eur_per_km, "true_cost", "EVERGREEN"],
+      ["ev_energy", (route.km * route.ev_kwh_per_100) / 100 * route.ev_eur_per_kwh, "cash", "VOLATILE"],
+      ["train_pp", route.train_eur_pp, "cash", "VOLATILE"],
+      ["bus_pp", route.bus_eur_pp, "cash", "VOLATILE"],
+      ["flight_pp", route.flight_eur_pp, "cash", "VOLATILE"],
     ];
-    for (const [key, value, kind] of components) {
+    for (const [key, value, kind, volatility] of components) {
       if (!value) continue;
       const cid = `${route.id}:cost:${key}`;
+      const prov = volatility === "EVERGREEN" ? DISTANCE_PROVENANCE : PRICE_PROVENANCE;
       store.addEntity(
         entity({
           id: cid,
@@ -1147,10 +1450,13 @@ function populateTripcost(store: GraphStore) {
             value: Math.round(value * 100) / 100,
             currency: "EUR",
             assumption_type: kind,
-            retrieved_at: PRICE_PROVENANCE.retrieved_at,
-            valid_until: PRICE_PROVENANCE.valid_until,
+            family: volatility,
+            retrieved_at: prov.retrieved_at,
+            valid_until: prov.valid_until ?? null,
+            observed_at: volatility === "VOLATILE" ? PRICE_PROVENANCE.retrieved_at : undefined,
+            expires_at: volatility === "VOLATILE" ? PRICE_PROVENANCE.valid_until : undefined,
           },
-          provenance: [PRICE_PROVENANCE],
+          provenance: [prov],
           confidence: "MEDIUM",
         }),
       );
@@ -1161,12 +1467,12 @@ function populateTripcost(store: GraphStore) {
           type: "HAS_COST_COMPONENT",
           from_id: route.id,
           to_id: cid,
-          properties: { kind, currency: "EUR" },
-          provenance: [PRICE_PROVENANCE],
+          properties: { kind, currency: "EUR", family: volatility },
+          provenance: [prov],
           confidence: "MEDIUM",
           index_eligible: false,
           method: "HEURISTIC",
-          verified_at: PRICE_PROVENANCE.retrieved_at,
+          verified_at: prov.retrieved_at,
         }),
       );
     }
@@ -1210,6 +1516,54 @@ function populateTripcost(store: GraphStore) {
           index_eligible: false,
         }),
       );
+      const timeBits: Array<[string, number]> =
+        mode === "flight"
+          ? [
+              ["origin_transfer", route.airport_access_minutes],
+              ["buffer", route.security_buffer_minutes],
+              ["travel", route.flight_minutes],
+              ["destination_transfer", route.city_transfer_minutes],
+            ]
+          : mode === "train"
+            ? [
+                ["waiting", 40],
+                ["travel", route.train_minutes],
+              ]
+            : mode === "bus"
+              ? [
+                  ["waiting", 30],
+                  ["travel", route.bus_minutes],
+                ]
+              : [["travel", Math.round((route.km / 95) * 60)]];
+      for (const [bit, minutes] of timeBits) {
+        if (!minutes) continue;
+        const tid = `${mid}:time:${bit}`;
+        store.addEntity(
+          entity({
+            id: tid,
+            site: "tripcost",
+            type: "time_component",
+            slug: bit,
+            name: bit,
+            properties: { minutes, family: "EVERGREEN" },
+            provenance: [DISTANCE_PROVENANCE],
+            confidence: "MEDIUM",
+          }),
+        );
+        store.addRelation(
+          rel({
+            id: `${mid}->HAS_TIME_COMPONENT->${tid}`,
+            site: "tripcost",
+            type: "HAS_TIME_COMPONENT",
+            from_id: mid,
+            to_id: tid,
+            properties: { minutes, door_to_door: true },
+            provenance: [DISTANCE_PROVENANCE],
+            confidence: "MEDIUM",
+            index_eligible: false,
+          }),
+        );
+      }
     }
   }
 }

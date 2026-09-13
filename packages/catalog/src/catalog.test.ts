@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { evaluatePageQuality, searchDemandScore, seoRecommendation, classifyDemand } from "@penta/quality-gate";
-import { assertInferenceCannotBecomeOfficial } from "@penta/data-provenance";
+import { evaluatePageQuality, searchDemandScore, seoRecommendation, classifyDemand, intentFamilyId, qualityDistribution, relationQuality } from "@penta/quality-gate";
+import { assertInferenceCannotBecomeOfficial, isFresh, provenance } from "@penta/data-provenance";
 import { applyAnswer, diagnose, getError, getSymptom, initialState, likelihoodLabel, BRANDS } from "@penta/fixcode";
-import { allocate, compatibility, getCharger, getDevice } from "@penta/chargematch";
+import { allocate, compatibility, compatibilityEvidence, getCharger, getDevice } from "@penta/chargematch";
 import { compareRoute, getRoute, timeValueBreakEven } from "@penta/tripcost";
-import { capsuleFor, DESTINATIONS, weatherSourceLabel } from "@penta/wearthere";
+import { capsuleFor, DESTINATIONS, isForecastCurrent, weatherSourceLabel } from "@penta/wearthere";
 import { checkFitment, ownershipScore, VEHICLES } from "@penta/autospec";
 import { buildCatalog, coverageReport, launchReport, programmaticSeoIssues } from "@penta/catalog";
 import { globalNoindex } from "@penta/publishing-core";
@@ -31,9 +31,13 @@ describe("PageQualityGate", () => {
       freshness_days: 10,
       freshness_ttl_days: 365,
       provenance_valid: true,
+      distinct_reason: "samsung-washer-4c",
+      verified_fact_count: 10,
+      decision_relation_count: 8,
     });
     expect(ok.score).toBeGreaterThanOrEqual(75);
     expect(ok.index_state).toBe("INDEXABLE");
+    expect(ok.why.toLowerCase()).not.toContain("score 82");
 
     const filler = evaluatePageQuality({
       ...{
@@ -93,6 +97,8 @@ describe("PageQualityGate", () => {
       freshness_ttl_days: 180,
       provenance_valid: true,
       llm_safety_claim: true,
+      verified_fact_count: 12,
+      decision_relation_count: 8,
     });
     expect(fail.score).toBeGreaterThanOrEqual(75);
     expect(fail.index_state).toBe("GRAPH_ONLY");
@@ -152,6 +158,8 @@ describe("ChargeMatch", () => {
     expect(air.compatible).toBe(true);
     expect(air.max_power).toBe(65);
     expect(air.safe).toBe(false);
+    expect(air.evidence).not.toBe("MEASURED");
+    expect(compatibilityEvidence("PROTOCOL_INFERRED")).toBe("INFERRED");
     expect(air.safety_note.toLowerCase()).toMatch(/unknown|certif/);
     const deck = compatibility(getDevice("steam-deck")!, getCharger("apple-20w")!);
     expect(deck.compatible).toBe(true);
@@ -190,6 +198,8 @@ describe("TripCost", () => {
     if (flight) expect(flight.minutes_door).toBeGreaterThan(flight.minutes_in_vehicle);
     expect(car4.retrieved_at).toBeTruthy();
     expect(car4.stale).toBe(false);
+    const expired = compareRoute(route, 4, false, new Date("2026-11-01T00:00:00.000Z"));
+    expect(expired.modes.find((m) => m.mode === "train")!.stale).toBe(true);
   });
 });
 
@@ -199,6 +209,7 @@ describe("WearThere", () => {
     const tokyo = DESTINATIONS.find((d) => d.slug === "tokyo")!;
     const cap = capsuleFor(tokyo, 1, "classic");
     expect(cap.weather_kind).toBe("TYPICAL");
+    expect(isForecastCurrent("2026-09-01T00:00:00.000Z", new Date("2026-09-13T00:00:00.000Z"), 6)).toBe(false);
     expect(cap.weather.month).toBe(1);
     expect(cap.pieces.length).toBeGreaterThan(4);
     expect(cap.coverage.weather_coverage).toBeGreaterThan(0);
@@ -228,6 +239,12 @@ describe("AutoSpec", () => {
     expect("compatible" in fit && fit.compatible).toBe(true);
     const unknown = checkFitment(v, "made-up-filter");
     expect(unknown.compatible).toBe(false);
+    const possible = checkFitment(v, "cabin-filter-universal");
+    expect(possible.compatible).toBe(false);
+    expect("reason" in possible && possible.reason).toBe("Possible fitment — verify.");
+    const market = checkFitment(v, "oil-ll01-us");
+    expect(market.compatible).toBe(false);
+    expect("reason" in market && String(market.reason).toLowerCase()).toMatch(/market/);
     const score = ownershipScore({
       km: 87432,
       last_oil_km: 80000,
@@ -268,6 +285,122 @@ describe("catalog / SEO tests", () => {
     const coverage = coverageReport();
     expect(coverage.fixcode.brands).toBe(4);
     expect(coverage.chargematch.lab_measurements).toBe(0);
+    const hasError = [...store.relations.values()].filter((r) => r.site === "fixcode" && r.type === "HAS_ERROR");
+    expect(hasError.length).toBeGreaterThan(0);
+    const safety = [...store.relations.values()].filter((r) => r.site === "fixcode" && r.type === "SAFETY_CLASS");
+    expect(safety.length).toBeGreaterThan(0);
+    const distance = [...store.relations.values()].filter((r) => r.site === "tripcost" && r.type === "HAS_DISTANCE");
+    expect(distance.length).toBeGreaterThan(0);
+    const climate = store.byType("wearthere", "historical_climate")[0];
+    expect(climate.properties.kind).toBe("CLIMATE_NORMAL");
+    expect(climate.properties.period).toBe("1991-2020");
+    const measuredEvidence = [...store.relations.values()].filter(
+      (r) => r.site === "chargematch" && (r.properties.evidence === "MEASURED" || r.properties.measured === true),
+    );
+    expect(measuredEvidence.length).toBe(0);
+  });
+});
+
+describe("quality gate extras", () => {
+  it("does not index a page because of word count or unique title", () => {
+    const thin = evaluatePageQuality({
+      site: "fixcode",
+      family: "error-code",
+      unique_fields: 2,
+      required_fields_present: 2,
+      required_fields_total: 9,
+      search_demand: { seed_research: 99 },
+      product_cta: false,
+      interactive: false,
+      distinct_from_parent: true,
+      near_duplicate: false,
+      year_only_variant: false,
+      city_without_specifics: false,
+      obscure_without_demand: false,
+      llm_filler: false,
+      confidence: "HIGH",
+      freshness_days: 1,
+      freshness_ttl_days: 365,
+      provenance_valid: true,
+      word_count: 900,
+      title_unique: true,
+      internal_link_count: 40,
+      verified_fact_count: 1,
+      decision_relation_count: 0,
+    });
+    expect(thin.index_state).not.toBe("INDEXABLE");
+  });
+
+  it("groups oil keyword variants into one intent family", () => {
+    const a = intentFamilyId({
+      site: "autospec",
+      family: "oil-type",
+      title: "BMW 320d oil",
+      structured_payload: { vehicle: "veh:bmw:3-series:g20:320d-b47" },
+    });
+    const b = intentFamilyId({
+      site: "autospec",
+      family: "oil-capacity",
+      title: "BMW 320d engine oil",
+      structured_payload: { vehicle: "veh:bmw:3-series:g20:320d-b47" },
+    });
+    const c = intentFamilyId({
+      site: "autospec",
+      family: "oil-type",
+      title: "best oil BMW 320d",
+      structured_payload: { vehicle: "veh:bmw:3-series:g20:320d-b47" },
+    });
+    expect(a).toBe(b);
+    expect(b).toBe(c);
+  });
+
+  it("spreads quality scores and scores relations", () => {
+    const dist = qualityDistribution([
+      { quality_score: 42, index_state: "GRAPH_ONLY" },
+      { quality_score: 81, index_state: "INDEXABLE" },
+      { quality_score: 76, index_state: "INDEXABLE" },
+    ]);
+    expect(dist.find((row) => row.bucket === "0-49")?.count).toBe(1);
+    expect(dist.find((row) => row.bucket === "80-89")?.indexable).toBe(1);
+    const relQ = relationQuality({
+      id: "x",
+      site: "fixcode",
+      type: "MAY_BE_CAUSED_BY",
+      from_id: "a",
+      to_id: "b",
+      properties: { prior: 0.4, kind: "document" },
+      provenance: [
+        provenance({
+          source_id: "fixcode-support-corpus",
+          source_type: "MANUFACTURER",
+          retrieved_at: "2026-08-01T00:00:00.000Z",
+          confidence: 80,
+          raw_value: "x",
+          normalized_value: "x",
+          verification_method: "MANUFACTURER_DOC",
+        }),
+      ],
+      confidence: "HIGH",
+      index_eligible: false,
+      decision_relevant: true,
+      inferred: false,
+    });
+    expect(relQ).toBeGreaterThan(50);
+  });
+
+  it("keeps AI_INFERRED from becoming official and marks expired facts", () => {
+    expect(() => assertInferenceCannotBecomeOfficial("AI_INFERRED", "OFFICIAL")).toThrow();
+    const expired = provenance({
+      source_id: "seed-transport-snapshot",
+      source_type: "THIRD_PARTY",
+      retrieved_at: "2026-08-01T00:00:00.000Z",
+      valid_until: "2026-09-01T00:00:00.000Z",
+      confidence: 40,
+      raw_value: "fare",
+      normalized_value: "fare",
+      verification_method: "HEURISTIC",
+    });
+    expect(isFresh(expired, new Date("2026-09-13T00:00:00.000Z"))).toBe(false);
   });
 });
 

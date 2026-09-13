@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "report": "tsx scripts/launch-report.ts",
-    "qa": "vitest run && tsx scripts/seo-audit.ts"
+    "qa": "vitest run && tsx scripts/seo-audit.ts",
+    "deep-qa": "tsx scripts/deep-graph-qa.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.5",

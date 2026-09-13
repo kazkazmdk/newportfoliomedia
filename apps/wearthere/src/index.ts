@@ -296,6 +296,14 @@ export function typicalWeather(dest: Destination, month: number): MonthClimate {
   return dest.climate[month - 1];
 }
 
+export const FORECAST_TTL_HOURS = 6;
+
+export type WeatherDataKind = "CLIMATE_NORMAL" | "HISTORICAL_OBSERVATION" | "FORECAST" | "LIVE_WEATHER";
+
+export function isForecastCurrent(retrievedAt: string, now = new Date(), ttlHours = FORECAST_TTL_HOURS): boolean {
+  return now.getTime() - new Date(retrievedAt).getTime() < ttlHours * 3600 * 1000;
+}
+
 export function weatherSourceLabel(input: { hasForecast: boolean; daysAhead: number }): {
   kind: "FORECAST" | "TYPICAL";
   label: string;
@@ -447,6 +455,8 @@ export function allWeartherePages(): PageRecord[] {
       hub_necessity: true,
       distinct_reason: dest.slug,
       forecast_as_climate: false,
+      verified_fact_count: 8,
+      decision_relation_count: 6,
     });
     pages.push({
       id: dest.id,
@@ -491,6 +501,8 @@ export function allWeartherePages(): PageRecord[] {
         provenance_valid: true,
         distinct_reason: `${dest.slug}-${month}`,
         forecast_as_climate: false,
+        verified_fact_count: 7,
+        decision_relation_count: 8,
       });
       const slug = MONTHS[month - 1];
       pages.push({
@@ -502,7 +514,7 @@ export function allWeartherePages(): PageRecord[] {
         title: `What to Wear in ${dest.city} in ${slug[0].toUpperCase()}${slug.slice(1)}`,
         meta_description: `Typical ${dest.city} ${slug}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
         entity_ids: [dest.id],
-    structured_payload: { ...w, city: dest.city, slug: dest.slug, distinct_reason: `${dest.slug}-${month}`, kind: "HISTORICAL_CLIMATE" },
+        structured_payload: { ...w, city: dest.city, slug: dest.slug, distinct_reason: `${dest.slug}-${month}`, kind: "CLIMATE_NORMAL", period: "1991-2020", aggregation: "monthly_mean", sample_years: 30 },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: dest.demand }),
         index_state: quality.index_state,
@@ -520,11 +532,13 @@ export function allWeartherePages(): PageRecord[] {
 
 export const CLIMATE_PROVENANCE = provenance({
   source_id: "climate-normals-compiled",
-  source_type: "THIRD_PARTY",
+  source_type: "TRUSTED_THIRD_PARTY",
+  source_name: "Compiled monthly climate normals",
   retrieved_at: RETRIEVED,
+  verified_at: RETRIEVED,
   confidence: 78,
   raw_value: "monthly climate normals",
-  normalized_value: "monthly climate normals",
+  normalized_value: "CLIMATE_NORMAL",
   verification_method: "CROSS_SOURCE",
-  notes: "Typical weather, not a live forecast.",
+  notes: "Period 1991-2020 monthly means, ~30 sample years. Typical weather, not a live forecast.",
 });

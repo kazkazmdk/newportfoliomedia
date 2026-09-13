@@ -1,4 +1,4 @@
-export { VEHICLES, MockVinProvider } from "./data";
+export { VEHICLES, MockVinProvider, fitmentStatus } from "./data";
 export {
   allAutospecPages,
   assistantAnswer,
@@ -11,4 +11,4 @@ export {
   vehicleUrl,
   RULE_VERSION,
 } from "./engine";
-export type { VehicleIdentity } from "./data";
+export type { Fitment, FitmentStatus, VehicleIdentity } from "./data";

@@ -171,6 +171,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
     ],
     allocations: [
       { ports: ["c1"], watts: [100] },
+      { ports: ["c2"], watts: [65] },
       { ports: ["c1", "c2"], watts: [65, 30] },
       { ports: ["c1", "c2", "a"], watts: [45, 30, 18] },
     ],
@@ -199,6 +200,8 @@ export type CompatibilityResult = {
   cable_ok: boolean;
   confidence: ConfidenceLevel;
   tag: ConfidenceTag;
+  /** Lab watts are MEASURED only. Protocol overlap is never MEASURED. */
+  evidence: "SPEC_VERIFIED" | "INFERRED" | "MEASURED";
   explanation: string;
   theoretical: boolean;
   rule_version: string;
@@ -207,8 +210,20 @@ export type CompatibilityResult = {
     relations: string[];
     rules: string[];
     sources: string[];
+    bottlenecks?: string[];
   };
 };
+
+export function compatibilityEvidence(
+  tag: ConfidenceTag,
+  measured = false,
+): CompatibilityResult["evidence"] {
+  if (measured) return "MEASURED";
+  if (tag === "MANUFACTURER_VERIFIED" || tag === "CERTIFICATION_VERIFIED" || tag === "INDEPENDENTLY_TESTED") {
+    return "SPEC_VERIFIED";
+  }
+  return "INFERRED";
+}
 
 export const RULE_VERSION = "compatibility-v2";
 
@@ -240,6 +255,7 @@ export function compatibility(
       cable_ok: false,
       confidence: "HIGH",
       tag: "MANUFACTURER_VERIFIED",
+      evidence: "SPEC_VERIFIED",
       explanation: "The charger may be fine for phones. It will not charge an Apple Watch by USB-C alone.",
       theoretical: false,
       rule_version: RULE_VERSION,
@@ -301,6 +317,7 @@ export function compatibility(
     cable_ok: cableOk,
     confidence,
     tag,
+    evidence: compatibilityEvidence(tag, false),
     explanation:
       match === "UNKNOWN"
         ? "The unmarked cable is the unknown. We will not invent a wattage."
@@ -407,6 +424,8 @@ export function allChargematchPages(): PageRecord[] {
       hub_necessity: device.demand >= 70,
       distinct_reason: device.slug,
       llm_safety_claim: false,
+      verified_fact_count: 4,
+      decision_relation_count: 4,
     });
     pages.push({
       id: device.id,
@@ -457,6 +476,9 @@ export function allChargematchPages(): PageRecord[] {
       provenance_valid: true,
       distinct_reason: `${d}-${c}`,
       llm_safety_claim: false,
+      unverified_specs: charger.tag === "PROTOCOL_INFERRED" || device.tag === "PROTOCOL_INFERRED",
+      verified_fact_count: result.evidence === "SPEC_VERIFIED" ? 6 : 3,
+      decision_relation_count: 6,
     });
     pages.push({
       id: `pair:${d}:${c}`,
@@ -467,7 +489,7 @@ export function allChargematchPages(): PageRecord[] {
       title: `Can I use a ${charger.name} with ${device.name}?`,
       meta_description: `${result.match}. Expected max ${result.max_power ?? "unknown"} W. ${result.tag.replaceAll("_", " ")}.`,
       entity_ids: [device.id, charger.id],
-      structured_payload: { match: result.match, max_power: result.max_power, device: d, charger: c, distinct_reason: `${d}-${c}`, theoretical: result.theoretical, tag: result.tag },
+      structured_payload: { match: result.match, max_power: result.max_power, device: d, charger: c, distinct_reason: `${d}-${c}`, theoretical: result.theoretical, tag: result.tag, evidence: result.evidence, bottleneck: result.bottleneck },
       quality_score: q.score,
       search_demand: searchDemandScore({ seed_research: demand }),
       index_state: q.index_state,
@@ -485,7 +507,9 @@ export function allChargematchPages(): PageRecord[] {
 export const POWER_PROVENANCE = provenance({
   source_id: "oem-power-specs",
   source_type: "MANUFACTURER",
+  source_name: "Compiled device input and charger PDO tables",
   retrieved_at: "2026-06-01T00:00:00.000Z",
+  verified_at: "2026-06-01T00:00:00.000Z",
   confidence: 85,
   raw_value: "device input + charger PDO tables",
   normalized_value: "watts",

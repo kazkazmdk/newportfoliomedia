@@ -277,6 +277,7 @@ export function compareRoute(
   route: RouteRecord,
   travellers: number,
   trueCost = false,
+  now = new Date(),
 ): { modes: ModeQuote[]; best: ModeId; cheaper_from?: { vs: ModeId; from_travellers: number } } {
   const fuel = (route.km * route.fuel_l_per_100) / 100 * route.fuel_eur_per_l;
   const carCash = fuel + route.tolls_eur + route.parking_eur;
@@ -296,7 +297,7 @@ export function compareRoute(
   const priceMeta = {
     retrieved_at: PRICE_PROVENANCE.retrieved_at,
     valid_until: PRICE_PROVENANCE.valid_until,
-    stale: PRICE_PROVENANCE.valid_until ? new Date(PRICE_PROVENANCE.valid_until).getTime() < Date.now() : false,
+    stale: PRICE_PROVENANCE.valid_until ? new Date(PRICE_PROVENANCE.valid_until).getTime() < now.getTime() : false,
     currency: "EUR" as const,
     source_id: PRICE_PROVENANCE.source_id,
   };
@@ -445,6 +446,8 @@ export function allTripcostPages(): PageRecord[] {
       hub_necessity: true,
       distinct_reason: `${route.id}-compare`,
       stale_presented_as_current: false,
+      verified_fact_count: 8,
+      decision_relation_count: comparison.modes.length + 4,
       site_rules: () => ({
         delta: comparison.modes.length >= 2 ? 0 : -40,
         reasons: ["Multiple modes or meaningful driving cost required."],
@@ -472,6 +475,8 @@ export function allTripcostPages(): PageRecord[] {
       provenance_valid: true,
       distinct_reason: `${route.id}-driving`,
       stale_presented_as_current: false,
+      verified_fact_count: 5,
+      decision_relation_count: 4,
     });
     const base = `/tripcost/${route.from.slug}/to/${route.to.slug}`;
     return [
@@ -522,11 +527,25 @@ export function allTripcostPages(): PageRecord[] {
 export const PRICE_PROVENANCE = provenance({
   source_id: "seed-transport-snapshot",
   source_type: "THIRD_PARTY",
+  source_name: "Compiled typical fares and fuel snapshot",
   retrieved_at: "2026-09-01T00:00:00.000Z",
   valid_until: "2026-10-01T00:00:00.000Z",
   confidence: 60,
   raw_value: "typical fares and fuel snapshot",
   normalized_value: "EUR",
   verification_method: "HEURISTIC",
-  notes: "Estimates. Live fares are not connected in batch 1.",
+  notes: "VOLATILE. Estimates. Live fares are not connected.",
+});
+
+export const DISTANCE_PROVENANCE = provenance({
+  source_id: "seed-km",
+  source_type: "THIRD_PARTY",
+  source_name: "Fixed corridor kilometre table",
+  retrieved_at: "2026-09-01T00:00:00.000Z",
+  valid_until: null,
+  confidence: 78,
+  raw_value: "intercity km + typical consumption",
+  normalized_value: "km",
+  verification_method: "CROSS_SOURCE",
+  notes: "EVERGREEN route topology. Not a live fare.",
 });

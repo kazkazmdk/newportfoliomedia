@@ -135,7 +135,16 @@ export function DiagnoseTool() {
                 className={`border px-3 py-2 text-sm ${outcome === id ? "bg-[#1c1c1a] text-white" : "bg-white"}`}
                 onClick={() => {
                   setOutcome(id);
-                  reportOutcome(profile.id, id);
+                  reportOutcome({
+                    profile_id: profile.id,
+                    appliance: profile.appliance,
+                    model: "models" in profile ? profile.models[0] : undefined,
+                    error: "code" in profile ? profile.code : profile.symptom,
+                    symptoms: "related_symptoms" in profile ? profile.related_symptoms : [profile.symptom],
+                    chosen_fix: id,
+                    successful: null,
+                    outcome: id,
+                  });
                 }}
               >
                 {id.replaceAll("_", " ")}

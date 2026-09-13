@@ -44,6 +44,8 @@ export type GraphRelation = {
   /** Used by a product engine to make a decision. Trivia links must stay false. */
   decision_relevant: boolean;
   inferred: boolean;
+  /** Protocol overlap / heuristic estimate — not a lab measurement. */
+  estimated?: boolean;
   method?: string;
   verified_at?: string;
 };
@@ -166,6 +168,13 @@ export class GraphStore {
     );
     const inferredRelations = relations.filter((relation) => relation.inferred);
     const unknownRelations = relations.filter((relation) => relation.confidence === "UNKNOWN");
+    const estimatedRelations = relations.filter(
+      (relation) => relation.estimated || relation.properties.theoretical === true,
+    );
+    const staleRelations = relations.filter((relation) => {
+      const until = relation.provenance[0]?.valid_until;
+      return until ? new Date(until).getTime() < Date.now() : false;
+    });
     const decisionRelations = relations.filter((relation) => relation.decision_relevant);
     const degrees = new Map<string, number>();
     for (const entity of entities) degrees.set(entity.id, 0);
@@ -173,7 +182,12 @@ export class GraphStore {
       degrees.set(relation.from_id, (degrees.get(relation.from_id) ?? 0) + 1);
       degrees.set(relation.to_id, (degrees.get(relation.to_id) ?? 0) + 1);
     }
-    const orphanEntities = [...degrees.entries()].filter(([, n]) => n === 0).length;
+    const degVals = [...degrees.values()];
+    const isolated_entity_count = degVals.filter((n) => n === 0).length;
+    const single_relation_entity_count = degVals.filter((n) => n === 1).length;
+    const entities_with_3plus_relations = degVals.filter((n) => n >= 3).length;
+    const entities_with_5plus_relations = degVals.filter((n) => n >= 5).length;
+    const entities_with_10plus_relations = degVals.filter((n) => n >= 10).length;
     const sourceCounts = entities.map((entity) => entity.provenance.length);
     const relSourceCounts = relations.map((relation) => relation.provenance.length);
     const avg = (nums: number[]) =>
@@ -186,13 +200,22 @@ export class GraphStore {
       inferred_relations: inferredRelations.length,
       unknown_relations: unknownRelations.length,
       decision_relevant_relations: decisionRelations.length,
+      decision_relations_per_entity:
+        entities.length ? Math.round((decisionRelations.length / entities.length) * 100) / 100 : 0,
+      estimated_relations: estimatedRelations.length,
+      stale_relations: staleRelations.length,
+      isolated_entity_count,
+      single_relation_entity_count,
+      entities_with_3plus_relations,
+      entities_with_5plus_relations,
+      entities_with_10plus_relations,
       relations_per_entity:
         entities.length ? Math.round((relations.length / entities.length) * 100) / 100 : 0,
       relations_per_indexable_page:
         indexable ? Math.round((relations.length / indexable) * 100) / 100 : 0,
       average_sources_per_entity: avg(sourceCounts),
       average_sources_per_relation: avg(relSourceCounts),
-      orphan_entities: orphanEntities,
+      orphan_entities: isolated_entity_count,
       low_confidence: [...entities, ...relations].filter(
         (item) => item.confidence === "LOW" || item.confidence === "UNKNOWN",
       ).length,
@@ -205,6 +228,43 @@ export class GraphStore {
       published: pages.filter((page) => page.publish_state === "PUBLISHED").length,
     };
   }
+}
+
+export type DecisionTrace = {
+  facts: string[];
+  relations: string[];
+  rules: string[];
+  sources: string[];
+  bottlenecks?: string[];
+};
+
+export type PageCandidate = {
+  url: string;
+  site: SiteId;
+  family: PageFamily | string;
+  intent_family: string;
+  index_state: IndexState;
+};
+
+export type EntityDepth = "ISOLATED" | "SHALLOW" | "CONNECTED" | "RICH";
+
+/** Decision entities need more edges than taxonomy nodes. */
+export function classifyEntityDepth(type: string, degree: number): EntityDepth {
+  if (degree <= 0) return "ISOLATED";
+  const decisionTypes = new Set([
+    "error_code",
+    "cause",
+    "vehicle_configuration",
+    "device",
+    "charger",
+    "corridor",
+    "destination",
+    "historical_climate",
+  ]);
+  const richAt = decisionTypes.has(type) ? 8 : 5;
+  if (degree < 3) return "SHALLOW";
+  if (degree < richAt) return "CONNECTED";
+  return "RICH";
 }
 
 export function slugify(value: string): string {

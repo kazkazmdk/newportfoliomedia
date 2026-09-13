@@ -19,6 +19,7 @@ Une app Next.js (`apps/web`) expose les cinq identités visuelles, l’admin int
 ```bash
 pnpm install
 pnpm test
+pnpm deep-qa   # régénère docs/DEEP_GRAPH_QA.md
 pnpm dev
 ```
 
@@ -48,7 +49,7 @@ Hard gates first, then a soft score (max 100). A page with 95/100 still fails if
 
 Hard gates: unique structured data, valid provenance, no critical unknown demand (unless hub necessity), not an unexplained duplicate, valid family, no invented LLM claims, no LLM safety claim, no year-only variant, not city-without-specifics, not obscure-without-demand, climate ≠ forecast, not stale-as-current, engine determined (AutoSpec), causes sourced (FixCode).
 
-Soft score dimensions: unique data 25, demand 20 (editorial seed is capped at 40 and labeled EDITORIAL_JUDGMENT), utility 15, completeness 15, differentiation 10, confidence 10, freshness 5. INDEXABLE if all hard gates pass and score ≥ 75.
+Soft score dimensions (max 100): verified facts 18, product utility 16, decision relations 14, demand 12 (editorial seed capped at 40 and labeled EDITORIAL_JUDGMENT), confidence 12, completeness 10, unique structured fields 8, differentiation 6, freshness 4. Word count, title uniqueness, and internal link count are ignored. Editorial scores are capped at 84. INDEXABLE if all hard gates pass and score ≥ 75.
 
 - `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex (meta, X-Robots-Tag, robots.txt, empty sitemap).
 - `NOINDEX_PRODUCT` / product-only tools (garage, trip, kit) stay private.

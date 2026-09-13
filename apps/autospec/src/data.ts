@@ -27,14 +27,24 @@ export type KnownIssue = {
   when_to_stop: string;
 };
 
+export type FitmentStatus = "VERIFIED" | "HIGH_CONFIDENCE" | "POSSIBLE" | "UNKNOWN";
+
 export type Fitment = {
   component_id: string;
   component_name: string;
   compatible: boolean;
   confidence: ConfidenceLevel;
+  status?: FitmentStatus;
   market: string[];
   source_id: string;
 };
+
+export function fitmentStatus(confidence: ConfidenceLevel): FitmentStatus {
+  if (confidence === "HIGH") return "VERIFIED";
+  if (confidence === "MEDIUM") return "HIGH_CONFIDENCE";
+  if (confidence === "LOW") return "POSSIBLE";
+  return "UNKNOWN";
+}
 
 export type VehicleIdentity = {
   id: string;
@@ -151,6 +161,23 @@ const CORE: VehicleIdentity[] = [
         compatible: true,
         confidence: "MEDIUM",
         market: ["EU"],
+        source_id: "oem-handbook",
+      },
+      {
+        component_id: "cabin-filter-universal",
+        component_name: "Universal cabin filter",
+        compatible: false,
+        confidence: "LOW",
+        status: "POSSIBLE",
+        market: ["EU"],
+        source_id: "oem-handbook",
+      },
+      {
+        component_id: "oil-ll01-us",
+        component_name: "LL-01 5W-30 (US petrol handbook row)",
+        compatible: true,
+        confidence: "HIGH",
+        market: ["US"],
         source_id: "oem-handbook",
       },
     ],

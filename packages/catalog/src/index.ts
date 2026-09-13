@@ -1,5 +1,5 @@
-import { GraphStore, type PageRecord } from "@penta/graph-core";
-import { classifyDemand, intentSimilarity, opportunityScore, type DemandSourceKind } from "@penta/quality-gate";
+import { GraphStore, classifyEntityDepth, type PageRecord } from "@penta/graph-core";
+import { classifyDemand, duplicateAction, intentFamilyId, intentSimilarity, opportunityScore, qualityDistribution, type DemandSourceKind } from "@penta/quality-gate";
 import { allFixcodePages } from "@penta/fixcode";
 import { allAutospecPages } from "@penta/autospec";
 import { allWeartherePages } from "@penta/wearthere";
@@ -53,13 +53,19 @@ export function duplicateReport(threshold = 0.8) {
       const distinct_a = String(pages[i].structured_payload.distinct_reason ?? "");
       const distinct_b = String(pages[j].structured_payload.distinct_reason ?? "");
       const hasDistinct = Boolean(distinct_a || distinct_b);
+      const action =
+        intentFamilyId(pages[i]) === intentFamilyId(pages[j]) && pages[i].url !== pages[j].url
+          ? "MERGE"
+          : hasDistinct
+            ? duplicateAction(sim, distinct_a || distinct_b)
+            : duplicateAction(sim);
       rows.push({
         a: pages[i].url,
         b: pages[j].url,
         similarity: Math.round(sim * 1000) / 1000,
         distinct_a: distinct_a || undefined,
         distinct_b: distinct_b || undefined,
-        action: hasDistinct ? "KEEP" : sim >= 0.92 ? "MERGE" : "NOINDEX",
+        action,
       });
     }
   }
@@ -73,13 +79,13 @@ function connectivity(store: GraphStore) {
     degree.set(rel.from_id, (degree.get(rel.from_id) ?? 0) + 1);
     degree.set(rel.to_id, (degree.get(rel.to_id) ?? 0) + 1);
   }
-  const buckets = { ORPHAN: 0, LOW_DEPTH: 0, CONNECTED: 0, RICH: 0 };
+  const buckets = { ISOLATED: 0, SHALLOW: 0, CONNECTED: 0, RICH: 0, ORPHAN: 0, LOW_DEPTH: 0 };
   for (const entity of store.entities.values()) {
     const n = degree.get(entity.id) ?? 0;
-    if (n === 0) buckets.ORPHAN += 1;
-    else if (n === 1) buckets.LOW_DEPTH += 1;
-    else if (n < 6) buckets.CONNECTED += 1;
-    else buckets.RICH += 1;
+    const depth = classifyEntityDepth(entity.type, n);
+    buckets[depth] += 1;
+    if (depth === "ISOLATED") buckets.ORPHAN += 1;
+    if (depth === "SHALLOW") buckets.LOW_DEPTH += 1;
   }
   return buckets;
 }
@@ -104,6 +110,7 @@ export function launchReport() {
     connectivity: connectivity(store),
     average_indexable_quality: Math.round(avg * 10) / 10,
     minimum_indexable_quality: min,
+    quality_distribution: qualityDistribution(pages),
     duplicate_candidates: dups.length,
     duplicates_without_distinct_reason: dups.filter((row) => row.action !== "KEEP").length,
     stale_relations: stale,
@@ -122,17 +129,20 @@ export function launchReport() {
 }
 
 export function pageExplainability(page: PageRecord) {
+  const distinct = String(page.structured_payload.distinct_reason ?? "");
+  const why =
+    page.index_state === "INDEXABLE"
+      ? `This page is indexable because hard gates passed for family ${page.family}, the canonical is self-consistent, provenance is attached via its entities (${page.entity_ids.length}), and it exposes a product tool. Soft score ${page.quality_score} is secondary and demand ${page.search_demand} is not claimed as GSC. Distinct structured reason: ${distinct || "entity identity on family+payload"}. Title uniqueness is not used as proof.`
+      : `Not indexable (${page.index_state}). Soft score ${page.quality_score} cannot override a failed hard gate. The record can still power the product or remain graph-only.`;
   return {
     url: page.url,
-    why_indexable:
-      page.index_state === "INDEXABLE"
-        ? "Hard gates passed, unique structured facts, product CTA, provenance present. Demand may still be editorial."
-        : page.index_state,
+    why_indexable: why,
     quality_score: page.quality_score,
     demand: page.search_demand,
     entity_ids: page.entity_ids,
     distinct_reason: page.structured_payload.distinct_reason ?? null,
     freshness: page.freshness,
+    intent_family: intentFamilyId(page),
   };
 }
 
@@ -188,7 +198,9 @@ export function coverageReport() {
       symptoms: store.byType("fixcode", "symptom").length,
       causes: store.byType("fixcode", "cause").length,
       tests: store.byType("fixcode", "test").length,
+      test_results: store.byType("fixcode", "test_result").length,
       fixes: store.byType("fixcode", "fix").length,
+      safety_relations: [...store.relations.values()].filter((r) => r.site === "fixcode" && r.type === "SAFETY_CLASS").length,
       outcomes: store.byType("fixcode", "outcome").length,
     },
     autospec: {
@@ -208,6 +220,7 @@ export function coverageReport() {
       climate_records: store.byType("wearthere", "historical_climate").length,
       garments: store.byType("wearthere", "garment").length,
       packing_relations: [...store.relations.values()].filter((r) => r.site === "wearthere" && r.type === "PACKS").length,
+      climate_kind: "CLIMATE_NORMAL",
     },
     chargematch: {
       devices: store.byType("chargematch", "device").length,
@@ -223,25 +236,35 @@ export function coverageReport() {
       corridors: store.byType("tripcost", "corridor").length,
       modes: store.byType("tripcost", "mode").length,
       cost_components: store.byType("tripcost", "cost_component").length,
+      time_components: store.byType("tripcost", "time_component").length,
+      distances: store.byType("tripcost", "distance").length,
+      volatile_cost_relations: [...store.relations.values()].filter(
+        (r) => r.site === "tripcost" && r.type === "HAS_COST_COMPONENT" && r.properties.family === "VOLATILE",
+      ).length,
+      evergreen_cost_relations: [...store.relations.values()].filter(
+        (r) => r.site === "tripcost" && r.type === "HAS_COST_COMPONENT" && r.properties.family === "EVERGREEN",
+      ).length,
     },
   };
 }
 
-export type AiUsageClass = "NECESSARY" | "OPTIONAL" | "SHOULD_BE_DETERMINISTIC";
+export type AiUsageClass = "GOOD_USE" | "OPTIONAL" | "SHOULD_BE_DETERMINISTIC" | "DANGEROUS";
 
 export const AI_USAGE_AUDIT: Array<{ fn: string; site: string; classification: AiUsageClass; status: string }> = [
   { fn: "oil / capacity lookup", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "deterministic graph lookup; no LLM" },
-  { fn: "fitment", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "OEM row only; LOW/UNKNOWN never shown as compatible" },
+  { fn: "fitment", site: "autospec", classification: "DANGEROUS", status: "OEM row only; LLM compatibility is forbidden; LOW shows Possible fitment — verify." },
   { fn: "VIN decode", site: "autospec", classification: "SHOULD_BE_DETERMINISTIC", status: "MockVinProvider stub — not a licensed VIN API" },
-  { fn: "climate normals", site: "wearthere", classification: "SHOULD_BE_DETERMINISTIC", status: "compiled monthly normals" },
-  { fn: "Open-Meteo forecast", site: "wearthere", classification: "OPTIONAL", status: "live HTTP optional; never mixed into historical climate" },
+  { fn: "climate normals", site: "wearthere", classification: "SHOULD_BE_DETERMINISTIC", status: "compiled monthly normals (CLIMATE_NORMAL)" },
+  { fn: "Open-Meteo forecast", site: "wearthere", classification: "OPTIONAL", status: "live HTTP optional; never mixed into climate normals" },
   { fn: "packing optimizer", site: "wearthere", classification: "SHOULD_BE_DETERMINISTIC", status: "packing-v1 property rules" },
-  { fn: "USB-PD compatibility", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "compatibility-v2 min(device,port,cable)" },
-  { fn: "lab watt measurement", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "not present; EXPECTED_POWER is inferred overlap, not MEASURED_AT" },
+  { fn: "USB-PD compatibility", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "compatibility-v2 min(device,port,cable); evidence never MEASURED without lab" },
+  { fn: "lab watt measurement", site: "chargematch", classification: "SHOULD_BE_DETERMINISTIC", status: "not present; EXPECTED_POWER is INFERRED overlap" },
   { fn: "route compare", site: "tripcost", classification: "SHOULD_BE_DETERMINISTIC", status: "tripcost-v1 seed fares + door-to-door buffers" },
+  { fn: "live transport price", site: "tripcost", classification: "DANGEROUS", status: "LLM must not invent current fares; snapshot labelled, stale ≠ current" },
   { fn: "diagnose()", site: "fixcode", classification: "SHOULD_BE_DETERMINISTIC", status: "diagnostic-v3 document priors; % hidden until VERIFIED outcomes" },
+  { fn: "repair probability without evidence", site: "fixcode", classification: "DANGEROUS", status: "priors are document weights; labels High/Medium/Possible only" },
   { fn: "explainDiagnosis", site: "fixcode", classification: "OPTIONAL", status: "template over ranked causes; no model call in this pass" },
-  { fn: "visionGuard / scan", site: "fixcode", classification: "NECESSARY", status: "upload gated; vision not executed without confirmation" },
+  { fn: "visionGuard / scan", site: "fixcode", classification: "GOOD_USE", status: "upload gated; vision not executed without confirmation" },
 ];
 
 export const DATA_LICENSING = [
@@ -415,7 +438,7 @@ export function fullOpsPayload() {
     coverage: coverageReport(),
     demand: demandBreakdown(),
     freshness: freshnessBuckets(),
-    duplicates: duplicateReport(0.8).slice(0, 50),
+    duplicates: duplicateReport(0.85).slice(0, 50),
     opportunity: opportunityQueue(),
     ai_usage: AI_USAGE_AUDIT,
     licensing: DATA_LICENSING,

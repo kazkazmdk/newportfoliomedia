@@ -89,6 +89,13 @@ export type OutcomeId =
   | "other";
 
 export type OutcomeRecord = {
+  appliance: string;
+  model?: string;
+  error: string;
+  symptoms: string[];
+  chosen_fix: string;
+  actual_fix?: string;
+  successful: boolean | null;
   profile_id: string;
   cause_id?: string;
   outcome: OutcomeId;

@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     confidence: result.confidence,
     tag: result.tag,
     explanation: result.explanation,
+    evidence: result.evidence,
     theoretical: result.theoretical,
     rule_version: result.rule_version,
     trace: result.trace,

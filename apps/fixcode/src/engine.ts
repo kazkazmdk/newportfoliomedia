@@ -1,6 +1,6 @@
 import type { ConfidenceLevel } from "@penta/data-provenance";
 import { explainStructured, recordToolCall, routeAiTask } from "@penta/ai-core";
-import type { DiagnosisResult, DiagnosisState, ErrorProfile, RankedCause, SafetyClass, SymptomProfile, OutcomeId } from "./types";
+import type { DiagnosisResult, DiagnosisState, ErrorProfile, RankedCause, SafetyClass, SymptomProfile, OutcomeId, OutcomeRecord } from "./types";
 import { ERRORS } from "./data-samsung";
 import { MORE_ERRORS } from "./data-more";
 import { SYMPTOMS as SEED_SYMPTOMS } from "./data-symptoms";
@@ -220,10 +220,20 @@ export function isBlocked(cause: RankedCause): boolean {
   return cause.safety === "PROFESSIONAL_ONLY" || cause.safety === "STOP_USE";
 }
 
-const outcomes: Array<{ profile_id: string; outcome: OutcomeId; status: "REPORTED" | "VERIFIED" | "AGGREGATED"; cause_id?: string; at: string }> = [];
+const outcomes: OutcomeRecord[] = [];
 
-export function reportOutcome(profile_id: string, outcome: OutcomeId, cause_id?: string): void {
-  outcomes.push({ profile_id, outcome, cause_id, status: "REPORTED", at: new Date().toISOString() });
+export function reportOutcome(input: Omit<OutcomeRecord, "at" | "status"> & { status?: OutcomeRecord["status"] }): OutcomeRecord {
+  const row: OutcomeRecord = {
+    ...input,
+    status: input.status ?? "REPORTED",
+    at: new Date().toISOString(),
+  };
+  outcomes.push(row);
+  return row;
+}
+
+export function listOutcomes(): OutcomeRecord[] {
+  return [...outcomes];
 }
 
 export function outcomeCounts(profile_id: string): Record<string, number> {

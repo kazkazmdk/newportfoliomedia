@@ -52,6 +52,10 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
           <dd className="cm-mono mt-1 text-2xl">{result.safe ? "YES" : "UNKNOWN"}</dd>
         </div>
         <div className="cm-box p-4">
+          <dt className="text-sm">Evidence</dt>
+          <dd className="cm-mono mt-1 text-2xl">{result.evidence.replaceAll("_", " ")}</dd>
+        </div>
+        <div className="cm-box p-4">
           <dt className="text-sm">Expected max</dt>
           <dd className="cm-mono mt-1 text-2xl">{result.max_power ?? "—"} W</dd>
         </div>

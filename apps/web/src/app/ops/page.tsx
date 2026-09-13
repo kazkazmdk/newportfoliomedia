@@ -48,7 +48,8 @@ export default function OpsPage() {
         </article>
         <article className="border p-4">
           <p>Connectivity</p>
-          <p className="mt-1">orphan {report.connectivity.ORPHAN} · low {report.connectivity.LOW_DEPTH} · connected {report.connectivity.CONNECTED} · rich {report.connectivity.RICH}</p>
+          <p className="mt-1">orphan {report.connectivity.ORPHAN} · isolated {report.connectivity.ISOLATED} · shallow {report.connectivity.SHALLOW} · connected {report.connectivity.CONNECTED} · rich {report.connectivity.RICH}</p>
+          <p className="mt-1">{g.isolated_entity_count} isolated · {g.single_relation_entity_count} single-rel · {g.entities_with_3plus_relations} 3+ · {g.entities_with_5plus_relations} 5+ · {g.entities_with_10plus_relations} 10+</p>
         </article>
       </section>
       <section className="mt-8 grid gap-4 md:grid-cols-5">
@@ -56,7 +57,10 @@ export default function OpsPage() {
           <article key={site} className="border border-[#ddd] p-4">
             <h2 className="capitalize">{site}</h2>
             <p className="mt-2 text-sm">
-              {stats.entities} entities · {stats.relations} rel ({stats.decision_relevant_relations} decision) · {stats.indexable} indexable
+              {stats.entities} entities · {stats.relations} rel ({stats.decision_relevant_relations} decision) · {stats.relations_per_entity} /entity · {stats.indexable} indexable
+            </p>
+            <p className="mt-1 text-xs">
+              verified {stats.verified_relations} · inferred {stats.inferred_relations} · estimated {stats.estimated_relations} · unknown {stats.unknown_relations} · stale {stats.stale_relations}
             </p>
           </article>
         ))}
@@ -71,6 +75,13 @@ export default function OpsPage() {
           <p className="mt-2">fresh {fresh.fresh} · aging {fresh.aging} · stale {fresh.stale} · expired {fresh.expired}</p>
           <p className="mt-2">Demand on INDEXABLE: editorial {demand.EDITORIAL_JUDGMENT} · GSC {demand.GSC_OBSERVED} (none until GSC is connected)</p>
           <p className="mt-2">Quality avg {report.average_indexable_quality} · min {report.minimum_indexable_quality}</p>
+          <ul className="mt-2 grid gap-1 text-xs">
+            {report.quality_distribution.map((row) => (
+              <li key={row.bucket}>
+                {row.bucket}: {row.count} ({row.percentage}%) · indexable {row.indexable}
+              </li>
+            ))}
+          </ul>
         </article>
       </section>
       <EntityInspector />

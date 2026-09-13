@@ -2,7 +2,7 @@ import type { ConfidenceLevel } from "@penta/data-provenance";
 import { explainStructured, recordToolCall, routeAiTask } from "@penta/ai-core";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
-import { MockVinProvider, VEHICLES, type Fitment, type VehicleIdentity } from "./data";
+import { MockVinProvider, VEHICLES, fitmentStatus, type Fitment, type FitmentStatus, type VehicleIdentity } from "./data";
 
 export function getVehicle(make: string, model: string, generation: string, variant: string) {
   return VEHICLES.find(
@@ -78,23 +78,42 @@ export const RULE_VERSION = "maintenance-v1";
 export function checkFitment(
   vehicle: VehicleIdentity,
   componentId: string,
-): Fitment | { compatible: false; confidence: ConfidenceLevel; reason: string } {
+): Fitment | { compatible: false; confidence: ConfidenceLevel; status: FitmentStatus; reason: string } {
   const hit = vehicle.fitment.find((item) => item.component_id === componentId);
   if (!hit) {
     return {
       compatible: false,
       confidence: "UNKNOWN",
+      status: "UNKNOWN",
       reason: "No verified fitment row. Similarity is not used as compatibility.",
     };
   }
-  if (hit.confidence === "LOW" || hit.confidence === "UNKNOWN") {
+  const status = hit.status ?? fitmentStatus(hit.confidence);
+  if (hit.market.length && !hit.market.some((m) => vehicle.market.includes(m))) {
+    return {
+      compatible: false,
+      confidence: "UNKNOWN",
+      status: "UNKNOWN",
+      reason: "Market mismatch — this fitment row is not for this vehicle market.",
+    };
+  }
+  if (status === "POSSIBLE" || status === "UNKNOWN" || hit.confidence === "LOW" || hit.confidence === "UNKNOWN") {
     return {
       compatible: false,
       confidence: hit.confidence,
-      reason: "Possible or unknown fitment is not displayed as compatible.",
+      status: status === "UNKNOWN" ? "UNKNOWN" : "POSSIBLE",
+      reason: "Possible fitment — verify.",
     };
   }
-  return hit;
+  if (status !== "VERIFIED" && status !== "HIGH_CONFIDENCE") {
+    return {
+      compatible: false,
+      confidence: hit.confidence,
+      status,
+      reason: "Possible fitment — verify.",
+    };
+  }
+  return { ...hit, status, compatible: true };
 }
 
 export async function decodeVin(vin: string) {
@@ -198,6 +217,8 @@ export function allAutospecPages(): PageRecord[] {
       hub_necessity: true,
       distinct_reason: vehicle.engine_code,
       engine_undetermined: !vehicle.engine_code,
+      verified_fact_count: 8,
+      decision_relation_count: 8,
     });
     pages.push({
       id: vehicle.id,
@@ -252,6 +273,8 @@ export function allAutospecPages(): PageRecord[] {
         provenance_valid: true,
         distinct_reason: `${vehicle.engine_code}:${topic.slug}`,
         engine_undetermined: !vehicle.engine_code,
+        verified_fact_count: topic.slug === "oil" ? 6 : 5,
+        decision_relation_count: topic.slug === "maintenance" ? 7 : 5,
         site_rules: () => ({
           delta: 0,
           reasons: [`Canonical engine page — years ${vehicle.years.join(", ")} are not split.`],

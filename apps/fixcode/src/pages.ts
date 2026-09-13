@@ -48,6 +48,8 @@ function qualityInputForError(profile: ErrorProfile): PageQualityInput {
     distinct_reason: profile.id,
     causes_without_source: profile.provenance.length === 0,
     llm_safety_claim: false,
+    verified_fact_count: present + profile.causes.filter((c) => c.fix).length,
+    decision_relation_count: profile.causes.length + profile.questions.length,
     site_rules: () => {
       const blockers: string[] = [];
       if (present < 8) blockers.push("Error page missing required diagnostic fields");
@@ -126,6 +128,8 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
     provenance_valid: profile.provenance.length > 0,
     distinct_reason: profile.id,
     causes_without_source: profile.provenance.length === 0,
+    verified_fact_count: 5 + profile.causes.length,
+    decision_relation_count: profile.causes.length + profile.questions.length,
   });
   return {
     id: profile.id,
@@ -178,6 +182,8 @@ export function hubPages(): PageRecord[] {
       provenance_valid: true,
       hub_necessity: true,
       distinct_reason: `hub-${brand.slug}`,
+      verified_fact_count: Math.min(8, errors.length),
+      decision_relation_count: Math.min(6, errors.length),
     });
     pages.push({
       id: `fix:hub:${brand.slug}`,
@@ -229,6 +235,8 @@ export function hubPages(): PageRecord[] {
         provenance_valid: true,
         hub_necessity: true,
         distinct_reason: `hub-${brand.slug}-${appliance}`,
+        verified_fact_count: 6,
+        decision_relation_count: Math.min(8, errors.length),
       });
       pages.push({
         id: `fix:hub:${brand.slug}:${appliance}`,
