@@ -16,24 +16,29 @@ import {
   Text,
 } from "@react-three/drei";
 import { DoubleSide, type Mesh } from "three";
+import { useIsMobileViewport, usePrefersReducedMotion } from "@/lib/use-media-query";
 
 export default function FolioScene() {
   const ring = useRef<Mesh>(null);
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  const isMobile = useIsMobileViewport();
+  const reducedMotion = usePrefersReducedMotion();
 
   useFrame(({ clock }) => {
-    if (ring.current) {
-      ring.current.rotation.y = clock.getElapsedTime() / 2;
+    if (!ring.current) return;
+    if (reducedMotion) {
+      ring.current.rotation.y = 0.35;
+      return;
     }
+    ring.current.rotation.y = clock.getElapsedTime() / 2;
   });
 
   return (
     <PresentationControls
-      enabled
+      enabled={!reducedMotion}
       global={false}
-      cursor
+      cursor={!reducedMotion}
       snap={false}
-      speed={1}
+      speed={reducedMotion ? 0 : 1}
       zoom={1}
       rotation={[0, 0, 0]}
       polar={[0, Math.PI / 2]}
@@ -43,23 +48,34 @@ export default function FolioScene() {
         intensity={0.5}
         adjustCamera={isMobile ? 1 : 2}
         preset="rembrandt"
-        shadows={{ type: "accumulative", color: "#9d4b4b" }}
+        shadows={
+          isMobile
+            ? false
+            : { type: "accumulative", color: "#9d4b4b" }
+        }
         environment={{ preset: "studio", blur: 1 }}
       >
         <Sphere position-y={0} castShadow receiveShadow>
           <MeshTransmissionMaterial
             color="lightgrey"
             thickness={0.2}
-            chromaticAberration={0.05}
-            anisotropy={1.5}
+            chromaticAberration={isMobile ? 0.02 : 0.05}
+            anisotropy={isMobile ? 0.4 : 1.5}
             clearcoat={1}
             clearcoatRoughness={0.2}
             envMapIntensity={1}
-            distortionScale={0.2}
-            temporalDistortion={0.1}
+            distortionScale={reducedMotion ? 0 : 0.2}
+            temporalDistortion={reducedMotion ? 0 : 0.1}
             transparent
           />
-          <Sparkles scale={0.5} color="#9d4b4b" />
+          {reducedMotion ? null : (
+            <Sparkles
+              scale={0.5}
+              color="#9d4b4b"
+              count={isMobile ? 8 : 20}
+              speed={0.6}
+            />
+          )}
         </Sphere>
         <Cylinder
           ref={ring}
@@ -78,7 +94,7 @@ export default function FolioScene() {
               polygonOffset
               polygonOffsetFactor={-1}
             >
-              <RenderTexture attach="map" anisotropy={16}>
+              <RenderTexture attach="map" anisotropy={isMobile ? 4 : 8}>
                 <PerspectiveCamera makeDefault manual aspect={5.5} position={[0, 0, 5]} />
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[10, 10, 5]} />

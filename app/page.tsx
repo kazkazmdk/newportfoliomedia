@@ -27,6 +27,9 @@ export default function Home() {
           instead.
         </p>
       </div>
+      <noscript>
+        <p>This page includes an interactive 3D scene. JavaScript is required to view it.</p>
+      </noscript>
       <FolioExperience />
     </>
   );
