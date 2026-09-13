@@ -46,3 +46,4 @@ CI GitHub Actions : `.github/workflows/ci.yml`.
 
 - Beyond Memories et le template Three.js sont des codebases 2021–2022. Three.js n’est **pas** upgradé ici.
 - Le folio à la racine est la vitrine moderne. Le template Three.js sert à démarrer d’autres scènes, pas à se substituer au folio.
+- Rapports : `ops/BASELINE_AUDIT.md`, `ops/PERFORMANCE.md`, `ops/DEPENDENCIES.md`, `ops/MERGE_READINESS.md`.
