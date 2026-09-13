@@ -1,59 +1,43 @@
-import type { Dispatch, SetStateAction } from "react";
-import type { Message } from "src/types/messageType";
-import { Container, Flex, Button, Input, useToast } from "@chakra-ui/react";
-import { useState, useRef } from "react";
-import { useLanguageModelSession } from "src/hooks/useLanguageModelSession";
-import { streamToAsyncIterable } from "src/utils/streamToAsyncIterable";
+import type { FormEvent } from "react";
+import { Button, Container, Flex, Input } from "@chakra-ui/react";
+import { useState } from "react";
+import { canSendMessage } from "src/lib/ai-capability";
 
 type Props = {
-  setMessages: Dispatch<SetStateAction<Message[]>>;
+  placeholder: string;
+  disabled: boolean;
+  sending: boolean;
+  sessionReady: boolean;
+  creating: boolean;
+  onSend: (text: string) => Promise<void> | void;
 };
 
-export const UserInput = ({ setMessages }: Props) => {
-  const { data: session } = useLanguageModelSession();
+export const UserInput = ({
+  placeholder,
+  disabled,
+  sending,
+  sessionReady,
+  creating,
+  onSend,
+}: Props) => {
   const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const toast = useToast();
+  const allowSend = canSendMessage({
+    session: sessionReady ? true : null,
+    sending,
+    creating,
+    input,
+  });
+
   const handleSend = async () => {
-    if (!input.trim() || !session) return;
-    setSending(true);
-    setMessages((msgs) => [...msgs, { role: "user", text: input }]);
-    const userInput = input;
+    if (!allowSend) return;
+    const value = input;
     setInput("");
-    try {
-      const response = await session.promptStreaming(userInput);
-      for await (const chunk of streamToAsyncIterable(response)) {
-        setMessages((msgs) => {
-          const lastMsg = msgs[msgs.length - 1];
-          if (lastMsg.role === "assistant") {
-            return [
-              ...msgs.slice(0, -1),
-              { ...lastMsg, text: lastMsg.text + chunk },
-            ];
-          }
-          return [...msgs, { role: "assistant", text: chunk }];
-        });
-      }
-    } catch {
-      toast({
-        title: "Erreur",
-        description: "Erreur lors de la réponse du modèle.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      setMessages((msgs) => [
-        ...msgs,
-        { role: "assistant", text: "Erreur lors de la réponse du modèle." },
-      ]);
-    }
-    setSending(false);
-    // inputRef.current?.focus();
+    await onSend(value);
   };
+
   return (
     <Container
-      w={"full"}
+      w="full"
       position="fixed"
       bottom={0}
       left={0}
@@ -63,27 +47,26 @@ export const UserInput = ({ setMessages }: Props) => {
       boxShadow="md"
     >
       <Flex
-        maxW={"container.md"}
+        maxW="container.md"
         as="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSend();
+        onSubmit={(event: FormEvent) => {
+          event.preventDefault();
+          void handleSend();
         }}
       >
         <Input
-          ref={inputRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Write a message…"
+          onChange={(event) => setInput(event.target.value)}
+          placeholder={placeholder}
           mr={2}
-          disabled={sending}
+          disabled={disabled || sending || creating || !sessionReady}
           autoComplete="off"
+          aria-label="Message"
         />
         <Button
           colorScheme="blue"
-          onClick={handleSend}
           isLoading={sending}
-          disabled={!input.trim() || sending}
+          isDisabled={!allowSend}
           type="submit"
         >
           Send

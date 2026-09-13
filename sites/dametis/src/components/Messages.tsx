@@ -4,20 +4,24 @@ import ReactMarkdown from "react-markdown";
 
 type Props = {
   messages: Message[];
+  emptyLabel?: string;
 };
 
-export const Messages = ({ messages }: Props) => {
+export const Messages = ({
+  messages,
+  emptyLabel = "Start a conversation…",
+}: Props) => {
   return (
-    <VStack p={3} mb={4} pb={20}>
+    <VStack p={3} mb={4} pb={24} align="stretch">
       {messages.length === 0 && (
-        <Text color="gray.400" textAlign="center">
-          Start a conversation…
+        <Text color="gray.500" textAlign="center">
+          {emptyLabel}
         </Text>
       )}
       {messages.map((msg, i) => (
         <Flex
-          key={i}
-          w={"full"}
+          key={`${msg.role}-${i}`}
+          w="full"
           justify={msg.role === "user" ? "flex-end" : "flex-start"}
         >
           <Box
@@ -25,7 +29,7 @@ export const Messages = ({ messages }: Props) => {
             color="white"
             px={4}
             py={2}
-            w={"fit-content"}
+            w="fit-content"
             borderRadius="xl"
             maxW="80%"
             fontSize="md"

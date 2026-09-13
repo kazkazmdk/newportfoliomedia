@@ -28,8 +28,7 @@
   },
   "include": [
     "src",
-    "vite.config.ts",
-    "tailwind.config.ts",
-    "postcss.config.js"
-  ]
+    "vite.config.ts"
+  ],
+  "exclude": ["src/**/*.test.ts"]
 }
