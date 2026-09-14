@@ -1,15 +1,40 @@
 import type { ProvenanceRecord, ConfidenceLevel } from "@penta/data-provenance";
 
 export const INDEX_STATES = [
-  "GRAPH_ONLY",
-  "NOINDEX_PRODUCT",
   "INDEXABLE",
-  "DRAFT",
-  "READY",
-  "PUBLISHED",
+  "NOINDEX_PRODUCT",
+  "GRAPH_ONLY",
+  "REVIEW_REQUIRED",
+  "CONFLICTED",
+  "STALE",
+  "REDIRECT",
+  "REMOVED",
 ] as const;
 
 export type IndexState = (typeof INDEX_STATES)[number];
+
+export const RELATION_CLASSES = [
+  "DECISION_RELEVANT",
+  "DESCRIPTIVE",
+  "NAVIGATION_ONLY",
+  "UNKNOWN",
+] as const;
+
+export type RelationClass = (typeof RELATION_CLASSES)[number];
+
+export const TRUTH_STATUSES = [
+  "VERIFIED_PRIMARY",
+  "VERIFIED_SECONDARY",
+  "TESTED",
+  "REPORTED",
+  "INFERRED",
+  "ESTIMATED",
+  "STALE",
+  "UNKNOWN",
+  "CONFLICTING",
+] as const;
+
+export type TruthStatus = (typeof TRUTH_STATUSES)[number];
 
 export type SiteId =
   | "fixcode"
@@ -43,6 +68,8 @@ export type GraphRelation = {
   index_eligible: boolean;
   /** Used by a product engine to make a decision. Trivia links must stay false. */
   decision_relevant: boolean;
+  /** Independent of the boolean flag — audit classifies from type + flag. */
+  relation_class?: RelationClass;
   inferred: boolean;
   /** Protocol overlap / heuristic estimate — not a lab measurement. */
   estimated?: boolean;
@@ -265,6 +292,128 @@ export function classifyEntityDepth(type: string, degree: number): EntityDepth {
   if (degree < 3) return "SHALLOW";
   if (degree < richAt) return "CONNECTED";
   return "RICH";
+}
+
+const DECISION_TYPES = new Set([
+  "MAY_BE_CAUSED_BY",
+  "TESTED_BY",
+  "RETURNS",
+  "FIXED_BY",
+  "RISK_LEVEL",
+  "SAFETY_CLASS",
+  "REQUIRES_TOOL",
+  "REQUIRES_PART",
+  "HAS_ERROR",
+  "NEXT_TEST",
+  "NEXT_ACTION",
+  "DIY_OR_TECH",
+  "SAFETY_HAZARD",
+  "HAS_EXPECTED_RESULT",
+  "REQUIRES_FLUID_SPEC",
+  "OIL_CAPACITY",
+  "HAS_SERVICE_INTERVAL",
+  "FITS",
+  "HAS_COMPONENT",
+  "HAS_BATTERY",
+  "USES_ENGINE",
+  "USES_TRANSMISSION",
+  "USES_DRIVETRAIN",
+  "HAS_COOLANT_SPEC",
+  "HAS_BRAKE_FLUID",
+  "HAS_TRANS_FLUID",
+  "SUBJECT_TO_RECALL",
+  "TYPICAL_CLIMATE",
+  "PACKS",
+  "PACKS_FOR_ACTIVITY",
+  "HAS_TEMPERATURE_RANGE",
+  "HAS_PRECIPITATION",
+  "HAS_WIND",
+  "HAS_HUMIDITY",
+  "HAS_PACKING_DECISION",
+  "DIFFERS_FROM",
+  "MAX_INPUT",
+  "MAX_OUTPUT",
+  "HAS_PORT",
+  "DEVICE_HAS_PORT",
+  "SUPPORTS_PROTOCOL",
+  "PORT_SUPPORTS_PROTOCOL",
+  "HAS_POWER_ALLOCATION",
+  "CHARGER_SPLITS_POWER_AS",
+  "CAN_CHARGE",
+  "EXPECTED_POWER",
+  "COMPATIBLE_IF",
+  "CABLE_MAX_CURRENT",
+  "CABLE_MAX_WATTAGE",
+  "CABLE_EMARKED",
+  "DEVICE_ACCEPTS_MAX_WATTAGE",
+  "DEVICE_NEGOTIATES_WITH",
+  "MEASUREMENT_OBSERVED_FOR",
+  "HAS_DISTANCE",
+  "HAS_CONSUMPTION",
+  "HAS_COST_COMPONENT",
+  "HAS_MODE",
+  "ROUTE_HAS_TOLL",
+  "ROUTE_NO_TOLL",
+  "ROUTE_ALTERNATIVE",
+  "ROUTE_BREAK_EVEN",
+  "ROUTE_ENERGY_REQUIRED",
+  "ROUTE_WEAR_COST",
+  "HAS_TIME_COMPONENT",
+  "VEHICLE_CONSUMPTION",
+]);
+
+const NAVIGATION_TYPES = new Set([
+  "FROM_PLACE",
+  "TO_PLACE",
+  "MAKES_APPLIANCE",
+  "ON_APPLIANCE",
+]);
+
+const DESCRIPTIVE_TYPES = new Set([
+  "HAS_MODEL",
+  "HAS_GENERATION",
+  "COVERS_YEARS",
+  "SOLD_IN",
+  "OBSERVED_ON_MODEL",
+  "INDICATES",
+  "MAY_INDICATE",
+  "IS_CONFIGURATION_OF",
+  "AVAILABLE_WITH_ENGINE",
+  "IN_FAMILY",
+  "BRAND_HAS_FAMILY",
+  "FAMILY_HAS_MODEL",
+  "HAS_TRIM",
+  "HAS_ERROR_CODE",
+  "SUPPORTS",
+  "ALLOCATION_UNKNOWN",
+]);
+
+export function classifyRelation(relation: {
+  type: string;
+  decision_relevant?: boolean;
+  relation_class?: RelationClass;
+}): RelationClass {
+  if (relation.relation_class) return relation.relation_class;
+  if (DECISION_TYPES.has(relation.type)) return "DECISION_RELEVANT";
+  if (NAVIGATION_TYPES.has(relation.type)) return "NAVIGATION_ONLY";
+  if (DESCRIPTIVE_TYPES.has(relation.type)) return "DESCRIPTIVE";
+  if (relation.decision_relevant === true) return "DECISION_RELEVANT";
+  if (relation.decision_relevant === false) return "DESCRIPTIVE";
+  return "UNKNOWN";
+}
+
+export function percentile(values: number[], p: number): number {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const idx = (sorted.length - 1) * p;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return Math.round((sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo)) * 100) / 100;
+}
+
+export function median(values: number[]): number {
+  return percentile(values, 0.5);
 }
 
 export function slugify(value: string): string {
