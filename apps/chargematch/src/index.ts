@@ -54,6 +54,22 @@ export type ChargerProfile = {
   tag: ConfidenceTag;
 };
 
+/** Lab row only. TESTED / MEASURED is forbidden unless a row exists. */
+export type MeasuredChargeCurve = {
+  device: string;
+  charger: string;
+  cable: string;
+  batteryStart: number;
+  batteryEnd: number;
+  maxObservedW: number;
+  averageW: number;
+  duration: number;
+  temperature: number;
+  testMethod: string;
+};
+
+export const MEASURED_CURVES: MeasuredChargeCurve[] = [];
+
 export type CableProfile = {
   id: string;
   name: string;
@@ -381,6 +397,9 @@ export function getDevice(slug: string) {
 }
 export function getCharger(slug: string) {
   return CHARGERS.find((item) => item.slug === slug);
+}
+export function getCable(slug: string) {
+  return CABLES.find((item) => item.slug === slug);
 }
 
 const POPULAR_PAIRS: Array<[string, string]> = [

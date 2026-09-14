@@ -45,15 +45,20 @@ export function rel(
   };
 }
 
-function compiled(source_id: string, notes: string, confidence = 78): ProvenanceRecord {
+function compiled(
+  source_id: string,
+  notes: string,
+  confidence = 78,
+  source_type: "THIRD_PARTY" | "MANUFACTURER" | "TRUSTED_THIRD_PARTY" = "THIRD_PARTY",
+): ProvenanceRecord {
   return provenance({
     source_id,
-    source_type: "THIRD_PARTY",
+    source_type,
     retrieved_at: NOW,
     confidence,
     raw_value: notes,
     normalized_value: notes,
-    verification_method: "CROSS_SOURCE",
+    verification_method: source_type === "MANUFACTURER" ? "MANUFACTURER_DOC" : "CROSS_SOURCE",
     notes,
   });
 }
@@ -436,7 +441,7 @@ function populateFixcode(store: GraphStore) {
 }
 
 function populateAutospec(store: GraphStore) {
-  const oem = compiled("oem-handbook", "Manufacturer handbook compiled specs");
+  const oem = compiled("oem-handbook", "Manufacturer handbook compiled specs", 82, "MANUFACTURER");
   for (const vehicle of VEHICLES) {
     const mfrId = `as:mfr:${vehicle.make_slug}`;
     addOnce(

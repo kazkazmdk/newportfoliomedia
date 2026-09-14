@@ -244,7 +244,7 @@ export function allAutospecPages(): PageRecord[] {
       if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) continue;
       const payload =
         topic.slug === "oil"
-          ? { vehicle: vehicle.id, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-oil` }
+          ? { vehicle: vehicle.id, engine: vehicle.engine_code, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-oil` }
           : topic.slug === "tyres"
             ? { vehicle: vehicle.id, ...vehicle.tyres, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-tyres` }
             : topic.slug === "battery"

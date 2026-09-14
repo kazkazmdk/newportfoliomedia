@@ -83,7 +83,7 @@ export function errorPage(profile: ErrorProfile): PageRecord {
     canonical: `/fixcode${url}`,
     title: `${profile.brand} ${profile.appliance} ${profile.code} Error: Meaning, Causes & Fix`,
     meta_description: `${profile.brand} ${profile.appliance} ${profile.code}: ${profile.meaning} Ranked causes, checks, risk, and likely cost from structured service data.`,
-    entity_ids: [profile.id],
+    entity_ids: [profile.id, ...profile.causes.map((cause) => `${profile.id}:cause:${cause.id}`)],
     structured_payload: payload,
     quality_score: quality.score,
     search_demand: demand,

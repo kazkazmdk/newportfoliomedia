@@ -9,6 +9,8 @@ import { globalNoindex } from "@penta/publishing-core";
 import { SITE_AI_TOOLS } from "@penta/ai-core";
 import { isFresh } from "@penta/data-provenance";
 import { populateDecisionGraph } from "./graph-depth";
+import { deepenDecisionGraph } from "./graph-deepen";
+import { applyIndexGates } from "./index-recompute";
 
 let cached: GraphStore | null = null;
 
@@ -20,6 +22,7 @@ export function buildCatalog(): GraphStore {
   if (cached) return cached;
   const store = new GraphStore();
   populateDecisionGraph(store);
+  deepenDecisionGraph(store);
   const pages = [
     ...allFixcodePages(),
     ...allAutospecPages(),
@@ -28,6 +31,7 @@ export function buildCatalog(): GraphStore {
     ...allTripcostPages(),
   ];
   for (const page of pages) store.addPage(page);
+  applyIndexGates(store);
   cached = store;
   return store;
 }
@@ -153,10 +157,18 @@ export function entityInspector(id: string) {
   const incoming = [...store.relations.values()].filter((rel) => rel.to_id === id);
   const outgoing = [...store.relations.values()].filter((rel) => rel.from_id === id);
   const pages = [...store.pages.values()].filter((page) => page.entity_ids.includes(id));
+  const decision = [...incoming, ...outgoing].filter((rel) => rel.decision_relevant);
+  const stale = [...incoming, ...outgoing].filter((rel) => {
+    const until = rel.provenance[0]?.valid_until;
+    return until ? new Date(until).getTime() < Date.now() : false;
+  });
   return {
     entity,
     incoming,
     outgoing,
+    decision_relevant: decision,
+    stale,
+    conflicts: store.conflicts.filter((c) => c.entity_id === id),
     pages: pages.map((page) => ({ url: page.url, index_state: page.index_state, quality_score: page.quality_score })),
   };
 }
@@ -168,7 +180,7 @@ export function programmaticSeoIssues() {
   const canonicals = new Map<string, string>();
   for (const page of store.pages.values()) {
     if (page.index_state !== "INDEXABLE") continue;
-    if (page.quality_score < 75) issues.push(`${page.url} quality ${page.quality_score} < 75`);
+    if (page.quality_score < 80) issues.push(`${page.url} quality ${page.quality_score} < 80`);
     if (!page.title.trim()) issues.push(`${page.url} empty title`);
     const prev = titles.get(page.title);
     if (prev) issues.push(`Duplicate title "${page.title}" on ${prev} and ${page.url}`);
@@ -450,3 +462,4 @@ export function fullOpsPayload() {
 
 export { populateDecisionGraph, entity, rel } from "./graph-depth";
 export { classifyDemand };
+export { applyIndexGates, nearestNeighbors, similarityReport } from "./index-recompute";
