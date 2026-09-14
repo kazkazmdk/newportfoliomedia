@@ -105,6 +105,7 @@ export function queryClusterFor(page: Pick<PageRecord, "site" | "family" | "titl
   return uniq([page.title]);
 }
 
+/** Northern-temperate calendar only. Prefer seasonLabel(classifyClimateModel(...)). */
 export function wearthereSeason(month: number): "winter" | "spring" | "summer" | "autumn" | "unknown" {
   if ([12, 1, 2].includes(month)) return "winter";
   if ([3, 4, 5].includes(month)) return "spring";

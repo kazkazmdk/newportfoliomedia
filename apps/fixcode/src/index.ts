@@ -2,6 +2,8 @@ export { ALL_ERRORS, ALL_SYMPTOMS, applyAnswer, diagnose, detectStopUse, explain
 export { ALL_ERRORS as ERRORS } from "./engine";
 export { APPLIANCES, BRANDS, SYMPTOMS, UNSUPPORTED_NOTE } from "./data-symptoms";
 export { allFixcodePages, errorPage, symptomPage } from "./pages";
+export { buildDiagnosticTree, treeHasUnsafeSelfService } from "./diagnostic-tree";
+export type { DiagnosticTree, DiagnosticNode, DiagnosticCheck, SafetyBoundary, ResolutionPath } from "./diagnostic-tree";
 export type { DiagnosticOutcome, OutcomeId, OutcomeRecord } from "./types";
 export { DIAGNOSTIC_OUTCOMES } from "./types";
 export type { DiagnosisResult, DiagnosisState, ErrorProfile, RankedCause, SymptomProfile } from "./types";

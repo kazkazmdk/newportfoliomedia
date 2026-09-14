@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { compatibility, getCharger, getDevice } from "@penta/chargematch";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
+import { readJsonBody } from "@/lib/read-json";
 
 export async function POST(request: Request) {
   const limited = rateLimit(`chargematch:${clientKey(request)}`, 60);
   if (!limited.ok) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
-  const body = (await request.json()) as { device?: string; charger?: string };
-  const device = getDevice(body.device ?? "");
-  const charger = getCharger(body.charger ?? "");
+  const parsed = await readJsonBody<{ device?: string; charger?: string }>(request);
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+  const device = getDevice(parsed.value.device ?? "");
+  const charger = getCharger(parsed.value.charger ?? "");
   if (!device || !charger) {
     return NextResponse.json({ error: "unknown_entity", confidence: "UNKNOWN" }, { status: 404 });
   }

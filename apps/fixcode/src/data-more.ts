@@ -7,6 +7,7 @@ function doc(brand: string, raw: string, url: string, confidence: number) {
   return provenance({
     source_id: `${brand.toLowerCase()}-support`,
     source_type: "MANUFACTURER",
+    source_name: `${brand} support compilation (generic root — PRIMARY_GENERAL)`,
     source_url: url,
     retrieved_at: RETRIEVED,
     valid_from: "2018-01-01",

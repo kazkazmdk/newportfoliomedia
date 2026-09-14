@@ -1,4 +1,5 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
+import { classifyClimateModel, seasonLabel } from "@penta/demand";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { climate, type MonthClimate } from "./climate";
@@ -416,7 +417,7 @@ export function airlineFit(volume_l: number, weight_kg: number, airline: Airline
 export async function fetchForecast(lat: number, lon: number, start: string, end: string) {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${start}&end_date=${end}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url);
     if (!res.ok) return null;
     return (await res.json()) as {
       daily?: {
@@ -518,16 +519,37 @@ export function allWeartherePages(): PageRecord[] {
           ...w,
           city: dest.city,
           slug: dest.slug,
+          lat: dest.lat,
           distinct_reason: `${dest.slug}-${month}`,
           kind: "CLIMATE_NORMAL",
           period: "1991-2020",
           aggregation: "monthly_mean",
           sample_years: 30,
           layers: capsuleFor(dest, month, "classic").pieces.map((p) => p.id),
+          not_to_pack: capsuleFor(dest, month, "classic").pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.id),
+          climate_season_model: classifyClimateModel({
+            lat: dest.lat,
+            months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
+          }),
+          season: seasonLabel(
+            classifyClimateModel({
+              lat: dest.lat,
+              months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
+            }),
+            month,
+          ),
           dataset: CLIMATE_DATASET.dataset,
           dataset_version: CLIMATE_DATASET.dataset_version,
           station_or_grid: CLIMATE_DATASET.station_or_grid,
           source_url: CLIMATE_DATASET.source_url,
+          action_evidence: {
+            actionType: "RECOMMEND",
+            inputFields: ["city", "month"],
+            outputFields: ["layers"],
+            rendered: true,
+            executable: true,
+            decisionFields: ["layers", "not_to_pack"],
+          },
         },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: dest.demand }),
@@ -581,4 +603,10 @@ export const CLIMATE_PROVENANCE = provenance({
   normalized_value: "CLIMATE_NORMAL",
   verification_method: "UNVERIFIED",
   notes: "Period 1991-2020 monthly means compiled in-repo. Not a WMO station citation. source_url is unknown.",
+  locator: {
+    dataset: "compiled-monthly-normals",
+    dataset_version: "penta-climate-v1",
+    period: "1991-2020",
+    document_title: "Penta compiled monthly climate normals",
+  },
 });

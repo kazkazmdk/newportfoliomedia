@@ -2,7 +2,7 @@ import type { ConfidenceLevel } from "@penta/data-provenance";
 import { explainStructured, recordToolCall, routeAiTask } from "@penta/ai-core";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
-import { MockVinProvider, VEHICLES, fitmentStatus, type Fitment, type FitmentStatus, type VehicleIdentity } from "./data";
+import { MockVinProvider, VEHICLES, fitmentScopeOf, fitmentStatus, type Fitment, type FitmentStatus, type VehicleIdentity } from "./data";
 
 export function getVehicle(make: string, model: string, generation: string, variant: string) {
   return VEHICLES.find(
@@ -187,6 +187,7 @@ export function vehicleUrl(v: VehicleIdentity, topic?: string) {
 export function allAutospecPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const vehicle of VEHICLES) {
+    const scope = fitmentScopeOf(vehicle);
     const hubPayload = {
       vehicle: vehicle.id,
       engine: vehicle.engine_code,
@@ -194,6 +195,9 @@ export function allAutospecPages(): PageRecord[] {
       generation: vehicle.generation,
       market_scope: vehicle.market,
       distinct_reason: vehicle.id,
+      fitment_scope: scope,
+      make: vehicle.make,
+      model: vehicle.model,
     };
     const hubQ = evaluatePageQuality({
       site: "autospec",
@@ -244,14 +248,59 @@ export function allAutospecPages(): PageRecord[] {
       if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) continue;
       const payload =
         topic.slug === "oil"
-          ? { vehicle: vehicle.id, engine: vehicle.engine_code, spec: vehicle.oil.spec, visc: vehicle.oil.viscosity, cap: vehicle.oil.capacity_liters, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-oil` }
+          ? {
+              vehicle: vehicle.id,
+              engine: vehicle.engine_code,
+              spec: vehicle.oil.spec,
+              viscosity: vehicle.oil.viscosity,
+              capacity_l: vehicle.oil.capacity_liters,
+              market_scope: vehicle.market,
+              generation: vehicle.generation,
+              year_from: vehicle.years[0],
+              year_to: vehicle.years.at(-1),
+              fitment_scope: scope,
+              distinct_reason: `${vehicle.engine_code}-oil`,
+              action_evidence: {
+                actionType: "CALCULATE",
+                inputFields: ["vehicle", "engine"],
+                outputFields: ["capacity_l", "spec"],
+                rendered: true,
+                executable: true,
+                decisionFields: ["capacity_l", "spec", "viscosity"],
+              },
+            }
           : topic.slug === "tyres"
-            ? { vehicle: vehicle.id, ...vehicle.tyres, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-tyres` }
+            ? {
+                vehicle: vehicle.id,
+                ...vehicle.tyres,
+                market_scope: vehicle.market,
+                fitment_scope: scope,
+                distinct_reason: `${vehicle.engine_code}-tyres`,
+              }
             : topic.slug === "battery"
-              ? { vehicle: vehicle.id, ...vehicle.battery, market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-battery` }
+              ? {
+                  vehicle: vehicle.id,
+                  ...vehicle.battery,
+                  market_scope: vehicle.market,
+                  fitment_scope: scope,
+                  distinct_reason: `${vehicle.engine_code}-battery`,
+                }
               : topic.slug === "maintenance"
-                ? { vehicle: vehicle.id, items: vehicle.services.map((s) => s.id), market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-maint` }
-                : { vehicle: vehicle.id, issues: vehicle.issues.map((i) => i.id), market_scope: vehicle.market, distinct_reason: `${vehicle.engine_code}-issues` };
+                ? {
+                    vehicle: vehicle.id,
+                    services: vehicle.services.map((s) => s.id),
+                    market_scope: vehicle.market,
+                    fitment_scope: scope,
+                    distinct_reason: `${vehicle.engine_code}-maint`,
+                  }
+                : {
+                    vehicle: vehicle.id,
+                    issues: vehicle.issues.map((i) => i.id),
+                    problems: vehicle.issues.map((i) => i.id),
+                    market_scope: vehicle.market,
+                    fitment_scope: scope,
+                    distinct_reason: `${vehicle.engine_code}-issues`,
+                  };
       const quality = evaluatePageQuality({
         site: "autospec",
         family: topic.family,

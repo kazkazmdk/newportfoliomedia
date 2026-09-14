@@ -25,6 +25,7 @@ export const INDEX_LABEL: Record<string, string> = {
 };
 
 export function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const g = globalThis as { window?: { matchMedia?: (q: string) => { matches: boolean } } };
+  if (!g.window?.matchMedia) return false;
+  return g.window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }

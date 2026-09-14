@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ALL_ERRORS, ALL_SYMPTOMS, getError, getSymptom } from "@penta/fixcode";
+import { ALL_ERRORS, ALL_SYMPTOMS, buildDiagnosticTree, getError, getSymptom } from "@penta/fixcode";
 import { allFixcodePages } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
@@ -49,15 +49,10 @@ export default async function ErrorPage({
   const schema = isError
     ? {
         "@context": "https://schema.org",
-        "@type": "HowTo",
-        name: `${profile.brand} ${profile.appliance} ${"code" in profile ? profile.code : ""}`,
+        "@type": "TechArticle",
+        headline: `${profile.brand} ${profile.appliance} ${error!.code}`,
         description: profile.meaning,
-        step: profile.questions.map((q, i) => ({
-          "@type": "HowToStep",
-          position: i + 1,
-          name: q.text,
-          text: q.why,
-        })),
+        about: `${profile.brand} ${profile.appliance} error ${error!.code}`,
       }
     : null;
 
@@ -78,6 +73,17 @@ export default async function ErrorPage({
         {isError ? error!.code : symptom!.symptom}
       </h1>
       <p className="mt-4 max-w-xl text-xl leading-8">{profile.meaning}</p>
+      <aside className="mt-6 max-w-xl border border-[#e2ddd4] bg-[#fffcf7] p-4">
+        <p className="text-sm uppercase tracking-[0.14em]">What to do now</p>
+        <p className="mt-2 text-[17px] leading-7">
+          Run the safe checks first. This is a structured diagnostic tree — not a ChatGPT guess.
+        </p>
+        {buildDiagnosticTree(profile).boundaries.length ? (
+          <p className="mt-2 text-sm text-[#8a1f11]">
+            Stop self-service if the tree hits a professional or stop-use boundary.
+          </p>
+        ) : null}
+      </aside>
       <Link
         href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
         className="fixcode-btn mt-8 inline-block"

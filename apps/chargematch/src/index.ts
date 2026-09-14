@@ -277,6 +277,55 @@ export function allocate(charger: ChargerProfile, usedPorts: string[]): Allocati
   return single ?? charger.allocations[0];
 }
 
+export type PowerChain = {
+  deviceAcceptance: number;
+  protocolCap: number;
+  portCap: number;
+  cableCap: number;
+  allocationCap: number;
+  delivered: number;
+  limiting: "device" | "protocol" | "port" | "cable" | "allocation";
+  measured: null;
+  rated: true;
+};
+
+export function powerChain(input: {
+  device: DeviceProfile;
+  charger: ChargerProfile;
+  cable?: CableProfile;
+  usedPorts?: string[];
+}): PowerChain {
+  const ports = input.usedPorts?.length ? input.usedPorts : [input.charger.ports[0].id];
+  const alloc = allocate(input.charger, ports);
+  const allocationCap = alloc.watts[0] ?? input.charger.ports[0].watts;
+  const portCap = input.charger.ports.find((p) => p.id === ports[0])?.watts ?? allocationCap;
+  const protocolCap = Math.max(...input.charger.ports.flatMap((p) => p.pdos.map((d) => d.watts)), 0);
+  const cableCap = input.cable?.max_watts ?? Number.POSITIVE_INFINITY;
+  const deviceAcceptance = input.device.max_watts;
+  const delivered = Math.min(deviceAcceptance, protocolCap || deviceAcceptance, portCap, cableCap, allocationCap);
+  const limiting =
+    delivered === cableCap
+      ? "cable"
+      : delivered === allocationCap && allocationCap < portCap
+        ? "allocation"
+        : delivered === portCap
+          ? "port"
+          : delivered === deviceAcceptance
+            ? "device"
+            : "protocol";
+  return {
+    deviceAcceptance,
+    protocolCap,
+    portCap,
+    cableCap: Number.isFinite(cableCap) ? cableCap : portCap,
+    allocationCap,
+    delivered,
+    limiting,
+    measured: null,
+    rated: true,
+  };
+}
+
 export function compatibility(
   device: DeviceProfile,
   charger: ChargerProfile,
@@ -310,14 +359,14 @@ export function compatibility(
     };
   }
   const ports = extraPorts.length ? extraPorts : [charger.ports[0].id];
-  const alloc = allocate(charger, ports);
-  const portWatts = alloc.watts[0] ?? charger.ports[0].watts;
+  const chain = powerChain({ device, charger, cable, usedPorts: ports });
+  const portWatts = chain.allocationCap;
   const cableOk = !cable || cable.max_watts >= Math.min(device.max_watts, portWatts) || cable.tag === "UNKNOWN";
-  const theoretical = Math.min(device.max_watts, portWatts, cable?.max_watts ?? portWatts);
+  const theoretical = chain.delivered;
   let bottleneck = "none";
-  if ((cable?.max_watts ?? 999) < Math.min(device.max_watts, portWatts)) bottleneck = "cable";
-  else if (portWatts < device.max_watts) bottleneck = "charger port allocation";
-  else if (device.max_watts < portWatts) bottleneck = "device input limit";
+  if (chain.limiting === "cable") bottleneck = "cable";
+  else if (chain.limiting === "allocation" || chain.limiting === "port") bottleneck = "charger port allocation";
+  else if (chain.limiting === "device") bottleneck = "device input limit";
 
   const pdIn = device.connector === "USB-C" || device.connector === "Lightning";
   const compatible = pdIn && portWatts >= device.min_watts;
@@ -355,7 +404,7 @@ export function compatibility(
     max_power: Number.isFinite(theoretical) ? theoretical : null,
     protocol: device.pd_version ?? "USB-C",
     bottleneck,
-    best_port: alloc.ports[0] ?? charger.ports[0].label,
+    best_port: ports[0] ?? charger.ports[0].label,
     cable_ok: cableOk,
     confidence,
     tag,
@@ -569,7 +618,27 @@ export function allChargematchPages(): PageRecord[] {
       title: `Can I use a ${charger.name} with ${device.name}?`,
       meta_description: `${result.match}. Expected max ${result.max_power ?? "unknown"} W. ${result.tag.replaceAll("_", " ")}.`,
       entity_ids: [device.id, charger.id],
-      structured_payload: { match: result.match, max_power: result.max_power, device: d, charger: c, distinct_reason: `${d}-${c}`, theoretical: result.theoretical, tag: result.tag, evidence: result.evidence, bottleneck: result.bottleneck },
+      structured_payload: {
+        match: result.match,
+        max_power: result.max_power,
+        device: d,
+        charger: c,
+        distinct_reason: `${d}-${c}`,
+        theoretical: result.theoretical,
+        tag: result.tag,
+        evidence: result.evidence,
+        bottleneck: result.bottleneck,
+        measured: null,
+        rated: true,
+        action_evidence: {
+          actionType: "VERIFY",
+          inputFields: ["device", "charger"],
+          outputFields: ["match", "max_power", "bottleneck"],
+          rendered: true,
+          executable: true,
+          decisionFields: ["match", "max_power", "bottleneck"],
+        },
+      },
       quality_score: q.score,
       search_demand: searchDemandScore({ seed_research: demand }),
       index_state: q.index_state,

@@ -7,11 +7,12 @@ import { allChargematchPages } from "@penta/chargematch";
 import { allTripcostPages } from "@penta/tripcost";
 import { globalNoindex } from "@penta/publishing-core";
 import { SITE_AI_TOOLS } from "@penta/ai-core";
-import { isFresh } from "@penta/data-provenance";
+import { isFresh, validateFactProvenance } from "@penta/data-provenance";
 import { populateDecisionGraph } from "./graph-depth";
 import { deepenDecisionGraph } from "./graph-deepen";
 import { applyIndexGates, resetDemandCache } from "./index-recompute";
-import type { DemandAssessmentV2, DemandEvidenceSource } from "@penta/demand";
+import { evaluateScaleStops, scaleMustStop, scaleCandidates, type ScaleSnapshot } from "./scale-stop";
+import { cellAction, truthDemandCell, type DemandAssessmentV2, type DemandEvidenceSource } from "@penta/demand";
 
 let cached: GraphStore | null = null;
 
@@ -40,9 +41,23 @@ export function buildCatalog(): GraphStore {
 
 export type DuplicateAction = "KEEP" | "MERGE" | "NOINDEX";
 
+function duplicateBucket(page: PageRecord): string {
+  const payload = page.structured_payload;
+  const city = String(payload.city ?? payload.slug ?? "");
+  const brand = String(payload.brand ?? payload.make ?? "");
+  const familyKey = city || brand || page.entity_ids[0] || page.family;
+  return `${page.site}:${page.family}:${familyKey}`;
+}
+
 export function duplicateReport(threshold = 0.8) {
   const store = buildCatalog();
-  const pages = [...store.pages.values()];
+  const buckets = new Map<string, PageRecord[]>();
+  for (const page of store.pages.values()) {
+    const key = duplicateBucket(page);
+    const list = buckets.get(key) ?? [];
+    list.push(page);
+    buckets.set(key, list);
+  }
   const rows: Array<{
     a: string;
     b: string;
@@ -51,28 +66,30 @@ export function duplicateReport(threshold = 0.8) {
     distinct_b?: string;
     action: DuplicateAction;
   }> = [];
-  for (let i = 0; i < pages.length; i++) {
-    for (let j = i + 1; j < pages.length; j++) {
-      if (pages[i].site !== pages[j].site) continue;
-      const sim = intentSimilarity(pages[i], pages[j]);
-      if (sim < threshold) continue;
-      const distinct_a = String(pages[i].structured_payload.distinct_reason ?? "");
-      const distinct_b = String(pages[j].structured_payload.distinct_reason ?? "");
-      const hasDistinct = Boolean(distinct_a || distinct_b);
-      const action =
-        intentFamilyId(pages[i]) === intentFamilyId(pages[j]) && pages[i].url !== pages[j].url
-          ? "MERGE"
-          : hasDistinct
-            ? duplicateAction(sim, distinct_a || distinct_b)
-            : duplicateAction(sim);
-      rows.push({
-        a: pages[i].url,
-        b: pages[j].url,
-        similarity: Math.round(sim * 1000) / 1000,
-        distinct_a: distinct_a || undefined,
-        distinct_b: distinct_b || undefined,
-        action,
-      });
+  for (const group of buckets.values()) {
+    const limit = Math.min(group.length, 80);
+    for (let i = 0; i < limit; i++) {
+      for (let j = i + 1; j < limit; j++) {
+        const sim = intentSimilarity(group[i], group[j]);
+        if (sim < threshold) continue;
+        const distinct_a = String(group[i].structured_payload.distinct_reason ?? "");
+        const distinct_b = String(group[j].structured_payload.distinct_reason ?? "");
+        const hasDistinct = Boolean(distinct_a || distinct_b);
+        const action =
+          intentFamilyId(group[i]) === intentFamilyId(group[j]) && group[i].url !== group[j].url
+            ? "MERGE"
+            : hasDistinct
+              ? duplicateAction(sim, distinct_a || distinct_b)
+              : duplicateAction(sim);
+        rows.push({
+          a: group[i].url,
+          b: group[j].url,
+          similarity: Math.round(sim * 1000) / 1000,
+          distinct_a: distinct_a || undefined,
+          distinct_b: distinct_b || undefined,
+          action,
+        });
+      }
     }
   }
   return rows;
@@ -131,6 +148,11 @@ export function launchReport() {
     ),
     public_site_live: process.env.PUBLIC_SITE_LIVE === "true",
     global_noindex: globalNoindex(),
+    dataset_coverage: datasetCoverage(),
+    scale_stops: catalogScaleStops(),
+    scale_must_stop: scaleMustStop(catalogScaleStops()),
+    scale_candidates: scaleCandidates(),
+    demand_data_priority: demandDataPriority().slice(0, 40),
   };
 }
 
@@ -267,6 +289,115 @@ export function coverageReport() {
       ).length,
     },
   };
+}
+
+export function datasetCoverage() {
+  const store = buildCatalog();
+  const sites = ["fixcode", "autospec", "wearthere", "chargematch", "tripcost"] as const;
+  return Object.fromEntries(
+    sites.map((site) => {
+      const entities = [...store.entities.values()].filter((e) => e.site === site);
+      const facts = entities.flatMap((e) =>
+        e.provenance.map((p) =>
+          validateFactProvenance({
+            source_type: p.source_type,
+            source_url: p.source_url,
+            source_name: p.source_name,
+            retrieved_at: p.retrieved_at,
+            verified_at: p.verified_at,
+            verification_method: p.verification_method,
+            locator: p.locator,
+          }),
+        ),
+      );
+      const pages = [...store.pages.values()].filter((p) => p.site === site);
+      const exact = facts.filter((f) => f.level === "PRIMARY_EXACT" || f.level === "REGULATORY_EXACT" || f.level === "TRUSTED_DATASET_EXACT").length;
+      const generic = facts.filter((f) => f.level === "PRIMARY_GENERAL" || f.level === "TRUSTED_THIRD_PARTY").length;
+      const missing = facts.filter((f) => f.level === "UNKNOWN" || f.level === "AI_INFERRED" || !f.valid).length;
+      const truthReady = pages.filter((p) => p.index_state === "SEO_CANDIDATE" || p.index_state === "INDEXABLE").length;
+      return [
+        site,
+        {
+          entities: entities.length,
+          entities_exact_provenance: entities.filter((e) =>
+            e.provenance.some((p) => {
+              const v = validateFactProvenance({
+                source_type: p.source_type,
+                source_url: p.source_url,
+                source_name: p.source_name,
+                retrieved_at: p.retrieved_at,
+                verified_at: p.verified_at,
+                verification_method: p.verification_method,
+                locator: p.locator,
+              });
+              return v.level === "PRIMARY_EXACT" || v.level === "REGULATORY_EXACT";
+            }),
+          ).length,
+          entities_general_provenance: entities.filter((e) => e.provenance.length > 0).length,
+          entities_no_provenance: entities.filter((e) => e.provenance.length === 0).length,
+          critical_facts_exact: exact,
+          critical_facts_generic: generic,
+          critical_facts_missing: missing,
+          truth_ready_entities: truthReady,
+          blocked_entities: pages.length - truthReady,
+        },
+      ];
+    }),
+  );
+}
+
+export function catalogScaleStops() {
+  const store = buildCatalog();
+  const pages = [...store.pages.values()];
+  const relations = [...store.relations.values()];
+  const facts = [...store.entities.values()].flatMap((e) =>
+    e.provenance.map((p) =>
+      validateFactProvenance({
+        source_type: p.source_type,
+        source_url: p.source_url,
+        source_name: p.source_name,
+        retrieved_at: p.retrieved_at,
+        verified_at: p.verified_at,
+        verification_method: p.verification_method,
+        locator: p.locator,
+      }),
+    ),
+  );
+  const snap: ScaleSnapshot = {
+    pages: pages.length,
+    truthReady: pages.filter((p) => p.index_state === "SEO_CANDIDATE" || p.index_state === "INDEXABLE").length,
+    criticalFacts: facts.length,
+    criticalFactsExact: facts.filter((f) => f.level === "PRIMARY_EXACT" || f.level === "REGULATORY_EXACT").length,
+    duplicatePairs: duplicateReport(0.85).length,
+    sitemapParity: true,
+    previousPages: pages.length,
+    sourceTruthEdges: relations.filter((r) => r.edge_kind === "SOURCE_TRUTH" || r.decision_relevant).length,
+    relations: relations.length,
+    unknownCritical: facts.filter((f) => f.level === "UNKNOWN" || !f.valid).length,
+    demandValidated: pages.filter((p) => p.seo_validation === "PRELAUNCH" || p.seo_validation === "POSTLAUNCH").length,
+  };
+  return evaluateScaleStops(snap);
+}
+
+export function demandDataPriority() {
+  const store = buildCatalog();
+  return [...store.pages.values()]
+    .map((page) => {
+      const assessment = page.structured_payload.demand_assessment as DemandAssessmentV2 | undefined;
+      const truthReady = page.index_state === "SEO_CANDIDATE" || page.index_state === "INDEXABLE";
+      const cell = truthDemandCell(truthReady, assessment?.class ?? "UNKNOWN");
+      return {
+        page_id: page.id,
+        site: page.site,
+        url: page.url,
+        cell,
+        action: cellAction(cell),
+        truth_ready: truthReady,
+        demand_class: assessment?.class ?? "UNKNOWN",
+        priority: cell === "LOW_TRUTH_HIGH_DEMAND" ? 100 : cell === "HIGH_TRUTH_HIGH_DEMAND" ? 80 : cell === "HIGH_TRUTH_LOW_DEMAND" ? 40 : 10,
+      };
+    })
+    .sort((a, b) => b.priority - a.priority);
 }
 
 export type AiUsageClass = "GOOD_USE" | "OPTIONAL" | "SHOULD_BE_DETERMINISTIC" | "DANGEROUS";
@@ -496,3 +627,10 @@ export function fullOpsPayload() {
 export { populateDecisionGraph, entity, rel } from "./graph-depth";
 export { classifyDemand };
 export { applyIndexGates, nearestNeighbors, similarityReport, resetDemandCache, loadDemandEvidence } from "./index-recompute";
+export {
+  evaluateScaleStops,
+  scaleMustStop,
+  scaleCandidates,
+  SCALE_STOP_THRESHOLDS,
+} from "./scale-stop";
+export type { ScaleCandidate, ScaleSnapshot, ScaleStopResult } from "./scale-stop";

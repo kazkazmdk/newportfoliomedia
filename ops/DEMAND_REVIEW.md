@@ -2,6 +2,272 @@
 
 Checkboxes are empty on purpose. Do not mark a signal observed unless you saw it.
 
+## Samsung Washer 4C Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:4c` · fixcode · /fixcode/samsung/washer/4c-error
+- Primary query: samsung 4c error
+- Alternative queries: samsung washer 4c · samsung error code 4c
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer 4E Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:4e` · fixcode · /fixcode/samsung/washer/4e-error
+- Primary query: samsung 4e error
+- Alternative queries: samsung washer 4e · samsung error code 4e
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer 5C Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:5c` · fixcode · /fixcode/samsung/washer/5c-error
+- Primary query: samsung 5c error
+- Alternative queries: samsung washer 5c · samsung error code 5c
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer 5E Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:5e` · fixcode · /fixcode/samsung/washer/5e-error
+- Primary query: samsung 5e error
+- Alternative queries: samsung washer 5e · samsung error code 5e
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer UE Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:ue` · fixcode · /fixcode/samsung/washer/ue-error
+- Primary query: samsung ue error
+- Alternative queries: samsung washer ue · samsung error code ue
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer DC Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:dc` · fixcode · /fixcode/samsung/washer/dc-error
+- Primary query: samsung dc error
+- Alternative queries: samsung washer dc · samsung error code dc
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer OE Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:oe` · fixcode · /fixcode/samsung/washer/oe-error
+- Primary query: samsung oe error
+- Alternative queries: samsung washer oe · samsung error code oe
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer LE Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:le` · fixcode · /fixcode/samsung/washer/le-error
+- Primary query: samsung le error
+- Alternative queries: samsung washer le · samsung error code le
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer tE Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:te` · fixcode · /fixcode/samsung/washer/te-error
+- Primary query: samsung te error
+- Alternative queries: samsung washer te · samsung error code te
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## Samsung Washer 3C Error: Meaning, Causes & Fix
+
+- Page: `fix:samsung:washer:3c` · fixcode · /fixcode/samsung/washer/3c-error
+- Primary query: samsung 3c error
+- Alternative queries: samsung washer 3c · samsung error code 3c
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## LG Washer IE Error: Meaning, Causes & Fix
+
+- Page: `fix:lg:washer:ie` · fixcode · /fixcode/lg/washer/ie-error
+- Primary query: lg ie error
+- Alternative queries: lg washer ie · lg error code ie
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## LG Washer OE Error: Meaning, Causes & Fix
+
+- Page: `fix:lg:washer:oe` · fixcode · /fixcode/lg/washer/oe-error
+- Primary query: lg oe error
+- Alternative queries: lg washer oe · lg error code oe
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## LG Washer UE Error: Meaning, Causes & Fix
+
+- Page: `fix:lg:washer:ue` · fixcode · /fixcode/lg/washer/ue-error
+- Primary query: lg ue error
+- Alternative queries: lg washer ue · lg error code ue
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## LG Washer DE Error: Meaning, Causes & Fix
+
+- Page: `fix:lg:washer:de` · fixcode · /fixcode/lg/washer/de-error
+- Primary query: lg de error
+- Alternative queries: lg washer de · lg error code de
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
 ## Bosch Dishwasher E15 Error: Meaning, Causes & Fix
 
 - Page: `fix:bosch:dishwasher:e15` · fixcode · /fixcode/bosch/dishwasher/e15-error
@@ -83,6 +349,25 @@ Final classification:
 - Page: `fix:miele:washer:f70` · fixcode · /fixcode/miele/washer/f70-error
 - Primary query: miele f70 error
 - Alternative queries: miele washer f70 · miele error code f70
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## LG Dryer d80 Error: Meaning, Causes & Fix
+
+- Page: `fix:lg:dryer:d80` · fixcode · /fixcode/lg/dryer/d80-error
+- Primary query: lg d80 error
+- Alternative queries: lg dryer d80 · lg error code d80
 - Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
 - Current SEO state: SEO_CANDIDATE
 - Demand class: UNKNOWN (unchecked unless evidence was imported)
@@ -938,6 +1223,291 @@ Final classification:
 - Page: `fix:miele:dryer:f2` · fixcode · /fixcode/miele/dryer/f2-error
 - Primary query: miele f2 error
 - Alternative queries: miele dryer f2 · miele error code f2
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in March
+
+- Page: `dest:paris:3` · wearthere · /wearthere/paris/march/what-to-wear
+- Primary query: what to wear in paris in march
+- Alternative queries: paris march packing list · what clothes for paris march
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in April
+
+- Page: `dest:paris:4` · wearthere · /wearthere/paris/april/what-to-wear
+- Primary query: what to wear in paris in april
+- Alternative queries: paris april packing list · what clothes for paris april
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in May
+
+- Page: `dest:paris:5` · wearthere · /wearthere/paris/may/what-to-wear
+- Primary query: what to wear in paris in may
+- Alternative queries: paris may packing list · what clothes for paris may
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in September
+
+- Page: `dest:paris:9` · wearthere · /wearthere/paris/september/what-to-wear
+- Primary query: what to wear in paris in september
+- Alternative queries: paris september packing list · what clothes for paris september
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in October
+
+- Page: `dest:paris:10` · wearthere · /wearthere/paris/october/what-to-wear
+- Primary query: what to wear in paris in october
+- Alternative queries: paris october packing list · what clothes for paris october
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in November
+
+- Page: `dest:paris:11` · wearthere · /wearthere/paris/november/what-to-wear
+- Primary query: what to wear in paris in november
+- Alternative queries: paris november packing list · what clothes for paris november
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Paris in December
+
+- Page: `dest:paris:12` · wearthere · /wearthere/paris/december/what-to-wear
+- Primary query: what to wear in paris in december
+- Alternative queries: paris december packing list · what clothes for paris december
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in March
+
+- Page: `dest:tokyo:3` · wearthere · /wearthere/tokyo/march/what-to-wear
+- Primary query: what to wear in tokyo in march
+- Alternative queries: tokyo march packing list · what clothes for tokyo march
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in April
+
+- Page: `dest:tokyo:4` · wearthere · /wearthere/tokyo/april/what-to-wear
+- Primary query: what to wear in tokyo in april
+- Alternative queries: tokyo april packing list · what clothes for tokyo april
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in May
+
+- Page: `dest:tokyo:5` · wearthere · /wearthere/tokyo/may/what-to-wear
+- Primary query: what to wear in tokyo in may
+- Alternative queries: tokyo may packing list · what clothes for tokyo may
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in June
+
+- Page: `dest:tokyo:6` · wearthere · /wearthere/tokyo/june/what-to-wear
+- Primary query: what to wear in tokyo in june
+- Alternative queries: tokyo june packing list · what clothes for tokyo june
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in September
+
+- Page: `dest:tokyo:9` · wearthere · /wearthere/tokyo/september/what-to-wear
+- Primary query: what to wear in tokyo in september
+- Alternative queries: tokyo september packing list · what clothes for tokyo september
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in October
+
+- Page: `dest:tokyo:10` · wearthere · /wearthere/tokyo/october/what-to-wear
+- Primary query: what to wear in tokyo in october
+- Alternative queries: tokyo october packing list · what clothes for tokyo october
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in November
+
+- Page: `dest:tokyo:11` · wearthere · /wearthere/tokyo/november/what-to-wear
+- Primary query: what to wear in tokyo in november
+- Alternative queries: tokyo november packing list · what clothes for tokyo november
+- Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
+- Current SEO state: SEO_CANDIDATE
+- Demand class: UNKNOWN (unchecked unless evidence was imported)
+
+- [ ] SERP strong
+- [ ] Autocomplete
+- [ ] Related searches
+- [ ] Trends
+- [ ] Keyword data
+
+Evidence notes:
+
+Final classification:
+
+## What to Wear in Tokyo in December
+
+- Page: `dest:tokyo:12` · wearthere · /wearthere/tokyo/december/what-to-wear
+- Primary query: what to wear in tokyo in december
+- Alternative queries: tokyo december packing list · what clothes for tokyo december
 - Truth readiness: READY (SEO_CANDIDATE/INDEXABLE)
 - Current SEO state: SEO_CANDIDATE
 - Demand class: UNKNOWN (unchecked unless evidence was imported)

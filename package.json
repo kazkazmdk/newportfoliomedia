@@ -6,7 +6,10 @@
     "dev": "pnpm --filter web dev --port 43121",
     "build": "pnpm --filter web build",
     "start": "pnpm --filter web start --port 43121",
-    "lint": "pnpm --filter web lint",
+    "lint": "pnpm --filter web lint && pnpm typecheck:packages",
+    "typecheck": "pnpm typecheck:web && pnpm typecheck:packages",
+    "typecheck:web": "pnpm --filter web exec tsc --noEmit",
+    "typecheck:packages": "tsc -p tsconfig.packages.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "report": "tsx scripts/launch-report.ts",
@@ -17,13 +20,17 @@
     "graph:inspect": "tsx scripts/graph-inspect.ts",
     "truth-gate": "tsx scripts/truth-gate.ts",
     "demand:import": "tsx scripts/demand-import.ts",
-    "demand:discover": "tsx scripts/demand-discovery.ts"
+    "demand:discover": "tsx scripts/demand-discovery.ts",
+    "demand:audit": "tsx scripts/demand-audit.ts",
+    "seo:audit": "tsx scripts/seo-audit.ts",
+    "sitemap:audit": "tsx scripts/sitemap-audit.ts"
   },
   "dependencies": {
     "@penta/catalog": "workspace:*",
     "@penta/demand": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "^20",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"

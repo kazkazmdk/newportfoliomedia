@@ -18,12 +18,16 @@ Une app Next.js (`apps/web`) expose les cinq identités visuelles, l’admin int
 
 ```bash
 pnpm install
+pnpm lint           # eslint apps/web + typecheck packages/engines/scripts
+pnpm typecheck      # apps/web + workspace packages
 pnpm test
-pnpm graph:audit    # recalcule les métriques → docs/DEEP_GRAPH_BASELINE.md
-pnpm graph:health   # tableau entités / relations / INDEX / SEO_CANDIDATE
-pnpm truth-gate     # invariants + sitemap vide
-pnpm test
-pnpm deep-qa        # rapport QA (ne pas traiter un markdown précédent comme source)
+pnpm build
+pnpm truth-gate
+pnpm graph:health
+pnpm demand:audit
+pnpm seo:audit
+pnpm sitemap:audit  # parité des SETS sitemap / INDEXABLE
+pnpm demand:discover
 pnpm dev
 ```
 
@@ -72,7 +76,7 @@ pnpm demand:import     # validate data/demand/** CSV/JSON
 pnpm demand:discover   # queue, waves, PRELAUNCH_BATCH, reports
 ```
 
-See `docs/TRUTH_GATE_V2_REPORT.md` and `docs/DEMAND_DISCOVERY_V2.md`.
+Rapport unique de cette passe : `docs/PENTA_ACCELERATION_REPORT.md`. Simulation de capacité : `docs/SCALE_SIMULATION.md`. Demand : `docs/DEMAND_DISCOVERY_V2.md`.
 
 ## Données (catalog, honnête)
 

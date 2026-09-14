@@ -82,6 +82,7 @@ export type ProvenanceRecord = {
   verification_method: VerificationMethod;
   notes?: string;
   confidence_evidence?: ConfidenceEvidence[];
+  locator?: FieldLocator;
 };
 
 export type FactConflictCandidate = {
@@ -280,6 +281,44 @@ export function isFresh(record: ProvenanceRecord, now = new Date()): boolean {
   return new Date(record.valid_until).getTime() >= now.getTime();
 }
 
+export type ProvenanceV3 = {
+  sourceId: string;
+  sourceClass: string;
+  sourceUrl?: string;
+  documentTitle?: string;
+  documentVersion?: string;
+  section?: string;
+  page?: string | number;
+  locator?: string;
+  retrievedAt: string;
+  verifiedAt?: string;
+  scope?: {
+    brand?: string;
+    model?: string;
+    generation?: string;
+    engine?: string;
+    country?: string;
+    market?: string;
+    device?: string;
+  };
+};
+
+export function toProvenanceV3(record: ProvenanceRecord, extras?: Partial<ProvenanceV3>): ProvenanceV3 {
+  return {
+    sourceId: record.source_id,
+    sourceClass: record.source_type,
+    sourceUrl: record.source_url,
+    documentTitle: extras?.documentTitle,
+    documentVersion: extras?.documentVersion,
+    section: extras?.section,
+    page: extras?.page,
+    locator: extras?.locator,
+    retrievedAt: record.retrieved_at,
+    verifiedAt: record.verified_at,
+    scope: extras?.scope,
+  };
+}
+
 export function provenance(partial: Omit<ProvenanceRecord, "confidence_level"> & { confidence_level?: ConfidenceLevel }): ProvenanceRecord {
   return {
     ...partial,
@@ -379,8 +418,9 @@ export function validateFactProvenance(input: {
 }): ProvenanceValidation {
   const missing: string[] = [];
   const warnings: string[] = [];
-  const generic_url = isGenericSourceUrl(input.source_url);
-  if (!input.source_url) missing.push("source_url");
+  const datasetExact = input.source_type === "PRIMARY_DATABASE" && Boolean(input.locator?.dataset);
+  const generic_url = datasetExact ? false : isGenericSourceUrl(input.source_url);
+  if (!input.source_url && !datasetExact) missing.push("source_url");
   if (!input.source_name && !input.locator?.document_title && !input.locator?.dataset) {
     missing.push("identifiable_document");
   }

@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 import { applyAnswer, diagnose, getError, getSymptom, initialState } from "@penta/fixcode";
 import { clientKey, rateLimit } from "@/lib/rate-limit";
+import { readJsonBody } from "@/lib/read-json";
 
 export async function POST(request: Request) {
   const limited = rateLimit(`fixcode:${clientKey(request)}`, 40);
   if (!limited.ok) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
-  const body = (await request.json()) as {
+  const parsed = await readJsonBody<{
     brand?: string;
     appliance?: string;
     error?: string;
     answers?: Array<{ question_id: string; answer_id: string }>;
-  };
+  }>(request);
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+  const body = parsed.value;
   const profile =
     getError(body.brand ?? "", body.appliance ?? "", body.error ?? "") ??
     getSymptom(body.brand, body.appliance ?? "", body.error ?? "");

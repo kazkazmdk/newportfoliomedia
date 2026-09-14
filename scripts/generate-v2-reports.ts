@@ -1,6 +1,6 @@
 import { writeFileSync } from "node:fs";
-import { auditGraph } from "../packages/catalog/src/graph-audit.ts";
-import { buildCatalog, coverageReport, demandBreakdown, launchReport } from "../packages/catalog/src/index.ts";
+import { auditGraph } from "../packages/catalog/src/graph-audit";
+import { buildCatalog, coverageReport, demandBreakdown, launchReport } from "../packages/catalog/src/index";
 import { VIN_SUPPORT } from "@penta/autospec";
 import { DIAGNOSTIC_OUTCOMES } from "@penta/fixcode";
 import { MEASURED_CURVES, buildPowerScenarios } from "@penta/chargematch";

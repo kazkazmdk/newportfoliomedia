@@ -16,7 +16,6 @@ import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data
 import {
   assessDemand,
   evidenceByPage,
-  importDemandDir,
   queryClusterFor,
   serpByPage,
   siteDefaultLocale,
@@ -24,6 +23,7 @@ import {
   type DemandEvidence,
   type SerpObservation,
 } from "@penta/demand";
+import { importDemandDir } from "@penta/demand/import";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -61,8 +61,40 @@ function pageRelations(store: GraphStore, page: PageRecord) {
   return page.entity_ids.flatMap((id) => store.related(id));
 }
 
+function neighborShortlist(store: GraphStore, page: PageRecord, n: number): PageRecord[] {
+  const familyBucket = [...store.pages.values()].filter(
+    (other) => other.site === page.site && other.family === page.family && other.url !== page.url,
+  );
+  const entityKey = String(
+    page.structured_payload.city ??
+      page.structured_payload.slug ??
+      page.structured_payload.brand ??
+      page.structured_payload.make ??
+      page.entity_ids[0] ??
+      "",
+  );
+  const entityBucket = entityKey
+    ? familyBucket.filter((other) => {
+        const otherKey = String(
+          other.structured_payload.city ??
+            other.structured_payload.slug ??
+            other.structured_payload.brand ??
+            other.structured_payload.make ??
+            other.entity_ids[0] ??
+            "",
+        );
+        return otherKey === entityKey;
+      })
+    : [];
+  if (entityBucket.length >= n) return entityBucket.slice(0, 48);
+  if (familyBucket.length >= n) return familyBucket.slice(0, 64);
+  return [...store.pages.values()]
+    .filter((other) => other.site === page.site && other.url !== page.url)
+    .slice(0, 64);
+}
+
 export function nearestNeighbors(store: GraphStore, page: PageRecord, n = 5): NeighborRow[] {
-  const pages = [...store.pages.values()].filter((other) => other.site === page.site && other.url !== page.url);
+  const pages = neighborShortlist(store, page, n);
   return pages
     .map((other) => {
       const structured = structuredSimilarity(page.structured_payload, other.structured_payload);
@@ -157,8 +189,9 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
         verified_at: rec.verified_at,
         verification_method: rec.verification_method,
         inferred: r.inferred,
+        locator: rec.locator,
       });
-      return v.valid && v.level !== "PRIMARY_GENERAL" && v.level !== "UNKNOWN";
+      return v.valid && v.level !== "PRIMARY_GENERAL" && v.level !== "UNKNOWN" && v.level !== "AI_INFERRED";
     }) ||
     ents.some((e) =>
       e!.provenance.some((p) => {
@@ -169,8 +202,9 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
           retrieved_at: p.retrieved_at,
           verified_at: p.verified_at,
           verification_method: p.verification_method,
+          locator: p.locator,
         });
-        return v.level !== "UNKNOWN" && !v.generic_url;
+        return v.valid && v.level !== "UNKNOWN" && v.level !== "AI_INFERRED";
       }),
     );
   const aiAsOfficial = [...ents, ...rels].some((row) =>
@@ -185,9 +219,15 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     ...Object.keys(page.structured_payload),
     ...ents.flatMap((e) => Object.keys(e!.properties)),
   ]).size;
+  const wearCity = String(page.structured_payload.slug ?? page.structured_payload.city ?? "");
   const wearSiblings =
     page.site === "wearthere" && page.family === "wear-month"
-      ? [...store.pages.values()].filter((p) => p.site === "wearthere" && p.family === "wear-month")
+      ? [...store.pages.values()].filter(
+          (p) =>
+            p.site === "wearthere" &&
+            p.family === "wear-month" &&
+            String(p.structured_payload.slug ?? p.structured_payload.city ?? "") === wearCity,
+        )
       : [];
   const climate = wearSiblings.length ? climateDeltaVsAdjacent(page, wearSiblings) : undefined;
 

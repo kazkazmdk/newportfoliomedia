@@ -109,3 +109,6 @@ export type IndexDecision = {
 export const PRELAUNCH_HEADERS = {
   "X-Robots-Tag": "noindex, nofollow",
 };
+
+export { surfaceParity, parityIssues } from "./parity";
+export type { SurfaceParityReport } from "./parity";

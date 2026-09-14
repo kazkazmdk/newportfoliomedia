@@ -1,6 +1,6 @@
 # Demand-driven data backlog
 
-Generated: 2026-09-14T13:31:36.569Z
+Generated: 2026-09-14T14:49:02.291Z
 
 Demand evidence can promote a page only when Truth/Quality already pass.
 No HIGH demand observations were imported in this pass, so there is **no** LOW_TRUTH + HIGH_DEMAND unlock yet.

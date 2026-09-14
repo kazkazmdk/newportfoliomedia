@@ -9,6 +9,7 @@
   "dependencies": {
     "@penta/ai-core": "workspace:*",
     "@penta/data-provenance": "workspace:*",
+    "@penta/demand": "workspace:*",
     "@penta/graph-core": "workspace:*",
     "@penta/quality-gate": "workspace:*"
   }

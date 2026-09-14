@@ -16,6 +16,24 @@ export const PRICE_KINDS = [
 ] as const;
 export type PriceKind = (typeof PRICE_KINDS)[number];
 
+export type CostEvidence = "LIVE" | "RECENT_SNAPSHOT" | "STATIC_REFERENCE" | "DERIVED" | "HEURISTIC";
+
+export type CostValue = {
+  value: number;
+  currency: string;
+  evidence: CostEvidence;
+  observedAt?: string;
+  sourceId?: string;
+};
+
+export function costLabel(evidence: CostEvidence): string {
+  if (evidence === "LIVE") return "Live fare";
+  if (evidence === "RECENT_SNAPSHOT") return "Recent snapshot";
+  if (evidence === "STATIC_REFERENCE") return "Static reference";
+  if (evidence === "DERIVED") return "Derived";
+  return "Typical estimate";
+}
+
 export type CostBreakdown = {
   base_transport: number;
   fuel: number;
@@ -474,6 +492,26 @@ export function compareRoute(
   return { modes, best, cheaper_from };
 }
 
+export function breakEvenByTravellers(
+  route: RouteRecord,
+  maxTravellers = 6,
+): Array<{ travellers: number; cheaper: ModeId; carCash: number; trainCash: number }> {
+  const rows: Array<{ travellers: number; cheaper: ModeId; carCash: number; trainCash: number }> = [];
+  for (let n = 1; n <= maxTravellers; n += 1) {
+    const compared = compareRoute(route, n, false);
+    const car = compared.modes.find((m) => m.mode === "car");
+    const train = compared.modes.find((m) => m.mode === "train");
+    if (!car || !train) continue;
+    rows.push({
+      travellers: n,
+      cheaper: car.per_person_cash <= train.per_person_cash ? "car" : "train",
+      carCash: car.cash_eur,
+      trainCash: train.cash_eur,
+    });
+  }
+  return rows;
+}
+
 export function timeValueBreakEven(a: ModeQuote, b: ModeQuote): number | null {
   const extraCash = a.cash_eur - b.cash_eur;
   const savedHours = (b.minutes_door - a.minutes_door) / 60;
@@ -561,12 +599,27 @@ export function allTripcostPages(): PageRecord[] {
         ].filter(Boolean),
         structured_payload: {
           route: route.id,
+          from: route.from.slug,
+          to: route.to.slug,
           km: route.km,
           tolls: route.tolls_eur,
           modes: comparison.modes.map((m) => m.mode),
           distinct_reason: `${route.id}-compare`,
           assumptions: comparison.modes[0]?.assumptions ?? [],
           toll_state: route.tolls_eur > 0 ? "HAS_TOLL_SNAPSHOT" : "EXPLICIT_NO_TOLL",
+          live_fare: false,
+          price_kind: "HEURISTIC_PRICE",
+          fare_provider: "MISSING",
+          cost_evidence: "HEURISTIC",
+          break_even: breakEvenByTravellers(route),
+          action_evidence: {
+            actionType: "COMPARE",
+            inputFields: ["route", "from", "to"],
+            outputFields: ["modes"],
+            rendered: true,
+            executable: true,
+            decisionFields: ["modes", "break_even"],
+          },
         },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: route.demand }),
@@ -596,6 +649,10 @@ export function allTripcostPages(): PageRecord[] {
           observed_at: "2026-09-01T00:00:00.000Z",
           expires_at: "2026-10-01T00:00:00.000Z",
           live_fare: false,
+          modes: ["car"],
+          price_kind: "HEURISTIC_PRICE",
+          cost_evidence: "HEURISTIC",
+          fare_provider: "MISSING",
         },
         quality_score: driving.score,
         search_demand: route.demand - 5,

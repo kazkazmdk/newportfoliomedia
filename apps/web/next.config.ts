@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     "@penta/catalog",
     "@penta/chargematch",
     "@penta/data-provenance",
+    "@penta/demand",
     "@penta/fixcode",
     "@penta/graph-core",
     "@penta/publishing-core",

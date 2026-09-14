@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DESTINATIONS, MONTHS, allWeartherePages, capsuleFor, indexedMonths } from "@penta/wearthere";
+import { classifyClimateModel, seasonLabel } from "@penta/demand";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
 
@@ -29,9 +30,17 @@ export default async function WearMonthPage({ params }: { params: Promise<{ city
   if (!dest || monthIdx < 1) notFound();
   const w = dest.climate[monthIdx - 1];
   const cap = capsuleFor(dest, monthIdx, "classic");
+  const model = classifyClimateModel({
+    lat: dest.lat,
+    months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
+  });
+  const season = seasonLabel(model, monthIdx);
+  const skip = cap.pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.name);
   return (
     <main>
-      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">Typical {month} climate — not a forecast</p>
+      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">
+        Typical {month} climate — {model.replaceAll("_", " ").toLowerCase()} / {season} — not a forecast
+      </p>
       <h1 className="mt-3 text-5xl md:text-6xl">
         What to Wear in {dest.city} in {month[0].toUpperCase() + month.slice(1)}
       </h1>
@@ -64,6 +73,32 @@ export default async function WearMonthPage({ params }: { params: Promise<{ city
           </li>
         ))}
       </ul>
+      <section className="mt-10 grid gap-4 md:grid-cols-3">
+        <article className="wt-card p-5">
+          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">Climate fact</p>
+          <p className="mt-2 leading-7">
+            Compiled monthly normals for {dest.city}. {w.tmin_c}–{w.tmax_c}°C, {w.rain_mm} mm, ~{w.rain_days} rain days.
+          </p>
+        </article>
+        <article className="wt-card p-5">
+          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">Derived packing rule</p>
+          <p className="mt-2 leading-7">
+            Base / mid / shell from those normals. Not a live forecast. Season model: {model}.
+          </p>
+        </article>
+        <article className="wt-card p-5">
+          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">Editorial styling</p>
+          <p className="mt-2 leading-7">
+            Classic capsule only. Colour and “look” are taste, not climate truth.
+          </p>
+        </article>
+      </section>
+      {skip.length ? (
+        <section className="mt-8">
+          <h2 className="text-3xl">What not to pack</h2>
+          <p className="mt-2 max-w-lg leading-7">{skip.join(", ")}</p>
+        </section>
+      ) : null}
       <section className="mt-10">
         <h2 className="text-3xl">By activity</h2>
         <p className="mt-2 max-w-lg leading-7">

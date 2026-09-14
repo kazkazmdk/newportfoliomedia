@@ -46,6 +46,43 @@ export function fitmentStatus(confidence: ConfidenceLevel): FitmentStatus {
   return "UNKNOWN";
 }
 
+export type FitmentScope = {
+  make: string;
+  model: string;
+  generation?: string;
+  engineCode?: string;
+  yearFrom?: number;
+  yearTo?: number;
+  market?: string;
+  trim?: string;
+  confidence: "EXACT" | "GENERATION" | "MODEL_GENERIC" | "UNKNOWN";
+};
+
+export function fitmentScopeOf(vehicle: {
+  make: string;
+  model: string;
+  generation?: string;
+  engine_code?: string;
+  years?: number[];
+  market?: string[];
+  variant?: string;
+}): FitmentScope {
+  const yearFrom = vehicle.years?.[0];
+  const yearTo = vehicle.years?.at(-1);
+  const exact = Boolean(vehicle.generation && vehicle.engine_code && yearFrom && vehicle.market?.length);
+  return {
+    make: vehicle.make,
+    model: vehicle.model,
+    generation: vehicle.generation,
+    engineCode: vehicle.engine_code,
+    yearFrom,
+    yearTo,
+    market: vehicle.market?.[0],
+    trim: vehicle.variant,
+    confidence: exact ? "EXACT" : vehicle.generation ? "GENERATION" : vehicle.model ? "MODEL_GENERIC" : "UNKNOWN",
+  };
+}
+
 export type VehicleIdentity = {
   id: string;
   make: string;
@@ -78,6 +115,7 @@ function mfr(raw: string, url: string, confidence: number) {
   return provenance({
     source_id: "oem-handbook",
     source_type: "MANUFACTURER",
+    source_name: "OEM handbook compilation (homepage/root — PRIMARY_GENERAL, not exact page)",
     source_url: url,
     retrieved_at: RETRIEVED,
     confidence,

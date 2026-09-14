@@ -122,7 +122,7 @@ export function deepGraphQa() {
         },
       ];
     }),
-  ) as Record<SiteId, ReturnType<GraphStore["stats"]> & Record<string, number>>;
+  ) as unknown as Record<SiteId, ReturnType<GraphStore["stats"]> & Record<string, number>>;
 
   const rnd = mulberry32(0x35f3633);
   const random50 = pick(pages, 50, rnd);

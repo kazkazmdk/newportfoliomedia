@@ -8,12 +8,12 @@ import {
   coldStartEligible,
   demandSatisfiesIndex,
   gscRowsToEvidence,
-  importDemandDir,
   queryClusterFor,
   reassessDemandAfterLaunch,
   recommendWearthereConsolidation,
   validateEvidence,
 } from "./index";
+import { importDemandDir } from "./import";
 import type { DemandEvidence, SerpObservation } from "./types";
 
 const NOW = new Date("2026-09-14T00:00:00.000Z");

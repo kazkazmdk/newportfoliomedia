@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CABLES, compatibility, getCharger, getDevice } from "@penta/chargematch";
+import { CABLES, compatibility, getCharger, getDevice, powerChain } from "@penta/chargematch";
 import { allChargematchPages } from "@penta/chargematch";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
@@ -33,6 +33,7 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
   const charger = getCharger(cSlug);
   if (!device || !charger) notFound();
   const result = compatibility(device, charger, CABLES[0]);
+  const chain = powerChain({ device, charger, cable: CABLES[0] });
   const alloc = charger.allocations;
   return (
     <main>
@@ -56,8 +57,12 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
           <dd className="cm-mono mt-1 text-2xl">{result.evidence.replaceAll("_", " ")}</dd>
         </div>
         <div className="cm-box p-4">
-          <dt className="text-sm">Expected max</dt>
+          <dt className="text-sm">Rated max</dt>
           <dd className="cm-mono mt-1 text-2xl">{result.max_power ?? "—"} W</dd>
+        </div>
+        <div className="cm-box p-4">
+          <dt className="text-sm">Measured</dt>
+          <dd className="cm-mono mt-1 text-2xl">UNKNOWN</dd>
         </div>
         <div className="cm-box p-4">
           <dt className="text-sm">Best port</dt>
@@ -73,6 +78,12 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
         </div>
       </dl>
       <section className="mt-10 cm-box p-5">
+        <p className="cm-mono text-sm">Power chain · limiter {chain.limiting}</p>
+        <p className="mt-2 text-sm leading-6">
+          device {chain.deviceAcceptance}W → protocol {chain.protocolCap}W → port {chain.portCap}W → cable{" "}
+          {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"} → allocation {chain.allocationCap}W
+        </p>
+        <p className="cm-mono my-3 text-2xl">delivered {chain.delivered} W · rated, not measured</p>
         <p className="cm-mono text-sm">{device.name}</p>
         <p className="cm-mono my-2 text-2xl">↓ {result.max_power ?? "?"} W</p>
         <p className="cm-mono">{charger.name}</p>

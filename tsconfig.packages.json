@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["node"],
+    "paths": {
+      "@penta/ai-core": ["./packages/ai-core/src/index.ts"],
+      "@penta/analytics": ["./packages/analytics/src/index.ts"],
+      "@penta/autospec": ["./apps/autospec/src/index.ts"],
+      "@penta/catalog": ["./packages/catalog/src/index.ts"],
+      "@penta/chargematch": ["./apps/chargematch/src/index.ts"],
+      "@penta/data-provenance": ["./packages/data-provenance/src/index.ts"],
+      "@penta/demand": ["./packages/demand/src/index.ts"],
+      "@penta/demand/import": ["./packages/demand/src/import.ts"],
+      "@penta/fixcode": ["./apps/fixcode/src/index.ts"],
+      "@penta/graph-core": ["./packages/graph-core/src/index.ts"],
+      "@penta/publishing-core": ["./packages/publishing-core/src/index.ts"],
+      "@penta/quality-gate": ["./packages/quality-gate/src/index.ts"],
+      "@penta/tripcost": ["./apps/tripcost/src/index.ts"],
+      "@penta/ui-primitives": ["./packages/ui-primitives/src/index.ts"],
+      "@penta/wearthere": ["./apps/wearthere/src/index.ts"]
+    }
+  },
+  "include": [
+    "packages/**/*.ts",
+    "apps/fixcode/**/*.ts",
+    "apps/autospec/**/*.ts",
+    "apps/wearthere/**/*.ts",
+    "apps/chargematch/**/*.ts",
+    "apps/tripcost/**/*.ts",
+    "scripts/**/*.ts"
+  ]
+}

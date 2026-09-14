@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-14T13:31:36.569Z",
+  "generatedAt": "2026-09-14T14:49:02.291Z",
   "totals": {
     "candidates": 890,
-    "truth_ready": 50,
-    "truth_not_ready": 840,
+    "truth_ready": 217,
+    "truth_not_ready": 673,
     "demand_checked": 0,
     "demand_unchecked": 890,
     "strong_demand": 0,
@@ -11,16 +11,16 @@
     "weak_demand": 0,
     "unknown_demand": 890,
     "PRELAUNCH_INDEXABLE": 0,
-    "SEO_CANDIDATE": 50,
-    "NOINDEX_PRODUCT": 299,
-    "GRAPH_ONLY": 385,
-    "REVIEW_REQUIRED": 156,
+    "SEO_CANDIDATE": 217,
+    "NOINDEX_PRODUCT": 210,
+    "GRAPH_ONLY": 365,
+    "REVIEW_REQUIRED": 98,
     "queries": 2297
   },
   "bySite": {
     "fixcode": {
       "candidates": 249,
-      "truth_ready": 50,
+      "truth_ready": 65,
       "demand_checked": 0,
       "demand_unchecked": 249,
       "strong_demand": 0,
@@ -29,15 +29,15 @@
       "unknown_demand": 249,
       "PRELAUNCH_INDEXABLE": 0,
       "INDEXABLE": 0,
-      "SEO_CANDIDATE": 50,
-      "NOINDEX_PRODUCT": 81,
+      "SEO_CANDIDATE": 65,
+      "NOINDEX_PRODUCT": 66,
       "GRAPH_ONLY": 20,
       "REVIEW_REQUIRED": 98,
       "cells": {
         "HIGH_TRUTH_HIGH_DEMAND": 0,
-        "HIGH_TRUTH_LOW_DEMAND": 50,
+        "HIGH_TRUTH_LOW_DEMAND": 65,
         "LOW_TRUTH_HIGH_DEMAND": 0,
-        "LOW_TRUTH_LOW_DEMAND": 199
+        "LOW_TRUTH_LOW_DEMAND": 184
       },
       "queries": 773,
       "evidence": 0
@@ -54,9 +54,9 @@
       "PRELAUNCH_INDEXABLE": 0,
       "INDEXABLE": 0,
       "SEO_CANDIDATE": 0,
-      "NOINDEX_PRODUCT": 0,
-      "GRAPH_ONLY": 84,
-      "REVIEW_REQUIRED": 39,
+      "NOINDEX_PRODUCT": 60,
+      "GRAPH_ONLY": 63,
+      "REVIEW_REQUIRED": 0,
       "cells": {
         "HIGH_TRUTH_HIGH_DEMAND": 0,
         "HIGH_TRUTH_LOW_DEMAND": 0,
@@ -68,7 +68,7 @@
     },
     "wearthere": {
       "candidates": 416,
-      "truth_ready": 0,
+      "truth_ready": 152,
       "demand_checked": 0,
       "demand_unchecked": 416,
       "strong_demand": 0,
@@ -77,15 +77,15 @@
       "unknown_demand": 416,
       "PRELAUNCH_INDEXABLE": 0,
       "INDEXABLE": 0,
-      "SEO_CANDIDATE": 0,
-      "NOINDEX_PRODUCT": 157,
-      "GRAPH_ONLY": 259,
+      "SEO_CANDIDATE": 152,
+      "NOINDEX_PRODUCT": 4,
+      "GRAPH_ONLY": 260,
       "REVIEW_REQUIRED": 0,
       "cells": {
         "HIGH_TRUTH_HIGH_DEMAND": 0,
-        "HIGH_TRUTH_LOW_DEMAND": 0,
+        "HIGH_TRUTH_LOW_DEMAND": 152,
         "LOW_TRUTH_HIGH_DEMAND": 0,
-        "LOW_TRUTH_LOW_DEMAND": 416
+        "LOW_TRUTH_LOW_DEMAND": 264
       },
       "queries": 1600,
       "evidence": 0
@@ -126,9 +126,9 @@
       "PRELAUNCH_INDEXABLE": 0,
       "INDEXABLE": 0,
       "SEO_CANDIDATE": 0,
-      "NOINDEX_PRODUCT": 19,
+      "NOINDEX_PRODUCT": 38,
       "GRAPH_ONLY": 0,
-      "REVIEW_REQUIRED": 19,
+      "REVIEW_REQUIRED": 0,
       "cells": {
         "HIGH_TRUTH_HIGH_DEMAND": 0,
         "HIGH_TRUTH_LOW_DEMAND": 0,
@@ -139,9 +139,9 @@
       "evidence": 0
     }
   },
-  "wave1": 50,
+  "wave1": 100,
   "wave2": 150,
-  "wave3": 541,
+  "wave3": 463,
   "prelaunch_batch": 0,
   "public_site_live": false
 }

@@ -155,6 +155,10 @@ export function detectProductAction(
 
   const familyImpliesAction = /wear-month|error-code|can-charger|oil-|route-/.test(family);
   void familyImpliesAction;
+  const intended = rec.intendedAction ?? rec.intended_action;
+  if (typeof intended === "string" && /help user decide|intended action/i.test(intended) && !action) {
+    return { present: false, inputs, outputs, evidence };
+  }
 
   return {
     present: Boolean(action && outputs.length && evidence.length),

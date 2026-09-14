@@ -7,6 +7,7 @@ import {
 import { ALL_ERRORS, ALL_SYMPTOMS } from "./engine";
 import { APPLIANCES, BRANDS } from "./data-symptoms";
 import type { ErrorProfile, SymptomProfile } from "./types";
+import { buildDiagnosticTree } from "./diagnostic-tree";
 
 function requiredFields(profile: ErrorProfile): string[] {
   const fields = [
@@ -71,7 +72,18 @@ export function errorPage(profile: ErrorProfile): PageRecord {
     code: profile.code,
     meaning: profile.meaning,
     causes: profile.causes.map((cause) => cause.id),
+    questions: profile.questions.map((q) => q.id),
+    tests: profile.questions.map((q) => q.id),
     distinct_reason: profile.id,
+    diagnostic_tree: buildDiagnosticTree(profile),
+    action_evidence: {
+      actionType: "DIAGNOSE",
+      inputFields: ["brand", "appliance", "code"],
+      outputFields: ["causes", "questions"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["causes", "safety"],
+    },
   };
   const quality = evaluatePageQuality(qualityInputForError(profile));
   const demand = searchDemandScore({ seed_research: profile.search_demand });

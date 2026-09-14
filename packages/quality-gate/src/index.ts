@@ -15,6 +15,7 @@ import {
   type SerpObservation,
 } from "@penta/demand";
 import { inspectRequiredFields, PAGE_REQUIREMENTS, requiredFieldKeys } from "./page-requirements";
+import { actionEvidenceFromPayload, actionEvidencePasses, isStringOnlyAction } from "./action-evidence";
 import {
   computeDistinctiveness,
   demandLevel,
@@ -27,6 +28,13 @@ import {
 } from "./truth-v2";
 
 export { PAGE_REQUIREMENTS, requiredFieldKeys, inspectRequiredFields } from "./page-requirements";
+export {
+  actionEvidenceFromPayload,
+  actionEvidencePasses,
+  deriveActionEvidence,
+  isStringOnlyAction,
+} from "./action-evidence";
+export type { ActionEvidence, ActionType } from "./action-evidence";
 export type { PageFamilyRequirements } from "./page-requirements";
 export {
   computeDistinctiveness,
@@ -367,8 +375,14 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     ? !inspected.passed
     : requiredPresent / Math.max(1, requiredTotal) < 1;
   const detectedAction = detectProductAction(input.family, input.structured_payload);
+  const derivedAction = actionEvidenceFromPayload(input.structured_payload);
+  const stringOnlyAction = Boolean(
+    input.structured_payload &&
+      (isStringOnlyAction(input.structured_payload.intendedAction) ||
+        isStringOnlyAction(input.structured_payload.intended_action)),
+  );
   const productAction = input.structured_payload
-    ? detectedAction.present
+    ? !stringOnlyAction && (actionEvidencePasses(derivedAction) || detectedAction.present)
     : input.product_action === true || (input.interactive === true && input.product_action !== false);
   const interactiveResult = detectInteractive(input.family, input.structured_payload, {
     product_cta: input.product_cta,
@@ -639,6 +653,14 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
       index_state = "REVIEW_REQUIRED";
       seo_validation = "NONE";
       reasons.push(scope);
+    }
+    const fitment = payload.fitment_scope as { confidence?: string; engineCode?: string } | undefined;
+    const sufficient =
+      fitment?.confidence === "EXACT" || (fitment?.confidence === "GENERATION" && Boolean(fitment.engineCode));
+    if (fitment && !sufficient) {
+      index_state = "REVIEW_REQUIRED";
+      seo_validation = "NONE";
+      reasons.push("AutoSpec fitment scope is not EXACT — generation/model generic cannot index");
     }
   }
   if (input.site === "tripcost" && index_state === "INDEXABLE") {

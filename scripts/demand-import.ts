@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { importDemandDir } from "@penta/demand";
+import { importDemandDir } from "@penta/demand/import";
 
 const root = resolve(process.cwd(), process.argv[2] ?? "data/demand");
 const result = importDemandDir(root);

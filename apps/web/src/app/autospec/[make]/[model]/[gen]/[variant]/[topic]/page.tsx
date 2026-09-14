@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { VEHICLES, allAutospecPages, getVehicle, vehicleUrl } from "@penta/autospec";
+import { VEHICLES, VIN_SUPPORT, allAutospecPages, fitmentScopeOf, getVehicle, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -44,12 +44,26 @@ export default async function TopicPage({
   const { make, model, gen, variant, topic } = await params;
   const v = getVehicle(make, model, gen, variant);
   if (!v) notFound();
+  const scope = fitmentScopeOf(v);
   return (
     <main>
       <Link href={vehicleUrl(v)} className="text-sm">
         {v.make} {v.generation} {v.variant}
       </Link>
       <h1 className="mt-4 text-5xl capitalize">{topic}</h1>
+      <aside className="as-panel mt-6 max-w-xl p-4 text-sm leading-6">
+        <p className="uppercase tracking-[0.14em]">Fitment scope · {scope.confidence}</p>
+        <p className="mt-2">
+          {scope.make} {scope.model}
+          {scope.generation ? ` · ${scope.generation}` : ""}
+          {scope.engineCode ? ` · ${scope.engineCode}` : " · engine UNKNOWN"}
+          {scope.yearFrom ? ` · ${scope.yearFrom}–${scope.yearTo}` : ""}
+          {scope.market ? ` · ${scope.market}` : " · market UNKNOWN"}
+        </p>
+        <p className="mt-2 text-[#6a6258]">
+          VIN decode is {VIN_SUPPORT}. Generation-level oil/tyre rows are not silently treated as an exact trim.
+        </p>
+      </aside>
       {topic === "oil" ? (
         <section className="mt-8 as-panel p-6">
           <p className="text-3xl">{v.oil.viscosity}</p>

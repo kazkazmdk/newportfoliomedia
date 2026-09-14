@@ -6,7 +6,7 @@ import {
   buildPrelaunchBatch,
   cellAction,
   queryClusterFor,
-  recommendWearthereConsolidation,
+  recommendWearthereConsolidationV2,
   seoOpportunityScore,
   truthDemandCell,
   type DemandAssessmentV2,
@@ -274,18 +274,20 @@ const bySite = Object.fromEntries(
       },
     ];
   }),
-) as Record<SiteId, Record<string, number | Record<string, number>>>;
+) as unknown as Record<SiteId, Record<string, number | Record<string, number>>>;
 
 const wearPages = pages
   .filter((page) => page.site === "wearthere" && page.family === "wear-month")
   .map((page) => ({
     city: String(page.structured_payload.city ?? page.structured_payload.slug ?? ""),
+    lat: Number(page.structured_payload.lat ?? 48),
     month: Number(page.structured_payload.month ?? 0),
     tmax: Number(page.structured_payload.tmax_c ?? page.structured_payload.tmax ?? 0),
     tmin: Number(page.structured_payload.tmin_c ?? page.structured_payload.tmin ?? 0),
+    rain_mm: Number(page.structured_payload.rain_mm ?? 0),
   }))
   .filter((row) => row.city && row.month);
-const consolidations = recommendWearthereConsolidation(wearPages);
+const consolidations = recommendWearthereConsolidationV2(wearPages);
 
 const evidenceBySource: Record<string, number> = {};
 for (const row of ranked) {
@@ -403,11 +405,11 @@ const report = [
   "",
   "## WearThere consolidation",
   "",
-  consolidations.filter((row) => row.action === "CONSOLIDATE_SEASON").length
+  consolidations.filter((row) => row.action !== "KEEP_MONTHS").length
     ? consolidations
-        .filter((row) => row.action === "CONSOLIDATE_SEASON")
+        .filter((row) => row.action !== "KEEP_MONTHS")
         .slice(0, 40)
-        .map((row) => `- ${row.city} ${row.season} months ${row.months.join("/")}: ${row.reason}`)
+        .map((row) => `- ${row.city} ${row.model} ${row.season} months ${row.months.join("/")}: ${row.action} — ${row.reason}`)
         .join("\n")
     : "- No seasonal consolidation recommended from climate spread alone.",
   "",
@@ -429,7 +431,7 @@ const report = [
     const opp = seoOpportunityScore({
       assessment: row.assessment,
       truthReady: truthReady(row.page),
-      productUseful: row.page.index_state !== "GRAPH_ONLY",
+      productUtility: row.page.index_state !== "GRAPH_ONLY",
       truthGatePass: truthReady(row.page),
     });
     return `| ${row.page_id} | ${opp.demand} | ${opp.truth_readiness} | ${opp.product_utility} | ${opp.serp_opportunity} | ${opp.total} | ${opp.indexable} |`;
