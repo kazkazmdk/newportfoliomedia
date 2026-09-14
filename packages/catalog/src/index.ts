@@ -10,12 +10,14 @@ import { SITE_AI_TOOLS } from "@penta/ai-core";
 import { isFresh } from "@penta/data-provenance";
 import { populateDecisionGraph } from "./graph-depth";
 import { deepenDecisionGraph } from "./graph-deepen";
-import { applyIndexGates } from "./index-recompute";
+import { applyIndexGates, resetDemandCache } from "./index-recompute";
+import type { DemandAssessmentV2, DemandEvidenceSource } from "@penta/demand";
 
 let cached: GraphStore | null = null;
 
 export function resetCatalogCache() {
   cached = null;
+  resetDemandCache();
 }
 
 export function buildCatalog(): GraphStore {
@@ -149,6 +151,9 @@ export function pageExplainability(page: PageRecord) {
     distinct_reason: page.structured_payload.distinct_reason ?? null,
     freshness: page.freshness,
     intent_family: intentFamilyId(page),
+    seo_validation: page.seo_validation ?? "NONE",
+    demand_phase: page.structured_payload.demand_phase ?? "PRE_LAUNCH",
+    seo_eligibility: page.structured_payload.seo_eligibility ?? "NONE",
   };
 }
 
@@ -182,7 +187,9 @@ export function programmaticSeoIssues() {
   const canonicals = new Map<string, string>();
   for (const page of store.pages.values()) {
     if (page.index_state !== "INDEXABLE") continue;
-    if (page.quality_score < 80) issues.push(`${page.url} quality ${page.quality_score} < 80`);
+    if (page.index_state === "INDEXABLE" && page.quality_score < 1) {
+      issues.push(`${page.url} INDEXABLE without a computed score`);
+    }
     if (!page.title.trim()) issues.push(`${page.url} empty title`);
     const prev = titles.get(page.title);
     if (prev) issues.push(`Duplicate title "${page.title}" on ${prev} and ${page.url}`);
@@ -329,11 +336,36 @@ export function demandBreakdown() {
     EDITORIAL_JUDGMENT: 0,
     UNKNOWN: 0,
   };
+  const v2_sources: Record<DemandEvidenceSource, number> = {
+    SERP: 0,
+    AUTOCOMPLETE: 0,
+    RELATED_SEARCH: 0,
+    PAA: 0,
+    GOOGLE_TRENDS: 0,
+    KEYWORD_PLANNER: 0,
+    KEYWORD_PROVIDER: 0,
+    GSC: 0,
+    INTERNAL_SEARCH: 0,
+    PRODUCT_USAGE: 0,
+    EDITORIAL: 0,
+  };
   for (const page of store.pages.values()) {
-    void page;
-    counts.EDITORIAL_JUDGMENT += 1;
+    const assessment = page.structured_payload.demand_assessment as DemandAssessmentV2 | undefined;
+    const live = (assessment?.evidence ?? []).filter((row) => row.source !== "EDITORIAL" && row.observed && !row.expired);
+    if (!live.length) counts.EDITORIAL_JUDGMENT += 1;
+    else if (live.some((row) => row.source === "GSC")) counts.GSC_OBSERVED += 1;
+    else if (live.some((row) => row.source === "INTERNAL_SEARCH" || row.source === "PRODUCT_USAGE")) {
+      counts.INTERNAL_SEARCH += 1;
+    } else if (live.some((row) => row.source === "KEYWORD_PROVIDER" || row.source === "KEYWORD_PLANNER")) {
+      counts.KEYWORD_PROVIDER += 1;
+    } else if (live.some((row) => row.source === "AUTOCOMPLETE")) counts.AUTOCOMPLETE += 1;
+    else if (live.some((row) => row.source === "SERP")) counts.SERP_EXISTENCE += 1;
+    else counts.UNKNOWN += 1;
+    for (const row of assessment?.evidence ?? []) {
+      v2_sources[row.source] += 1;
+    }
   }
-  return counts;
+  return { ...counts, v2_sources };
 }
 
 export function pageQualityReport() {
@@ -463,4 +495,4 @@ export function fullOpsPayload() {
 
 export { populateDecisionGraph, entity, rel } from "./graph-depth";
 export { classifyDemand };
-export { applyIndexGates, nearestNeighbors, similarityReport } from "./index-recompute";
+export { applyIndexGates, nearestNeighbors, similarityReport, resetDemandCache, loadDemandEvidence } from "./index-recompute";

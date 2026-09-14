@@ -39,6 +39,7 @@ apps/web                                              Next.js (UI + route handle
 packages/graph-core                                   entités / relations / pages
 packages/data-provenance                              sources, conflits, confiance
 packages/quality-gate                                 PageQualityGate 0–100
+packages/demand                                       DemandEvidence V2 / pre-launch vs GSC
 packages/publishing-core                              sitemaps, canonical, batches
 packages/ai-core                                      tools-first, audit, routing
 packages/analytics                                    PostHog-ready events
@@ -47,7 +48,7 @@ packages/catalog                                      graphe assemblé + rapport
 
 Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe, la provenance, le quality gate, l’analytics et l’observabilité le sont.
 
-## Indexation (Truth Gate V2)
+## Indexation (Truth Gate V2.1)
 
 A positive boolean is not proof. Each gate returns `{ gate, status, evidence, reason }`.
 
@@ -58,13 +59,20 @@ A positive boolean is not proof. Each gate returns `{ gate, status, evidence, re
 - `VERIFIED_PRIMARY` requires `validateFactProvenance` (PRIMARY_EXACT / REGULATORY_EXACT). `bmw.com` is PRIMARY_GENERAL.
 - `EDITORIAL_JUDGMENT` alone cannot produce `INDEXABLE` (max `SEO_CANDIDATE`).
 - Soft score cannot compensate a failed hard gate.
+- **GSC is not required** for a pre-launch INDEXABLE decision. A qualifying external path is (SERP intent + autocomplete, or SERP intent + observed volume, or volume + related/PAA/autocomplete).
+- SERP existence, autocomplete, or Trends alone cannot index. Volumes are never invented (`null` if unknown).
+- Demand never repairs a failed Truth Gate.
 
-States: `INDEXABLE` | `SEO_CANDIDATE` | `NOINDEX_PRODUCT` | `GRAPH_ONLY` | `REVIEW_REQUIRED`.
+States: `INDEXABLE` | `SEO_CANDIDATE` | `NOINDEX_PRODUCT` | `GRAPH_ONLY` | `REVIEW_REQUIRED` + `seo_validation` `NONE|PRELAUNCH|POSTLAUNCH`.
 
 - `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex, empty sitemap.
-- Demand in this catalog is editorial. Current INDEXABLE count is **0**. That is intended.
 
-See `docs/TRUTH_GATE_V2_REPORT.md`.
+```bash
+pnpm demand:import     # validate data/demand/** CSV/JSON
+pnpm demand:discover   # queue, waves, PRELAUNCH_BATCH, reports
+```
+
+See `docs/TRUTH_GATE_V2_REPORT.md` and `docs/DEMAND_DISCOVERY_V2.md`.
 
 ## Données (catalog, honnête)
 

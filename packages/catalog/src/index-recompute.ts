@@ -13,6 +13,36 @@ import {
   type SearchDemandEvidence,
 } from "@penta/quality-gate";
 import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data-provenance";
+import {
+  assessDemand,
+  evidenceByPage,
+  importDemandDir,
+  queryClusterFor,
+  serpByPage,
+  siteDefaultLocale,
+  type DemandAssessmentV2,
+  type DemandEvidence,
+  type SerpObservation,
+} from "@penta/demand";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+
+let demandCache: { evidence: DemandEvidence[]; serp: SerpObservation[] } | null = null;
+
+export function loadDemandEvidence(root = resolve(process.cwd(), "data/demand")) {
+  if (demandCache) return demandCache;
+  if (!existsSync(root)) {
+    demandCache = { evidence: [], serp: [] };
+    return demandCache;
+  }
+  const imported = importDemandDir(root);
+  demandCache = { evidence: imported.evidence, serp: imported.serp };
+  return demandCache;
+}
+
+export function resetDemandCache() {
+  demandCache = null;
+}
 
 export type NeighborRow = {
   url: string;
@@ -173,6 +203,18 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     required_fields_present: 0,
     required_fields_total: 1,
     search_demand: demandEvidence(page),
+    demand_evidence_v2: (() => {
+      const loaded = loadDemandEvidence();
+      return (evidenceByPage(loaded.evidence).get(page.id) ?? []).concat(
+        evidenceByPage(loaded.evidence).get(page.url) ?? [],
+      );
+    })(),
+    serp_observations: (() => {
+      const loaded = loadDemandEvidence();
+      return (serpByPage(loaded.serp).get(page.id) ?? []).concat(serpByPage(loaded.serp).get(page.url) ?? []);
+    })(),
+    page_locale: siteDefaultLocale(page.site),
+    query_cluster: queryClusterFor(page),
     product_cta: action.present,
     interactive: action.present,
     product_action: action.present,
@@ -236,11 +278,17 @@ export function applyIndexGates(store: GraphStore): void {
     const worst = neighbors.find((n) => !n.pass);
     const result = evaluatePageQuality(qualityInputFromGraph(store, page, worst ?? neighbors[0]));
     let state: IndexState = result.index_state;
-    if (page.review_required && state === "INDEXABLE") state = "REVIEW_REQUIRED";
+    let seoValidation = result.seo_validation ?? "NONE";
+    if (page.review_required && state === "INDEXABLE") {
+      state = "REVIEW_REQUIRED";
+      seoValidation = "NONE";
+    }
     page.quality_score = result.score;
     page.index_state = state;
     page.noindex = state !== "INDEXABLE";
     page.publish_state = publishState(state);
+    page.seo_validation = seoValidation;
+    const cluster = queryClusterFor(page);
     page.structured_payload = {
       ...page.structured_payload,
       quality_why: result.why,
@@ -249,6 +297,12 @@ export function applyIndexGates(store: GraphStore): void {
       hard_blockers: result.blockers,
       gate_evidence: result.gate_evidence,
       axes: result.axes,
+      query_cluster: cluster,
+      demand_assessment: result.demand_assessment,
+      seo_validation: seoValidation,
+      demand_class: result.demand_assessment?.class ?? "UNKNOWN",
+      demand_phase: result.demand_assessment?.phase ?? "PRE_LAUNCH",
+      seo_eligibility: result.demand_assessment?.seoEligibility ?? "NONE",
     };
   }
 }

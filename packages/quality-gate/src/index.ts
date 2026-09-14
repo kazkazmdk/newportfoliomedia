@@ -5,6 +5,15 @@ import {
   sourceRank,
   type ConfidenceLevel,
 } from "@penta/data-provenance";
+import {
+  assessDemand,
+  autospecScopeMismatch,
+  demandSatisfiesIndex,
+  type DemandAssessmentV2,
+  type DemandEvidence,
+  type SeoValidation,
+  type SerpObservation,
+} from "@penta/demand";
 import { inspectRequiredFields, PAGE_REQUIREMENTS, requiredFieldKeys } from "./page-requirements";
 import {
   computeDistinctiveness,
@@ -119,6 +128,8 @@ export type QualityResult = {
   hard_gates: HardGateResult[];
   demand: DemandClassification;
   why: string;
+  seo_validation?: SeoValidation;
+  demand_assessment?: DemandAssessmentV2;
   gate_evidence?: GateResult[];
   axes?: {
     content_quality: number;
@@ -202,6 +213,11 @@ export type PageQualityInput = {
   provenance_urls?: string[];
   wearthere_climate_delta_c?: number;
   wearthere_rain_delta?: number;
+  demand_evidence_v2?: DemandEvidence[];
+  serp_observations?: SerpObservation[];
+  demand_assessment?: DemandAssessmentV2;
+  page_locale?: string;
+  query_cluster?: string[];
 };
 
 const DIMENSION_MAX: QualityBreakdown = {
@@ -284,6 +300,38 @@ function clamp100(value: number): number {
 
 function gate(id: HardGateId, passed: boolean, detail: string): HardGateResult {
   return { id, passed, detail };
+}
+
+function legacyDemandToV2(pageId: string, evidence: SearchDemandEvidence): DemandEvidence[] {
+  const now = "2026-09-14T00:00:00.000Z";
+  const rows: DemandEvidence[] = [];
+  const push = (source: DemandEvidence["source"], value: number | null | undefined, extra?: Partial<DemandEvidence>) => {
+    rows.push({
+      id: `${pageId}:${source}`,
+      source,
+      query: pageId,
+      locale: "en",
+      observedAt: now,
+      observed: true,
+      value: source === "EDITORIAL" ? null : value ?? null,
+      unit: source === "GSC" ? "IMPRESSIONS" : source === "GOOGLE_TRENDS" ? "RELATIVE_INDEX" : null,
+      confidence: source === "EDITORIAL" ? 0.2 : 0.7,
+      collectionMethod: "SYSTEM",
+      pageId,
+      ...extra,
+    });
+  };
+  if (evidence.gsc != null) push("GSC", evidence.gsc);
+  if (evidence.internal_search != null) push("INTERNAL_SEARCH", evidence.internal_search);
+  if (evidence.user_questions != null) push("INTERNAL_SEARCH", evidence.user_questions);
+  if (evidence.keyword_provider != null) push("KEYWORD_PROVIDER", evidence.keyword_provider);
+  if (evidence.autocomplete != null) push("AUTOCOMPLETE", null, { observed: true, value: null, rawLabel: "legacy-autocomplete-flag" });
+  if (evidence.related_queries != null) push("RELATED_SEARCH", null, { observed: true, value: null });
+  if (evidence.competitor_coverage != null) {
+    push("SERP", null, { observed: true, value: null, notes: "legacy competitor_coverage is SERP existence only — not intent match" });
+  }
+  if (evidence.seed_research != null) push("EDITORIAL", null);
+  return rows;
 }
 
 export function evaluatePageQuality(input: PageQualityInput): QualityResult {
@@ -533,7 +581,22 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     },
   ];
 
+  const demandRows = input.demand_evidence_v2?.length
+    ? input.demand_evidence_v2
+    : legacyDemandToV2(input.page_id ?? input.family, input.search_demand);
+  const assessment =
+    input.demand_assessment ??
+    assessDemand({
+      pageId: input.page_id ?? input.family,
+      queryCluster: input.query_cluster ?? [],
+      evidence: demandRows,
+      serpObservations: input.serp_observations,
+      pageLocale: input.page_locale ?? "en",
+    });
+  const demandIndex = demandSatisfiesIndex(assessment);
+
   let index_state: IndexState = "GRAPH_ONLY";
+  let seo_validation: SeoValidation = "NONE";
   if (input.unresolved_critical_conflict) index_state = "CONFLICTED";
   else if (input.stale_presented_as_current) index_state = "STALE";
   else if (input.invented_data || input.llm_filler) index_state = productAction ? "NOINDEX_PRODUCT" : "GRAPH_ONLY";
@@ -543,19 +606,49 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   else if (siblingTooClose || (computedDistinct && !distinctiveness.passed)) index_state = "GRAPH_ONLY";
   else if (failedHard && productAction) index_state = "NOINDEX_PRODUCT";
   else if (failedHard) index_state = "GRAPH_ONLY";
-  else if (editorial || demandLv < 2) {
-    index_state = "SEO_CANDIDATE";
-    reasons.push("EDITORIAL_JUDGMENT / demand level < 2 cannot produce INDEXABLE.");
-  } else if (score >= INDEXABLE_THRESHOLD && demandLv >= 2 && distinctOk && productAction) {
-    index_state = "INDEXABLE";
-  } else if (productAction) index_state = "SEO_CANDIDATE";
-  else index_state = "GRAPH_ONLY";
+  else if (demandIndex.pass && distinctOk && productAction) {
+    if (verifiedCount < 3) {
+      index_state = "SEO_CANDIDATE";
+      seo_validation = "NONE";
+      reasons.push("verified exact fact coverage < 3 — score is capped and cannot produce INDEXABLE");
+    } else {
+      index_state = "INDEXABLE";
+      seo_validation = demandIndex.seoValidation;
+      reasons.push(demandIndex.reason);
+    }
+  } else {
+    index_state = productAction || input.hub_necessity ? "SEO_CANDIDATE" : "GRAPH_ONLY";
+    reasons.push(demandIndex.reason || "EDITORIAL_JUDGMENT cannot produce INDEXABLE.");
+  }
 
   if (failedHard && index_state === "INDEXABLE") {
     index_state = productAction ? "NOINDEX_PRODUCT" : "GRAPH_ONLY";
+    seo_validation = "NONE";
   }
-  if (editorial && index_state === "INDEXABLE") {
+  if (index_state === "INDEXABLE" && !demandIndex.pass) {
     index_state = "SEO_CANDIDATE";
+    seo_validation = "NONE";
+  }
+  const payload = input.structured_payload ?? {};
+  if (input.site === "autospec" && index_state === "INDEXABLE") {
+    const scope = autospecScopeMismatch(payload, [
+      ...assessment.queryCluster,
+      ...assessment.evidence.map((row) => row.query),
+    ]);
+    if (scope) {
+      index_state = "REVIEW_REQUIRED";
+      seo_validation = "NONE";
+      reasons.push(scope);
+    }
+  }
+  if (input.site === "tripcost" && index_state === "INDEXABLE") {
+    const heuristic = payload.price_kind === "HEURISTIC_PRICE" || payload.live_fare === false;
+    const claimedLive = payload.live_fare === true || payload.presented_as_live === true;
+    if (heuristic || claimedLive) {
+      index_state = "SEO_CANDIDATE";
+      seo_validation = "NONE";
+      reasons.push("TripCost fare is heuristic or not live — demand cannot compensate truth weakness");
+    }
   }
 
   const why = explainWhyIndexable({
@@ -578,7 +671,20 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     safety: input.llm_safety_claim ? 20 : 80,
   };
 
-  return { score, breakdown, index_state, reasons, blockers, hard_gates, demand, why, gate_evidence, axes };
+  return {
+    score,
+    breakdown,
+    index_state,
+    reasons,
+    blockers,
+    hard_gates,
+    demand,
+    why,
+    seo_validation,
+    demand_assessment: assessment,
+    gate_evidence,
+    axes,
+  };
 }
 
 export function explainWhyIndexable(result: Omit<QualityResult, "why"> & { why?: string }): string {
@@ -594,7 +700,7 @@ export function explainWhyIndexable(result: Omit<QualityResult, "why"> & { why?:
   }
   return [
     `Hard gates passed (${result.hard_gates.filter((g) => g.passed).length}/${result.hard_gates.length}).`,
-    `Demand evidence is ${result.demand.kind} (editorial is capped; GSC is not claimed).`,
+    `Demand path validated (${result.seo_validation ?? "NONE"}). GSC is not required pre-launch. Editorial alone never indexes.`,
     `Decision utility ${result.breakdown.decision_utility}/${DIMENSION_MAX.decision_utility}; graph depth ${result.breakdown.graph_depth}/${DIMENSION_MAX.graph_depth}.`,
     `Soft score ${result.score} is secondary — it cannot override a failed hard gate. INDEX candidate threshold is ${INDEXABLE_THRESHOLD}.`,
   ].join(" ");

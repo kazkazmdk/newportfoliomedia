@@ -12,6 +12,7 @@
     "@penta/ai-core": "workspace:*",
     "@penta/autospec": "workspace:*",
     "@penta/data-provenance": "workspace:*",
+    "@penta/demand": "workspace:*",
     "@penta/chargematch": "workspace:*",
     "@penta/fixcode": "workspace:*",
     "@penta/graph-core": "workspace:*",

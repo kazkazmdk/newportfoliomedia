@@ -15,6 +15,7 @@
     "@penta/catalog": "workspace:*",
     "@penta/chargematch": "workspace:*",
     "@penta/data-provenance": "workspace:*",
+    "@penta/demand": "workspace:*",
     "@penta/fixcode": "workspace:*",
     "@penta/graph-core": "workspace:*",
     "@penta/publishing-core": "workspace:*",

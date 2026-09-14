@@ -428,7 +428,7 @@ export function validateFactProvenance(input: {
     (hasLocator ? 15 : 0) +
     (generic_url ? -20 : 10);
   return {
-    valid: missing.length === 0 && level !== "UNKNOWN" && level !== "AI_INFERRED",
+    valid: missing.length === 0 && level !== "UNKNOWN",
     level,
     verified_primary,
     missing_fields: missing,

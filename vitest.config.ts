@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@penta/data-provenance": path.resolve("packages/data-provenance/src/index.ts"),
       "@penta/graph-core": path.resolve("packages/graph-core/src/index.ts"),
+      "@penta/demand": path.resolve("packages/demand/src/index.ts"),
       "@penta/quality-gate": path.resolve("packages/quality-gate/src/index.ts"),
       "@penta/publishing-core": path.resolve("packages/publishing-core/src/index.ts"),
       "@penta/ai-core": path.resolve("packages/ai-core/src/index.ts"),

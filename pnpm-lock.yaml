@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@penta/catalog':
+        specifier: workspace:*
+        version: link:packages/catalog
+      '@penta/demand':
+        specifier: workspace:*
+        version: link:packages/demand
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -113,6 +120,9 @@ importers:
       '@penta/data-provenance':
         specifier: workspace:*
         version: link:../../packages/data-provenance
+      '@penta/demand':
+        specifier: workspace:*
+        version: link:../../packages/demand
       '@penta/fixcode':
         specifier: workspace:*
         version: link:../fixcode
@@ -191,6 +201,9 @@ importers:
       '@penta/data-provenance':
         specifier: workspace:*
         version: link:../data-provenance
+      '@penta/demand':
+        specifier: workspace:*
+        version: link:../demand
       '@penta/fixcode':
         specifier: workspace:*
         version: link:../../apps/fixcode
@@ -211,6 +224,12 @@ importers:
         version: link:../../apps/wearthere
 
   packages/data-provenance: {}
+
+  packages/demand:
+    dependencies:
+      '@penta/graph-core':
+        specifier: workspace:*
+        version: link:../graph-core
 
   packages/graph-core:
     dependencies:
@@ -235,6 +254,9 @@ importers:
       '@penta/data-provenance':
         specifier: workspace:*
         version: link:../data-provenance
+      '@penta/demand':
+        specifier: workspace:*
+        version: link:../demand
       '@penta/graph-core':
         specifier: workspace:*
         version: link:../graph-core

@@ -132,6 +132,7 @@ export type PageRecord = {
   review_required: boolean;
   batch: string;
   publish_state: "DRAFT" | "READY" | "INDEXABLE" | "PUBLISHED";
+  seo_validation?: "NONE" | "PRELAUNCH" | "POSTLAUNCH";
 };
 
 export class GraphStore {

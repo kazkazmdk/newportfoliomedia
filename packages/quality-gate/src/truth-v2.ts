@@ -1,4 +1,4 @@
-import type { DemandEvidence, GraphRelation, PageRecord, SiteId } from "@penta/graph-core";
+import type { GraphRelation, PageRecord, SiteId } from "@penta/graph-core";
 import { classifyEdgeKind } from "@penta/graph-core";
 import {
   isGenericSourceUrl,
@@ -430,4 +430,3 @@ export function axisDistribution(values: number[]) {
 }
 
 export { inspectRequiredFields, inspectPayloadKeys };
-export type { DemandEvidence };
