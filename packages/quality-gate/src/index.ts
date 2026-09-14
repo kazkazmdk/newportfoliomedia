@@ -1,4 +1,4 @@
-import type { GraphRelation, PageRecord, SiteId } from "@penta/graph-core";
+import type { GraphRelation, IndexState, PageRecord, SiteId } from "@penta/graph-core";
 import {
   confidenceLevelFromScore,
   isFresh,
@@ -7,15 +7,14 @@ import {
 } from "@penta/data-provenance";
 
 export type QualityDimension =
+  | "intent_strength"
   | "unique_structured_data"
-  | "search_intent_evidence"
-  | "product_utility"
-  | "information_completeness"
+  | "decision_utility"
+  | "graph_depth"
+  | "provenance"
+  | "completeness"
   | "differentiation"
-  | "data_confidence"
-  | "freshness"
-  | "verified_facts"
-  | "decision_relations";
+  | "freshness";
 
 export type QualityBreakdown = Record<QualityDimension, number>;
 
@@ -35,6 +34,25 @@ export type DemandClassification = {
 };
 
 export type HardGateId =
+  | "identifiable_intent"
+  | "valid_canonical"
+  | "critical_data_present"
+  | "minimum_provenance"
+  | "no_unresolved_critical_conflict"
+  | "no_stale_current"
+  | "no_ai_inferred_as_official"
+  | "distinct_from_sibling"
+  | "product_action"
+  | "no_placeholder"
+  | "no_broken_relations"
+  | "no_invented_data"
+  | "no_self_declared_score"
+  | "http_viable"
+  | "sitemap_robots_coherent"
+  | "not_llm_safety_claim"
+  | "engine_determined"
+  | "causes_sourced"
+  | "density_sufficient"
   | "unique_structured_data"
   | "valid_source"
   | "no_critical_unknown"
@@ -47,10 +65,7 @@ export type HardGateId =
   | "not_city_without_specifics"
   | "not_obscure_without_demand"
   | "not_forecast_as_climate"
-  | "not_llm_safety_claim"
   | "not_stale_as_current"
-  | "engine_determined"
-  | "causes_sourced"
   | "no_critical_missing_facts"
   | "explicit_entity_identity"
   | "data_confidence_sufficient"
@@ -63,7 +78,7 @@ export type HardGateResult = { id: HardGateId; passed: boolean; detail: string }
 export type QualityResult = {
   score: number;
   breakdown: QualityBreakdown;
-  index_state: "INDEXABLE" | "NOINDEX_PRODUCT" | "GRAPH_ONLY";
+  index_state: IndexState;
   reasons: string[];
   blockers: string[];
   hard_gates: HardGateResult[];
@@ -110,31 +125,46 @@ export type PageQualityInput = {
   engine_undetermined?: boolean;
   causes_without_source?: boolean;
   unverified_specs?: boolean;
-  /** Count of sourced facts used by the engine — not JSON key count. */
   verified_fact_count?: number;
-  /** Decision-relevant relations attached to the page entities. */
   decision_relation_count?: number;
-  /** Ignored. Text length is not a quality gate. */
   word_count?: number;
   title_unique?: boolean;
   internal_link_count?: number;
   site_rules?: (input: PageQualityInput) => { delta: number; reasons: string[]; blockers: string[] };
+  canonical_self_valid?: boolean;
+  unresolved_critical_conflict?: boolean;
+  ai_inferred_as_official?: boolean;
+  placeholder?: boolean;
+  broken_relations?: boolean;
+  invented_data?: boolean;
+  depends_on_self_declared_score?: boolean;
+  http_viable?: boolean;
+  sitemap_robots_ok?: boolean;
+  product_action?: boolean;
+  sibling_structured_similarity?: number;
+  same_intent_sibling?: boolean;
+  same_decision_output?: boolean;
+  density_ok?: boolean;
+  hazard_known?: boolean;
+  diy_boundary?: boolean;
+  /** Soft-score only. Never used as a hard proof. */
+  stored_quality_score?: number;
 };
 
-/** Soft-score caps. Word count / title uniqueness / link count are not dimensions. */
 const DIMENSION_MAX: QualityBreakdown = {
-  unique_structured_data: 8,
-  search_intent_evidence: 12,
-  product_utility: 16,
-  information_completeness: 10,
-  differentiation: 6,
-  data_confidence: 12,
-  freshness: 4,
-  verified_facts: 18,
-  decision_relations: 14,
+  intent_strength: 15,
+  unique_structured_data: 15,
+  decision_utility: 20,
+  graph_depth: 15,
+  provenance: 15,
+  completeness: 10,
+  differentiation: 5,
+  freshness: 5,
 };
 
 const EDITORIAL_SCORE_CAP = 84;
+
+export const INDEXABLE_THRESHOLD = 80;
 
 export function classifyDemand(evidence: SearchDemandEvidence): DemandClassification {
   if (typeof evidence.gsc === "number") {
@@ -214,55 +244,89 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     engine_undetermined: false,
     causes_without_source: false,
     unverified_specs: false,
+    canonical_self_valid: true,
+    unresolved_critical_conflict: false,
+    ai_inferred_as_official: false,
+    placeholder: false,
+    broken_relations: false,
+    invented_data: false,
+    depends_on_self_declared_score: false,
+    http_viable: true,
+    sitemap_robots_ok: true,
+    density_ok: true,
     ...input,
   };
 
   const missingCritical =
     input.required_fields_present / Math.max(1, input.required_fields_total) < 0.75;
-  const productUtility = input.product_cta || input.interactive;
-  const confidenceOk =
-    input.confidence === "HIGH" ||
-    input.confidence === "MEDIUM" ||
-    (input.confidence === "LOW" && Boolean(input.hub_necessity));
+  const productAction = input.product_action ?? (input.product_cta || input.interactive);
+  const siblingTooClose =
+    (input.sibling_structured_similarity ?? 0) > 0.85 &&
+    Boolean(input.same_intent_sibling) &&
+    Boolean(input.same_decision_output);
+  const distinctOk =
+    !siblingTooClose &&
+    !(input.near_duplicate && !input.distinct_reason) &&
+    !input.year_only_variant;
+
+  const intentIdentifiable = demand.kind !== "UNKNOWN" || Boolean(input.hub_necessity);
 
   const hard_gates: HardGateResult[] = [
+    gate("identifiable_intent", intentIdentifiable, demand.kind),
+    gate("valid_canonical", Boolean(input.family) && input.canonical_self_valid !== false, input.family || "missing family"),
+    gate("critical_data_present", !missingCritical, `${input.required_fields_present}/${input.required_fields_total}`),
+    gate("minimum_provenance", input.provenance_valid, input.provenance_valid ? "provenance present" : "missing provenance"),
+    gate(
+      "no_unresolved_critical_conflict",
+      !input.unresolved_critical_conflict,
+      input.unresolved_critical_conflict ? "unresolved critical conflict" : "no critical conflict",
+    ),
+    gate("no_stale_current", !input.stale_presented_as_current, "freshness claim"),
+    gate("no_ai_inferred_as_official", !input.ai_inferred_as_official, "AI_INFERRED ≠ OFFICIAL"),
+    gate("distinct_from_sibling", distinctOk, input.distinct_reason ?? "sibling check"),
+    gate("product_action", productAction, productAction ? "tool or CTA" : "no product utility"),
+    gate("no_placeholder", !input.placeholder && !input.llm_filler, "placeholder/filler"),
+    gate("no_broken_relations", !input.broken_relations, "broken relations"),
+    gate(
+      "no_invented_data",
+      !input.invented_data && !input.llm_filler && !input.unverified_specs,
+      "invented/unverified",
+    ),
+    gate("no_self_declared_score", !input.depends_on_self_declared_score, "self-declared score ignored"),
+    gate("http_viable", input.http_viable !== false, "http"),
+    gate("sitemap_robots_coherent", input.sitemap_robots_ok !== false, "sitemap/robots"),
+    gate("not_llm_safety_claim", !input.llm_safety_claim, "llm safety claim"),
+    gate("engine_determined", !input.engine_undetermined, "engine identity"),
+    gate("causes_sourced", !input.causes_without_source, "cause sources"),
+    gate("density_sufficient", input.density_ok !== false, "relation density"),
     gate("unique_structured_data", input.unique_fields >= 4, `${input.unique_fields} unique fields`),
     gate("valid_source", input.provenance_valid, input.provenance_valid ? "provenance present" : "missing provenance"),
-    gate(
-      "no_critical_unknown",
-      demand.confidence !== "UNKNOWN" || Boolean(input.hub_necessity),
-      demand.kind,
-    ),
-    gate(
-      "not_duplicate",
-      !(input.near_duplicate && !input.distinct_reason),
-      input.distinct_reason ?? "no distinct_reason",
-    ),
+    gate("no_critical_unknown", demand.confidence !== "UNKNOWN" || Boolean(input.hub_necessity), demand.kind),
+    gate("not_duplicate", distinctOk, input.distinct_reason ?? "no distinct_reason"),
     gate("valid_canonical_fields", Boolean(input.family), input.family || "missing family"),
     gate(
       "explicit_entity_identity",
       Boolean(input.family) && (Boolean(input.distinct_reason) || input.unique_fields >= 6),
       input.distinct_reason ?? input.family,
     ),
-    gate("no_invented_claims", !input.llm_filler, "llm_filler"),
+    gate("no_invented_claims", !input.llm_filler && !input.invented_data, "llm_filler"),
     gate("no_safety_issue", !input.llm_safety_claim, "llm safety claim"),
     gate("no_llm_filler", !input.llm_filler, "filler"),
     gate("not_year_only", !input.year_only_variant, "year-only variant"),
     gate("not_city_without_specifics", !input.city_without_specifics, "city specifics"),
     gate("not_obscure_without_demand", !input.obscure_without_demand, "obscure combo"),
     gate("not_forecast_as_climate", !input.forecast_as_climate, "climate vs forecast"),
-    gate("not_llm_safety_claim", !input.llm_safety_claim, "safety"),
     gate("not_stale_as_current", !input.stale_presented_as_current, "freshness claim"),
-    gate("engine_determined", !input.engine_undetermined, "engine identity"),
-    gate("causes_sourced", !input.causes_without_source, "cause sources"),
     gate("no_critical_missing_facts", !missingCritical, `${input.required_fields_present}/${input.required_fields_total}`),
-    gate("data_confidence_sufficient", confidenceOk, input.confidence),
     gate(
-      "actual_user_intent",
-      demand.kind !== "UNKNOWN",
-      demand.kind === "UNKNOWN" ? "UNKNOWN demand is product-only" : demand.kind,
+      "data_confidence_sufficient",
+      input.confidence === "HIGH" ||
+        input.confidence === "MEDIUM" ||
+        (input.confidence === "LOW" && Boolean(input.hub_necessity)),
+      input.confidence,
     ),
-    gate("actual_product_utility", productUtility, productUtility ? "tool or CTA" : "no product utility"),
+    gate("actual_user_intent", intentIdentifiable, demand.kind),
+    gate("actual_product_utility", productAction, productAction ? "tool or CTA" : "no product utility"),
     gate("unverified_specs", !input.unverified_specs, "specs"),
   ];
 
@@ -282,79 +346,75 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   void input.word_count;
   void input.title_unique;
   void input.internal_link_count;
+  void input.stored_quality_score;
 
-  const unique = clamp(
+  const intent_strength = clamp((demand.score / 100) * DIMENSION_MAX.intent_strength, DIMENSION_MAX.intent_strength);
+  const unique_structured_data = clamp(
     (input.unique_fields / 10) * DIMENSION_MAX.unique_structured_data,
     DIMENSION_MAX.unique_structured_data,
   );
-  const intent = clamp(
-    (demand.score / 100) * DIMENSION_MAX.search_intent_evidence,
-    DIMENSION_MAX.search_intent_evidence,
-  );
-  let utility = input.product_cta ? 9 : 2;
-  if (input.interactive) utility += 7;
-  utility = clamp(utility, DIMENSION_MAX.product_utility);
-  const completeness = clamp(
-    (input.required_fields_present / Math.max(1, input.required_fields_total)) *
-      DIMENSION_MAX.information_completeness,
-    DIMENSION_MAX.information_completeness,
-  );
-  let differentiation = input.distinct_from_parent ? 5 : 2;
-  if (input.near_duplicate || input.year_only_variant) differentiation = 1;
-  if (input.distinct_reason && input.distinct_reason.length > 8) differentiation = Math.max(differentiation, 5);
-  differentiation = clamp(differentiation, DIMENSION_MAX.differentiation);
+  let decision_utility = input.product_cta ? 10 : 2;
+  if (input.interactive) decision_utility += 10;
+  decision_utility = clamp(decision_utility, DIMENSION_MAX.decision_utility);
 
-  const confidenceScore =
-    input.confidence === "HIGH"
-      ? 12
-      : input.confidence === "MEDIUM"
-        ? 8
-        : input.confidence === "LOW"
-          ? 3
-          : 0;
-
-  const freshnessRatio = Math.max(
-    0,
-    1 - input.freshness_days / Math.max(1, input.freshness_ttl_days * 2),
-  );
-  const freshness = clamp(freshnessRatio * DIMENSION_MAX.freshness, DIMENSION_MAX.freshness);
+  const decisionCount = input.decision_relation_count ?? 0;
+  const graph_depth = clamp((decisionCount / 10) * DIMENSION_MAX.graph_depth, DIMENSION_MAX.graph_depth);
 
   const verifiedCount = input.verified_fact_count ?? Math.min(input.unique_fields, 4);
-  const decisionCount = input.decision_relation_count ?? 0;
-  const verified_facts = clamp((verifiedCount / 8) * DIMENSION_MAX.verified_facts, DIMENSION_MAX.verified_facts);
-  const decision_relations = clamp(
-    (decisionCount / 8) * DIMENSION_MAX.decision_relations,
-    DIMENSION_MAX.decision_relations,
+  let provenancePts = input.provenance_valid ? 8 : 0;
+  if (input.confidence === "HIGH") provenancePts += 7;
+  else if (input.confidence === "MEDIUM") provenancePts += 5;
+  else if (input.confidence === "LOW") provenancePts += 2;
+  if (verifiedCount >= 6) provenancePts = Math.min(15, provenancePts + 2);
+  const provenanceScore = clamp(provenancePts, DIMENSION_MAX.provenance);
+
+  const completeness = clamp(
+    (input.required_fields_present / Math.max(1, input.required_fields_total)) * DIMENSION_MAX.completeness,
+    DIMENSION_MAX.completeness,
   );
+
+  let differentiation = input.distinct_from_parent ? 4 : 1;
+  if (input.near_duplicate || input.year_only_variant || siblingTooClose) differentiation = 1;
+  if (input.distinct_reason && input.distinct_reason.length > 8) differentiation = Math.max(differentiation, 4);
+  differentiation = clamp(differentiation, DIMENSION_MAX.differentiation);
+
+  const freshnessRatio = Math.max(0, 1 - input.freshness_days / Math.max(1, input.freshness_ttl_days * 2));
+  const freshness = clamp(freshnessRatio * DIMENSION_MAX.freshness, DIMENSION_MAX.freshness);
 
   const site = input.site_rules?.(input) ?? { delta: 0, reasons: [], blockers: [] };
   reasons.push(...site.reasons);
   blockers.push(...site.blockers);
 
   const breakdown: QualityBreakdown = {
-    unique_structured_data: round1(unique),
-    search_intent_evidence: round1(intent),
-    product_utility: round1(utility),
-    information_completeness: round1(completeness),
+    intent_strength: round1(intent_strength),
+    unique_structured_data: round1(unique_structured_data),
+    decision_utility: round1(decision_utility),
+    graph_depth: round1(graph_depth),
+    provenance: round1(provenanceScore),
+    completeness: round1(completeness),
     differentiation: round1(differentiation),
-    data_confidence: confidenceScore,
     freshness: round1(freshness),
-    verified_facts: round1(verified_facts),
-    decision_relations: round1(decision_relations),
   };
 
-  let score = Math.round(
-    Object.values(breakdown).reduce((sum, value) => sum + value, 0) + site.delta,
-  );
+  let score = Math.round(Object.values(breakdown).reduce((sum, value) => sum + value, 0) + site.delta);
   score = Math.max(0, Math.min(100, score));
   if (demand.kind === "EDITORIAL_JUDGMENT") score = Math.min(score, EDITORIAL_SCORE_CAP);
   if (verifiedCount < 3) score = Math.min(score, 68);
+  if (decisionCount < 3 && !input.hub_necessity) score = Math.min(score, 74);
 
   const failedHard = hard_gates.some((g) => !g.passed) || site.blockers.length > 0;
-  let index_state: QualityResult["index_state"] = "GRAPH_ONLY";
-  if (!failedHard && score >= 75) index_state = "INDEXABLE";
-  else if (!failedHard && score >= 60) index_state = "NOINDEX_PRODUCT";
-  if (failedHard) index_state = "GRAPH_ONLY";
+  let index_state: IndexState = "GRAPH_ONLY";
+  if (input.unresolved_critical_conflict) index_state = "CONFLICTED";
+  else if (input.stale_presented_as_current) index_state = "STALE";
+  else if (failedHard && productAction) index_state = "NOINDEX_PRODUCT";
+  else if (failedHard) index_state = "GRAPH_ONLY";
+  else if (score >= INDEXABLE_THRESHOLD) index_state = "INDEXABLE";
+  else if (productAction) index_state = "NOINDEX_PRODUCT";
+  else index_state = "GRAPH_ONLY";
+
+  if (failedHard && index_state === "INDEXABLE") {
+    index_state = productAction ? "NOINDEX_PRODUCT" : "GRAPH_ONLY";
+  }
 
   const why = explainWhyIndexable({
     score,
@@ -374,18 +434,16 @@ export function explainWhyIndexable(result: Omit<QualityResult, "why"> & { why?:
   if (result.index_state !== "INDEXABLE") {
     const failed = result.hard_gates.filter((g) => !g.passed).map((g) => g.id);
     if (failed.length) {
-      return `Not indexable: hard gates failed (${failed.join(", ")}). Soft score ${result.score} does not compensate.`;
+      return `Not indexable: hard gates failed (${failed.slice(0, 8).join(", ")}). Soft score ${result.score} does not compensate. State=${result.index_state}.`;
     }
-    return `Not indexable: soft score ${result.score} is below the index threshold after hard gates passed. Product/graph use can remain.`;
+    return `Not indexable: soft score ${result.score} is below ${INDEXABLE_THRESHOLD} after hard gates passed. Product/graph use can remain (${result.index_state}).`;
   }
-  const parts = [
+  return [
     `Hard gates passed (${result.hard_gates.filter((g) => g.passed).length}/${result.hard_gates.length}).`,
     `Demand evidence is ${result.demand.kind} (editorial is capped; GSC is not claimed).`,
-    `Verified-fact dimension ${result.breakdown.verified_facts}/${DIMENSION_MAX.verified_facts}; decision-relation dimension ${result.breakdown.decision_relations}/${DIMENSION_MAX.decision_relations}.`,
-    `Product utility ${result.breakdown.product_utility}/${DIMENSION_MAX.product_utility} from the interactive tool, not from word count.`,
-    `Soft score ${result.score} is secondary — it cannot override a failed hard gate.`,
-  ];
-  return parts.join(" ");
+    `Decision utility ${result.breakdown.decision_utility}/${DIMENSION_MAX.decision_utility}; graph depth ${result.breakdown.graph_depth}/${DIMENSION_MAX.graph_depth}.`,
+    `Soft score ${result.score} is secondary — it cannot override a failed hard gate. INDEX candidate threshold is ${INDEXABLE_THRESHOLD}.`,
+  ].join(" ");
 }
 
 function round1(value: number): number {
@@ -409,9 +467,19 @@ export function seoRecommendation(input: {
   return "NO_ACTION";
 }
 
-export const INDEXABLE_THRESHOLD = 75;
-
-const CORE_SIM_KEYS = ["facts", "relations", "answer", "decision", "code", "engine", "vehicle", "causes", "modes", "max_power", "match"];
+const CORE_SIM_KEYS = [
+  "facts",
+  "relations",
+  "answer",
+  "decision",
+  "code",
+  "engine",
+  "vehicle",
+  "causes",
+  "modes",
+  "max_power",
+  "match",
+];
 
 export function structuredSimilarity(
   a: Record<string, unknown>,
@@ -429,9 +497,23 @@ export function structuredSimilarity(
   return weight ? weightedSame / weight : 1;
 }
 
+export function outputSimilarity(a: Record<string, unknown>, b: Record<string, unknown>): number {
+  const keys = ["match", "max_power", "decision", "answer", "modes", "causes", "spec", "capsule"];
+  let same = 0;
+  let n = 0;
+  for (const key of keys) {
+    if (!(key in a) && !(key in b)) continue;
+    n += 1;
+    if (JSON.stringify(a[key]) === JSON.stringify(b[key])) same += 1;
+  }
+  return n ? same / n : 0;
+}
+
 export function intentSimilarity(a: PageRecord, b: PageRecord): number {
   if (a.site !== b.site) return 0;
-  if (intentFamilyId(a) === intentFamilyId(b)) return Math.max(0.9, structuredSimilarity(a.structured_payload, b.structured_payload));
+  if (intentFamilyId(a) === intentFamilyId(b)) {
+    return Math.max(0.9, structuredSimilarity(a.structured_payload, b.structured_payload));
+  }
   if (a.family !== b.family) return 0.2;
   return structuredSimilarity(a.structured_payload, b.structured_payload);
 }
@@ -484,7 +566,16 @@ export function relationQuality(relation: GraphRelation, now = new Date()): numb
   return Math.max(0, Math.min(100, score));
 }
 
-export const QUALITY_BUCKETS = ["0-49", "50-59", "60-69", "70-79", "80-89", "90-100"] as const;
+export const QUALITY_BUCKETS = [
+  "0-49",
+  "50-59",
+  "60-69",
+  "70-79",
+  "80-84",
+  "85-89",
+  "90-94",
+  "95-100",
+] as const;
 export type QualityBucket = (typeof QUALITY_BUCKETS)[number];
 
 export function qualityBucket(score: number): QualityBucket {
@@ -492,8 +583,10 @@ export function qualityBucket(score: number): QualityBucket {
   if (score < 60) return "50-59";
   if (score < 70) return "60-69";
   if (score < 80) return "70-79";
-  if (score < 90) return "80-89";
-  return "90-100";
+  if (score < 85) return "80-84";
+  if (score < 90) return "85-89";
+  if (score < 95) return "90-94";
+  return "95-100";
 }
 
 export function qualityDistribution(
@@ -514,4 +607,18 @@ export function qualityDistribution(
   return rows;
 }
 
-export { confidenceLevelFromScore };
+export const DENSITY_MIN: Record<string, number> = {
+  error_code: 5,
+  vehicle_configuration: 8,
+  device: 10,
+  charger: 10,
+  corridor: 6,
+  historical_climate: 5,
+  destination: 5,
+};
+
+export function densityRequired(entityType: string): number | null {
+  return DENSITY_MIN[entityType] ?? null;
+}
+
+export { confidenceLevelFromScore, DIMENSION_MAX };
