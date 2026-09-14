@@ -196,6 +196,32 @@ export const CORE_CHARGERS: ChargerProfile[] = [
 
 export const CHARGERS: ChargerProfile[] = [...CORE_CHARGERS, ...MORE_CHARGERS];
 
+export const POWER_KINDS = [
+  "MEASURED",
+  "MANUFACTURER_RATED",
+  "PROTOCOL_MAX",
+  "CALCULATED_EXPECTED",
+  "HEURISTIC_EXPECTED",
+] as const;
+export type PowerKind = (typeof POWER_KINDS)[number];
+
+export type PowerScenario = {
+  id: string;
+  device_id: string;
+  charger_id: string;
+  cable_id?: string;
+  port: string;
+  protocol: string;
+  negotiated_voltage: number | null;
+  negotiated_current: number | null;
+  expected_power: number | null;
+  limiting_component: string;
+  power_kind: PowerKind;
+  measured_curve: null;
+  confidence: ConfidenceLevel;
+  evidence: "SPEC_VERIFIED" | "INFERRED" | "MEASURED";
+};
+
 export const CABLES: CableProfile[] = [
   { id: "cab:apple-usbc-60w", name: "Apple USB-C 60W", slug: "apple-usbc-60w", e_marker: true, max_watts: 60, max_volts: 20, connector: "USB-C to USB-C", tag: "MANUFACTURER_VERIFIED" },
   { id: "cab:apple-usbc-240w", name: "Apple USB-C 240W", slug: "apple-usbc-240w", e_marker: true, max_watts: 240, max_volts: 48, connector: "USB-C to USB-C", tag: "MANUFACTURER_VERIFIED" },
@@ -402,7 +428,42 @@ export function getCable(slug: string) {
   return CABLES.find((item) => item.slug === slug);
 }
 
-const POPULAR_PAIRS: Array<[string, string]> = [
+export function powerKindFor(result: CompatibilityResult): PowerKind {
+  if (result.evidence === "MEASURED") return "MEASURED";
+  if (result.evidence === "SPEC_VERIFIED" && !result.theoretical) return "MANUFACTURER_RATED";
+  if (result.theoretical) return "CALCULATED_EXPECTED";
+  return "HEURISTIC_EXPECTED";
+}
+
+export function buildPowerScenarios(): PowerScenario[] {
+  const defaultCable = CABLES.find((c) => c.slug === "apple-usbc-60w");
+  const rows: PowerScenario[] = [];
+  for (const [d, c] of POPULAR_PAIRS) {
+    const device = getDevice(d);
+    const charger = getCharger(c);
+    if (!device || !charger) continue;
+    const result = compatibility(device, charger, defaultCable);
+    rows.push({
+      id: `cm:scenario:${d}:${c}:${defaultCable?.slug ?? "none"}`,
+      device_id: device.id,
+      charger_id: charger.id,
+      cable_id: defaultCable?.id,
+      port: result.best_port,
+      protocol: result.protocol,
+      negotiated_voltage: null,
+      negotiated_current: null,
+      expected_power: result.max_power,
+      limiting_component: result.bottleneck,
+      power_kind: powerKindFor(result),
+      measured_curve: null,
+      confidence: result.confidence,
+      evidence: result.evidence === "MEASURED" ? "INFERRED" : result.evidence,
+    });
+  }
+  return rows;
+}
+
+export const POPULAR_PAIRS: Array<[string, string]> = [
   ["iphone-16", "apple-20w"],
   ["iphone-16", "apple-35w-dual"],
   ["iphone-16", "anker-65w"],

@@ -2,7 +2,7 @@ import { compareRoute, timeValueBreakEven, ROUTES } from "@penta/tripcost";
 import { ALL_ERRORS } from "@penta/fixcode";
 import { VEHICLES } from "@penta/autospec";
 import { DESTINATIONS, capsuleFor, CLIMATE_PROVENANCE } from "@penta/wearthere";
-import { CABLES, CHARGERS, DEVICES, POWER_PROVENANCE, compatibility } from "@penta/chargematch";
+import { CABLES, CHARGERS, DEVICES, POWER_PROVENANCE } from "@penta/chargematch";
 import type { GraphStore } from "@penta/graph-core";
 import { entity, rel } from "./graph-depth";
 
@@ -788,56 +788,6 @@ function deepenChargematch(store: GraphStore) {
         index_eligible: false,
       }),
     );
-  }
-  for (const device of DEVICES) {
-    for (const charger of CHARGERS) {
-      const result = compatibility(device, charger);
-      addRel(
-        store,
-        rel({
-          id: `${device.id}->DEVICE_NEGOTIATES_WITH->${charger.id}`,
-          site: "chargematch",
-          type: "DEVICE_NEGOTIATES_WITH",
-          from_id: device.id,
-          to_id: charger.id,
-          properties: {
-            protocol: result.protocol,
-            expected_w: result.max_power,
-            evidence: result.evidence,
-            theoretical: result.theoretical,
-          },
-          provenance: [POWER_PROVENANCE],
-          confidence: result.confidence,
-          index_eligible: false,
-          inferred: result.evidence !== "SPEC_VERIFIED",
-        }),
-      );
-      addRel(
-        store,
-        rel({
-          id: `${device.id}->COMPATIBLE_IF->${charger.id}`,
-          site: "chargematch",
-          type: "COMPATIBLE_IF",
-          from_id: device.id,
-          to_id: charger.id,
-          properties: {
-            conditions: {
-              protocol: device.pd_version ?? device.connector,
-              pps: Boolean(device.pps),
-              emarker_if_above_60w: device.max_watts > 60,
-              single_port: true,
-              device_state: "below_taper",
-            },
-            match: result.match,
-            bottleneck: result.bottleneck,
-          },
-          provenance: [POWER_PROVENANCE],
-          confidence: result.confidence,
-          index_eligible: false,
-          inferred: charger.tag === "PROTOCOL_INFERRED",
-        }),
-      );
-    }
   }
 }
 

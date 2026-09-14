@@ -2,6 +2,7 @@ import type { ProvenanceRecord, ConfidenceLevel } from "@penta/data-provenance";
 
 export const INDEX_STATES = [
   "INDEXABLE",
+  "SEO_CANDIDATE",
   "NOINDEX_PRODUCT",
   "GRAPH_ONLY",
   "REVIEW_REQUIRED",
@@ -21,6 +22,9 @@ export const RELATION_CLASSES = [
 ] as const;
 
 export type RelationClass = (typeof RELATION_CLASSES)[number];
+
+export const EDGE_KINDS = ["SOURCE_TRUTH", "DERIVED_RULE", "PERSONALIZED_DECISION", "UNKNOWN"] as const;
+export type EdgeKind = (typeof EDGE_KINDS)[number];
 
 export const TRUTH_STATUSES = [
   "VERIFIED_PRIMARY",
@@ -70,6 +74,7 @@ export type GraphRelation = {
   decision_relevant: boolean;
   /** Independent of the boolean flag — audit classifies from type + flag. */
   relation_class?: RelationClass;
+  edge_kind?: EdgeKind;
   inferred: boolean;
   /** Protocol overlap / heuristic estimate — not a lab measurement. */
   estimated?: boolean;
@@ -248,10 +253,15 @@ export class GraphStore {
       ).length,
       pages: pages.length,
       indexable,
+      seo_candidate: pages.filter((page) => page.index_state === "SEO_CANDIDATE").length,
       noindex_product: pages.filter(
         (page) => page.index_state === "NOINDEX_PRODUCT",
       ).length,
       graph_only: pages.filter((page) => page.index_state === "GRAPH_ONLY").length,
+      review_required: pages.filter((page) => page.index_state === "REVIEW_REQUIRED").length,
+      source_truth_edges: relations.filter((r) => classifyEdgeKind(r) === "SOURCE_TRUTH").length,
+      derived_rule_edges: relations.filter((r) => classifyEdgeKind(r) === "DERIVED_RULE").length,
+      personalized_decision_edges: relations.filter((r) => classifyEdgeKind(r) === "PERSONALIZED_DECISION").length,
       published: pages.filter((page) => page.publish_state === "PUBLISHED").length,
     };
   }
@@ -387,6 +397,75 @@ const DESCRIPTIVE_TYPES = new Set([
   "SUPPORTS",
   "ALLOCATION_UNKNOWN",
 ]);
+
+const SOURCE_TRUTH_TYPES = new Set([
+  "HAS_ERROR",
+  "ON_APPLIANCE",
+  "HAS_ERROR_CODE",
+  "IN_FAMILY",
+  "REQUIRES_FLUID_SPEC",
+  "OIL_CAPACITY",
+  "HAS_SERVICE_INTERVAL",
+  "HAS_COOLANT_SPEC",
+  "HAS_BRAKE_FLUID",
+  "USES_ENGINE",
+  "USES_TRANSMISSION",
+  "SOLD_IN",
+  "SUBJECT_TO_RECALL",
+  "TYPICAL_CLIMATE",
+  "HAS_TEMPERATURE_RANGE",
+  "HAS_PRECIPITATION",
+  "HAS_WIND",
+  "HAS_HUMIDITY",
+  "MAX_INPUT",
+  "MAX_OUTPUT",
+  "HAS_PORT",
+  "DEVICE_HAS_PORT",
+  "SUPPORTS_PROTOCOL",
+  "PORT_SUPPORTS_PROTOCOL",
+  "HAS_POWER_ALLOCATION",
+  "CABLE_MAX_WATTAGE",
+  "CABLE_EMARKED",
+  "DEVICE_ACCEPTS_MAX_WATTAGE",
+  "HAS_DISTANCE",
+  "ROUTE_HAS_TOLL",
+  "ROUTE_NO_TOLL",
+  "MEASUREMENT_OBSERVED_FOR",
+]);
+
+const PERSONALIZED_TYPES = new Set(["PERSONALIZED_PACK", "USER_TRIP_OUTFIT", "USER_ROUTE_QUOTE"]);
+
+const DERIVED_TYPES = new Set([
+  "PACKS",
+  "PACKS_FOR_ACTIVITY",
+  "HAS_PACKING_DECISION",
+  "CAN_CHARGE",
+  "HAS_SCENARIO",
+  "EXPECTED_POWER",
+  "COMPATIBLE_IF",
+  "DEVICE_NEGOTIATES_WITH",
+  "CHARGER_SPLITS_POWER_AS",
+  "ROUTE_BREAK_EVEN",
+  "ROUTE_ALTERNATIVE",
+  "ROUTE_WEAR_COST",
+  "HAS_COST_COMPONENT",
+  "HAS_CONSUMPTION",
+  "VEHICLE_CONSUMPTION",
+  "MAY_BE_CAUSED_BY",
+  "TESTED_BY",
+  "NEXT_TEST",
+  "NEXT_ACTION",
+  "FIXED_BY",
+]);
+
+export function classifyEdgeKind(relation: { type: string; inferred?: boolean; estimated?: boolean; edge_kind?: EdgeKind }): EdgeKind {
+  if (relation.edge_kind) return relation.edge_kind;
+  if (PERSONALIZED_TYPES.has(relation.type)) return "PERSONALIZED_DECISION";
+  if (SOURCE_TRUTH_TYPES.has(relation.type) && !relation.inferred && !relation.estimated) return "SOURCE_TRUTH";
+  if (DERIVED_TYPES.has(relation.type) || relation.inferred || relation.estimated) return "DERIVED_RULE";
+  if (SOURCE_TRUTH_TYPES.has(relation.type)) return "SOURCE_TRUTH";
+  return "UNKNOWN";
+}
 
 export function classifyRelation(relation: {
   type: string;

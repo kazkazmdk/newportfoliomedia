@@ -20,7 +20,9 @@ Une app Next.js (`apps/web`) expose les cinq identités visuelles, l’admin int
 pnpm install
 pnpm test
 pnpm graph:audit    # recalcule les métriques → docs/DEEP_GRAPH_BASELINE.md
-pnpm graph:health   # tableau entités / relations / INDEX
+pnpm graph:health   # tableau entités / relations / INDEX / SEO_CANDIDATE
+pnpm truth-gate     # invariants + sitemap vide
+pnpm test
 pnpm deep-qa        # rapport QA (ne pas traiter un markdown précédent comme source)
 pnpm dev
 ```
@@ -45,21 +47,28 @@ packages/catalog                                      graphe assemblé + rapport
 
 Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe, la provenance, le quality gate, l’analytics et l’observabilité le sont.
 
-## Indexation
+## Indexation (Truth Gate V2)
 
-Hard gates first, then a soft score (max 100). A page with 95/100 still fails if a hard gate fails.
+A positive boolean is not proof. Each gate returns `{ gate, status, evidence, reason }`.
 
-Hard gates: unique structured data, valid provenance, no critical unknown demand (unless hub necessity), not an unexplained duplicate, valid family, no invented LLM claims, no LLM safety claim, no year-only variant, not city-without-specifics, not obscure-without-demand, climate ≠ forecast, not stale-as-current, engine determined (AutoSpec), causes sourced (FixCode).
+- Required fields come from `PAGE_REQUIREMENTS` per family (mandatory + decision-critical).
+- `product_action` is detected from the payload, not from the page family.
+- A CTA is not interactive.
+- `distinct_from_parent` is computed. `page.id` is not distinctiveness.
+- `VERIFIED_PRIMARY` requires `validateFactProvenance` (PRIMARY_EXACT / REGULATORY_EXACT). `bmw.com` is PRIMARY_GENERAL.
+- `EDITORIAL_JUDGMENT` alone cannot produce `INDEXABLE` (max `SEO_CANDIDATE`).
+- Soft score cannot compensate a failed hard gate.
 
-Soft score (max 100): intent 15, unique structured 15, decision utility 20, graph depth 15, provenance 15, completeness 10, differentiation 5, freshness 5. Word count / title uniqueness / link count are ignored. Editorial demand is capped; total editorial scores cap at 84. INDEXABLE only if **all** hard gates pass **and** score ≥ **80**. A 99 soft score cannot override a failed hard gate.
+States: `INDEXABLE` | `SEO_CANDIDATE` | `NOINDEX_PRODUCT` | `GRAPH_ONLY` | `REVIEW_REQUIRED`.
 
-- `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex (meta, X-Robots-Tag, robots.txt, empty sitemap).
-- `NOINDEX_PRODUCT` / product-only tools (garage, trip, kit) stay private.
-- Demand in this pass is **editorial judgment**, not GSC.
+- `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex, empty sitemap.
+- Demand in this catalog is editorial. Current INDEXABLE count is **0**. That is intended.
+
+See `docs/TRUTH_GATE_V2_REPORT.md`.
 
 ## Données (catalog, honnête)
 
-Le graphe s’étend **en profondeur**, pas en pages creuses. Relations décisionnelles portent `decision_relevant`. Overlap ChargeMatch device×charger×cable is `EXPECTED_POWER` (inferred), **not** a lab `MEASURED_AT`.
+Le graphe distingue SOURCE_TRUTH / DERIVED_RULE / PERSONALIZED_DECISION. ChargeMatch utilise `PowerScenario` (expected power = CALCULATED_EXPECTED, `measured_curve = null`). Pas de matrice cartésienne `EXPECTED_POWER`.
 
 - FixCode : Samsung / LG / Bosch / Miele — `Coverage: 4 brands verified`. Pas de Whirlpool inventé. Probabilités affichées comme High/Medium/Possible jusqu’à outcomes VERIFIED.
 - AutoSpec : identités moteur/génération, `market_scope`, fitment jamais via LLM. VIN = stub.

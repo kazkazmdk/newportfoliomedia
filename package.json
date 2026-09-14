@@ -14,7 +14,8 @@
     "deep-qa": "tsx scripts/deep-graph-qa.ts",
     "graph:audit": "tsx scripts/graph-audit.ts",
     "graph:health": "tsx scripts/graph-health.ts",
-    "graph:inspect": "tsx scripts/graph-inspect.ts"
+    "graph:inspect": "tsx scripts/graph-inspect.ts",
+    "truth-gate": "tsx scripts/truth-gate.ts"
   },
   "devDependencies": {
     "tsx": "^4.20.5",

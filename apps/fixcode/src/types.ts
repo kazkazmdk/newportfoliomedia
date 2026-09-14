@@ -88,6 +88,19 @@ export type OutcomeId =
   | "technician_repair"
   | "other";
 
+/** Observed repair outcome. Empty until real reports exist — do not invent rows. */
+export type DiagnosticOutcome = {
+  code: string;
+  test?: string;
+  repair?: string;
+  resolved?: boolean;
+  not_resolved?: boolean;
+  model?: string;
+  context?: string;
+};
+
+export const DIAGNOSTIC_OUTCOMES: DiagnosticOutcome[] = [];
+
 export type OutcomeRecord = {
   appliance: string;
   model?: string;

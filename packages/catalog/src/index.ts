@@ -136,8 +136,10 @@ export function pageExplainability(page: PageRecord) {
   const distinct = String(page.structured_payload.distinct_reason ?? "");
   const why =
     page.index_state === "INDEXABLE"
-      ? `This page is indexable because hard gates passed for family ${page.family}, the canonical is self-consistent, provenance is attached via its entities (${page.entity_ids.length}), and it exposes a product tool. Soft score ${page.quality_score} is secondary and demand ${page.search_demand} is not claimed as GSC. Distinct structured reason: ${distinct || "entity identity on family+payload"}. Title uniqueness is not used as proof.`
-      : `Not indexable (${page.index_state}). Soft score ${page.quality_score} cannot override a failed hard gate. The record can still power the product or remain graph-only.`;
+      ? `INDEXABLE because demand evidence is above editorial, hard gates passed, and distinctiveness was computed — not because a boolean was set. Soft score ${page.quality_score} is secondary. ${page.structured_payload.quality_why ?? ""}`
+      : page.index_state === "SEO_CANDIDATE"
+        ? `SEO_CANDIDATE: ${page.structured_payload.quality_why ?? "editorial/unknown demand cannot produce INDEXABLE"}. Soft score ${page.quality_score} does not create demand.`
+        : `Not indexable (${page.index_state}). Soft score ${page.quality_score} cannot override a failed hard gate. ${page.structured_payload.quality_why ?? ""}`;
   return {
     url: page.url,
     why_indexable: why,
@@ -328,9 +330,8 @@ export function demandBreakdown() {
     UNKNOWN: 0,
   };
   for (const page of store.pages.values()) {
-    if (page.index_state !== "INDEXABLE") continue;
-    counts.EDITORIAL_JUDGMENT += 1;
     void page;
+    counts.EDITORIAL_JUDGMENT += 1;
   }
   return counts;
 }
@@ -356,7 +357,7 @@ export function pageQualityReport() {
       quality_score: page.quality_score,
       index_state: page.index_state,
       demand: page.search_demand,
-      demand_kind: "EDITORIAL_JUDGMENT" as DemandSourceKind,
+      demand_kind: (page.index_state === "INDEXABLE" ? "UNKNOWN" : "EDITORIAL_JUDGMENT") as DemandSourceKind,
       structured_data_count: Object.keys(page.structured_payload).length,
       closest_sibling: sibling ? (sibling.a === page.url ? sibling.b : sibling.a) : null,
       similarity: sibling?.similarity ?? null,

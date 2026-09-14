@@ -470,6 +470,9 @@ const WMI: Record<string, string> = {
   "5YJ": "Tesla",
 };
 
+/** Licensed VIN decode is not implemented. WMI stub only. */
+export const VIN_SUPPORT = "NOT_IMPLEMENTED" as const;
+
 export const MockVinProvider: VehicleIdentityProvider = {
   id: "mock-wmi",
   territory: ["EU", "US"],

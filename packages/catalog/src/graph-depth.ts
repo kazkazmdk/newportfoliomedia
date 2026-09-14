@@ -14,6 +14,7 @@ import {
   CHARGERS,
   DEVICES,
   POWER_PROVENANCE,
+  buildPowerScenarios,
   compatibility,
   type ChargerProfile,
   type DeviceProfile,
@@ -949,6 +950,14 @@ function populateWearthere(store: GraphStore) {
             sample_years: 30,
             last_update: CLIMATE_PROVENANCE.retrieved_at,
             data_type: "CLIMATE_NORMAL",
+            dataset: "compiled-monthly-normals",
+            dataset_version: "penta-climate-v1",
+            station_or_grid: null,
+            variable: "tmin_c,tmax_c,rain_days,rain_mm,humidity,wind_kmh",
+            unit: "degC / mm / days / % / kmh",
+            source_url: null,
+            interpolation_method: null,
+            derived_method: null,
           },
           provenance: [CLIMATE_PROVENANCE],
           confidence: "HIGH",
@@ -961,12 +970,13 @@ function populateWearthere(store: GraphStore) {
           type: "TYPICAL_CLIMATE",
           from_id: dest.id,
           to_id: monthId,
-          properties: { month: month.month, tmin: month.tmin_c, tmax: month.tmax_c, rain_days: month.rain_days },
+            properties: { month: month.month, tmin: month.tmin_c, tmax: month.tmax_c, rain_days: month.rain_days },
           provenance: [CLIMATE_PROVENANCE],
           confidence: "HIGH",
           index_eligible: dest.demand >= 50,
           method: "CROSS_SOURCE",
           verified_at: CLIMATE_PROVENANCE.retrieved_at,
+          edge_kind: "SOURCE_TRUTH",
         }),
       );
       const cap = capsuleFor(dest, month.month, "classic");
@@ -990,8 +1000,10 @@ function populateWearthere(store: GraphStore) {
             provenance: [CLIMATE_PROVENANCE],
             confidence: "MEDIUM",
             index_eligible: false,
-            inferred: false,
+            inferred: true,
+            estimated: true,
             method: "HEURISTIC",
+            edge_kind: "DERIVED_RULE",
           }),
         );
       }
@@ -1284,37 +1296,84 @@ function populateChargematch(store: GraphStore) {
           inferred,
           method: inferred ? "HEURISTIC" : "MANUFACTURER_DOC",
           verified_at: POWER_PROVENANCE.retrieved_at,
+          edge_kind: "DERIVED_RULE",
         }),
       );
-      for (const cable of CABLES) {
-        const withCable = compatibility(device, charger, cable);
-        store.addRelation(
-          rel({
-            id: `${device.id}+${charger.id}+${cable.id}`,
-            site: "chargematch",
-            type: "EXPECTED_POWER",
-            from_id: device.id,
-            to_id: charger.id,
-            properties: {
-              cable: cable.id,
-              watts: withCable.max_power,
-              theoretical: true,
-              lab: false,
-              measured: false,
-              evidence: "INFERRED",
-              match: withCable.match,
-              graph_only: true,
-              note: "Protocol overlap, not a lab measurement.",
-            },
-            provenance: [POWER_PROVENANCE],
-            confidence: cable.tag === "UNKNOWN" ? "UNKNOWN" : withCable.confidence,
-            index_eligible: false,
-            inferred: true,
-            decision_relevant: true,
-            method: "HEURISTIC",
-          }),
-        );
-      }
+    }
+  }
+  for (const scenario of buildPowerScenarios()) {
+    store.addEntity(
+      entity({
+        id: scenario.id,
+        site: "chargematch",
+        type: "power_scenario",
+        slug: scenario.id.replace("cm:scenario:", ""),
+        name: `${scenario.device_id} × ${scenario.charger_id}`,
+        properties: {
+          device: scenario.device_id,
+          charger: scenario.charger_id,
+          cable: scenario.cable_id ?? null,
+          port: scenario.port,
+          protocol: scenario.protocol,
+          negotiated_voltage: scenario.negotiated_voltage,
+          negotiated_current: scenario.negotiated_current,
+          expected_power: scenario.expected_power,
+          limiting_component: scenario.limiting_component,
+          power_kind: scenario.power_kind,
+          measured_curve: null,
+          evidence: scenario.evidence,
+          note: "CALCULATED_EXPECTED from protocol overlap. Not a lab measurement.",
+        },
+        provenance: [POWER_PROVENANCE],
+        confidence: scenario.confidence,
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${scenario.device_id}->HAS_SCENARIO->${scenario.id}`,
+        site: "chargematch",
+        type: "HAS_SCENARIO",
+        from_id: scenario.device_id,
+        to_id: scenario.id,
+        properties: { role: "device" },
+        provenance: [POWER_PROVENANCE],
+        confidence: scenario.confidence,
+        index_eligible: false,
+        inferred: true,
+        edge_kind: "DERIVED_RULE",
+      }),
+    );
+    store.addRelation(
+      rel({
+        id: `${scenario.charger_id}->HAS_SCENARIO->${scenario.id}`,
+        site: "chargematch",
+        type: "HAS_SCENARIO",
+        from_id: scenario.charger_id,
+        to_id: scenario.id,
+        properties: { role: "charger" },
+        provenance: [POWER_PROVENANCE],
+        confidence: scenario.confidence,
+        index_eligible: false,
+        inferred: true,
+        edge_kind: "DERIVED_RULE",
+      }),
+    );
+    if (scenario.cable_id) {
+      store.addRelation(
+        rel({
+          id: `${scenario.cable_id}->HAS_SCENARIO->${scenario.id}`,
+          site: "chargematch",
+          type: "HAS_SCENARIO",
+          from_id: scenario.cable_id,
+          to_id: scenario.id,
+          properties: { role: "cable" },
+          provenance: [POWER_PROVENANCE],
+          confidence: scenario.confidence,
+          index_eligible: false,
+          inferred: true,
+          edge_kind: "DERIVED_RULE",
+        }),
+      );
     }
   }
 }

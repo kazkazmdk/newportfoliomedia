@@ -5,6 +5,41 @@ import {
   sourceRank,
   type ConfidenceLevel,
 } from "@penta/data-provenance";
+import { inspectRequiredFields, PAGE_REQUIREMENTS, requiredFieldKeys } from "./page-requirements";
+import {
+  computeDistinctiveness,
+  demandLevel,
+  detectInteractive,
+  detectProductAction,
+  editorialOnly,
+  weartherePageValue,
+  type GateResult,
+  type PageEvidenceReport,
+} from "./truth-v2";
+
+export { PAGE_REQUIREMENTS, requiredFieldKeys, inspectRequiredFields } from "./page-requirements";
+export type { PageFamilyRequirements } from "./page-requirements";
+export {
+  computeDistinctiveness,
+  demandLevel,
+  detectInteractive,
+  detectProductAction,
+  editorialOnly,
+  weartherePageValue,
+  climateDeltaVsAdjacent,
+  countVerifiedExact,
+  provenanceCoverage,
+  relationProvenanceLevel,
+  axisDistribution,
+  inspectPayloadKeys,
+} from "./truth-v2";
+export type {
+  AxisScores,
+  Distinctiveness,
+  GateResult,
+  PageEvidenceReport,
+  ProductActionEvidence,
+} from "./truth-v2";
 
 export type QualityDimension =
   | "intent_strength"
@@ -84,6 +119,15 @@ export type QualityResult = {
   hard_gates: HardGateResult[];
   demand: DemandClassification;
   why: string;
+  gate_evidence?: GateResult[];
+  axes?: {
+    content_quality: number;
+    truth_quality: number;
+    decision_utility: number;
+    demand_evidence: number;
+    distinctiveness: number;
+    safety: number;
+  };
 };
 
 export type SearchDemandEvidence = {
@@ -149,6 +193,15 @@ export type PageQualityInput = {
   diy_boundary?: boolean;
   /** Soft-score only. Never used as a hard proof. */
   stored_quality_score?: number;
+  /** Inspected payload. When present, required fields / action / interactive are computed, not trusted. */
+  structured_payload?: Record<string, unknown>;
+  page_id?: string;
+  title?: string;
+  parent_payload?: Record<string, unknown>;
+  parent_id?: string;
+  provenance_urls?: string[];
+  wearthere_climate_delta_c?: number;
+  wearthere_rain_delta?: number;
 };
 
 const DIMENSION_MAX: QualityBreakdown = {
@@ -257,24 +310,52 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     ...input,
   };
 
-  const missingCritical =
-    input.required_fields_present / Math.max(1, input.required_fields_total) < 0.75;
-  const productAction = input.product_action ?? (input.product_cta || input.interactive);
+  const inspected = input.structured_payload
+    ? inspectRequiredFields(input.family, input.structured_payload)
+    : null;
+  const requiredPresent = inspected ? inspected.present.length : input.required_fields_present;
+  const requiredTotal = inspected ? inspected.required.length || input.required_fields_total : input.required_fields_total;
+  const missingCritical = inspected
+    ? !inspected.passed
+    : requiredPresent / Math.max(1, requiredTotal) < 1;
+  const detectedAction = detectProductAction(input.family, input.structured_payload);
+  const productAction = input.structured_payload
+    ? detectedAction.present
+    : input.product_action === true || (input.interactive === true && input.product_action !== false);
+  const interactiveResult = detectInteractive(input.family, input.structured_payload, {
+    product_cta: input.product_cta,
+    interactive: input.interactive,
+  });
+  const distinctiveness = computeDistinctiveness({
+    page_id: input.page_id ?? input.distinct_reason ?? input.family,
+    title: input.title,
+    payload: input.structured_payload,
+    parent: input.parent_id
+      ? { id: input.parent_id, payload: input.parent_payload }
+      : undefined,
+    sibling_structured_similarity: input.sibling_structured_similarity,
+    same_intent_sibling: input.same_intent_sibling,
+    same_decision_output: input.same_decision_output,
+    claimed_reason: input.distinct_reason,
+  });
   const siblingTooClose =
     (input.sibling_structured_similarity ?? 0) > 0.85 &&
     Boolean(input.same_intent_sibling) &&
     Boolean(input.same_decision_output);
+  const computedDistinct =
+    Boolean(input.structured_payload) || input.sibling_structured_similarity != null;
   const distinctOk =
     !siblingTooClose &&
     !(input.near_duplicate && !input.distinct_reason) &&
-    !input.year_only_variant;
+    !input.year_only_variant &&
+    (computedDistinct ? distinctiveness.passed : Boolean(input.distinct_from_parent));
 
   const intentIdentifiable = demand.kind !== "UNKNOWN" || Boolean(input.hub_necessity);
 
   const hard_gates: HardGateResult[] = [
     gate("identifiable_intent", intentIdentifiable, demand.kind),
     gate("valid_canonical", Boolean(input.family) && input.canonical_self_valid !== false, input.family || "missing family"),
-    gate("critical_data_present", !missingCritical, `${input.required_fields_present}/${input.required_fields_total}`),
+    gate("critical_data_present", !missingCritical, `${requiredPresent}/${requiredTotal}${inspected ? ` missing=${inspected.missing.join(",")}` : ""}`),
     gate("minimum_provenance", input.provenance_valid, input.provenance_valid ? "provenance present" : "missing provenance"),
     gate(
       "no_unresolved_critical_conflict",
@@ -284,7 +365,7 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     gate("no_stale_current", !input.stale_presented_as_current, "freshness claim"),
     gate("no_ai_inferred_as_official", !input.ai_inferred_as_official, "AI_INFERRED ≠ OFFICIAL"),
     gate("distinct_from_sibling", distinctOk, input.distinct_reason ?? "sibling check"),
-    gate("product_action", productAction, productAction ? "tool or CTA" : "no product utility"),
+    gate("product_action", productAction, productAction ? detectedAction.action ?? "computed action" : "no inspectable action/input/output"),
     gate("no_placeholder", !input.placeholder && !input.llm_filler, "placeholder/filler"),
     gate("no_broken_relations", !input.broken_relations, "broken relations"),
     gate(
@@ -317,7 +398,7 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     gate("not_obscure_without_demand", !input.obscure_without_demand, "obscure combo"),
     gate("not_forecast_as_climate", !input.forecast_as_climate, "climate vs forecast"),
     gate("not_stale_as_current", !input.stale_presented_as_current, "freshness claim"),
-    gate("no_critical_missing_facts", !missingCritical, `${input.required_fields_present}/${input.required_fields_total}`),
+    gate("no_critical_missing_facts", !missingCritical, `${requiredPresent}/${requiredTotal}`),
     gate(
       "data_confidence_sufficient",
       input.confidence === "HIGH" ||
@@ -326,7 +407,7 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
       input.confidence,
     ),
     gate("actual_user_intent", intentIdentifiable, demand.kind),
-    gate("actual_product_utility", productAction, productAction ? "tool or CTA" : "no product utility"),
+    gate("actual_product_utility", productAction, productAction ? detectedAction.action ?? "computed action" : "CTA/family is not a product action"),
     gate("unverified_specs", !input.unverified_specs, "specs"),
   ];
 
@@ -353,8 +434,8 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     (input.unique_fields / 10) * DIMENSION_MAX.unique_structured_data,
     DIMENSION_MAX.unique_structured_data,
   );
-  let decision_utility = input.product_cta ? 10 : 2;
-  if (input.interactive) decision_utility += 10;
+  let decision_utility = productAction ? 12 : 2;
+  if (interactiveResult.status) decision_utility += 8;
   decision_utility = clamp(decision_utility, DIMENSION_MAX.decision_utility);
 
   const decisionCount = input.decision_relation_count ?? 0;
@@ -373,9 +454,13 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     DIMENSION_MAX.completeness,
   );
 
-  let differentiation = input.distinct_from_parent ? 4 : 1;
+  let differentiation = distinctOk ? 4 : 1;
   if (input.near_duplicate || input.year_only_variant || siblingTooClose) differentiation = 1;
-  if (input.distinct_reason && input.distinct_reason.length > 8) differentiation = Math.max(differentiation, 4);
+  if (computedDistinct) {
+    differentiation = distinctiveness.passed ? clamp(3 + distinctiveness.unique_fact_count, DIMENSION_MAX.differentiation) : 1;
+  } else if (input.distinct_reason && input.distinct_reason.length > 8 && input.distinct_reason !== input.page_id) {
+    differentiation = Math.max(differentiation, 4);
+  }
   differentiation = clamp(differentiation, DIMENSION_MAX.differentiation);
 
   const freshnessRatio = Math.max(0, 1 - input.freshness_days / Math.max(1, input.freshness_ttl_days * 2));
@@ -403,17 +488,74 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
   if (decisionCount < 3 && !input.hub_necessity) score = Math.min(score, 74);
 
   const failedHard = hard_gates.some((g) => !g.passed) || site.blockers.length > 0;
+  const demandLv = demandLevel(input.search_demand);
+  const editorial = editorialOnly(input.search_demand) || demand.kind === "EDITORIAL_JUDGMENT" || demand.kind === "UNKNOWN";
+  const wearValue =
+    (input.family === "wear-month" || input.family === "wearthere-city-month") &&
+    (input.wearthere_climate_delta_c != null || input.wearthere_rain_delta != null)
+      ? weartherePageValue({
+          family: input.family,
+          demand_level: demandLv,
+          climate_delta_c: input.wearthere_climate_delta_c,
+          rain_delta: input.wearthere_rain_delta,
+        })
+      : undefined;
+
+  const gate_evidence: GateResult[] = [
+    {
+      gate: "required_fields_present",
+      status: !missingCritical,
+      evidence: inspected ?? {
+        required: requiredFieldKeys(input.family),
+        present_count: requiredPresent,
+        total: requiredTotal,
+        note: "count-only path; payload was not inspected",
+      },
+      reason: missingCritical ? "mandatory or decision-critical field missing" : undefined,
+    },
+    {
+      gate: "product_action",
+      status: productAction,
+      evidence: { ...detectedAction, claimed: input.product_action === true, family: input.family },
+      reason: productAction ? undefined : "family/CTA is not a product action",
+    },
+    interactiveResult,
+    {
+      gate: "distinct_from_parent",
+      status: distinctOk,
+      evidence: { ...distinctiveness, claimed: input.distinct_from_parent === true },
+      reason: distinctiveness.reason,
+    },
+    {
+      gate: "depends_on_self_declared_score",
+      status: !input.depends_on_self_declared_score,
+      evidence: { depends_on_self_declared_score: input.depends_on_self_declared_score === true },
+    },
+  ];
+
   let index_state: IndexState = "GRAPH_ONLY";
   if (input.unresolved_critical_conflict) index_state = "CONFLICTED";
   else if (input.stale_presented_as_current) index_state = "STALE";
+  else if (input.invented_data || input.llm_filler) index_state = productAction ? "NOINDEX_PRODUCT" : "GRAPH_ONLY";
+  else if (input.year_only_variant) index_state = "GRAPH_ONLY";
+  else if (wearValue?.graph_only) index_state = "GRAPH_ONLY";
+  else if (missingCritical) index_state = "REVIEW_REQUIRED";
+  else if (siblingTooClose || (computedDistinct && !distinctiveness.passed)) index_state = "GRAPH_ONLY";
   else if (failedHard && productAction) index_state = "NOINDEX_PRODUCT";
   else if (failedHard) index_state = "GRAPH_ONLY";
-  else if (score >= INDEXABLE_THRESHOLD) index_state = "INDEXABLE";
-  else if (productAction) index_state = "NOINDEX_PRODUCT";
+  else if (editorial || demandLv < 2) {
+    index_state = "SEO_CANDIDATE";
+    reasons.push("EDITORIAL_JUDGMENT / demand level < 2 cannot produce INDEXABLE.");
+  } else if (score >= INDEXABLE_THRESHOLD && demandLv >= 2 && distinctOk && productAction) {
+    index_state = "INDEXABLE";
+  } else if (productAction) index_state = "SEO_CANDIDATE";
   else index_state = "GRAPH_ONLY";
 
   if (failedHard && index_state === "INDEXABLE") {
     index_state = productAction ? "NOINDEX_PRODUCT" : "GRAPH_ONLY";
+  }
+  if (editorial && index_state === "INDEXABLE") {
+    index_state = "SEO_CANDIDATE";
   }
 
   const why = explainWhyIndexable({
@@ -427,10 +569,22 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
     why: "",
   });
 
-  return { score, breakdown, index_state, reasons, blockers, hard_gates, demand, why };
+  const axes = {
+    content_quality: Math.round((breakdown.intent_strength / DIMENSION_MAX.intent_strength) * 100),
+    truth_quality: Math.round((breakdown.provenance / DIMENSION_MAX.provenance) * 100),
+    decision_utility: Math.round((breakdown.decision_utility / DIMENSION_MAX.decision_utility) * 100),
+    demand_evidence: Math.round((demandLv / 3) * 100),
+    distinctiveness: Math.round((breakdown.differentiation / DIMENSION_MAX.differentiation) * 100),
+    safety: input.llm_safety_claim ? 20 : 80,
+  };
+
+  return { score, breakdown, index_state, reasons, blockers, hard_gates, demand, why, gate_evidence, axes };
 }
 
 export function explainWhyIndexable(result: Omit<QualityResult, "why"> & { why?: string }): string {
+  if (result.index_state === "SEO_CANDIDATE") {
+    return `SEO_CANDIDATE: quality/action may exist but demand evidence is ${result.demand.kind} (editorial/unknown never becomes INDEXABLE). Soft score ${result.score} does not create demand.`;
+  }
   if (result.index_state !== "INDEXABLE") {
     const failed = result.hard_gates.filter((g) => !g.passed).map((g) => g.id);
     if (failed.length) {

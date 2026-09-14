@@ -1,13 +1,15 @@
 import {
+  classifyEdgeKind,
   classifyRelation,
   median,
   percentile,
+  type EdgeKind,
   type IndexState,
   type RelationClass,
   type SiteId,
   type TruthStatus,
 } from "@penta/graph-core";
-import { isFresh } from "@penta/data-provenance";
+import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data-provenance";
 import { qualityDistribution } from "@penta/quality-gate";
 import { buildCatalog } from "./index";
 
@@ -64,7 +66,17 @@ function truthStatus(input: {
   ) {
     return "TESTED";
   }
-  if (input.provenance.some((p) => ["OFFICIAL", "MANUFACTURER", "REGULATORY"].includes(p.source_type))) {
+  if (
+    input.provenance.some((p) => {
+      const v = validateFactProvenance({
+        source_type: p.source_type as never,
+        source_url: (p as { source_url?: string }).source_url,
+        source_name: (p as { source_name?: string }).source_name,
+        verification_method: p.verification_method as never,
+      });
+      return v.verified_primary;
+    })
+  ) {
     return "VERIFIED_PRIMARY";
   }
   if (input.provenance.some((p) => ["PRIMARY_DATABASE", "TRUSTED_THIRD_PARTY"].includes(p.source_type))) {
@@ -106,6 +118,12 @@ export function auditGraph() {
     UNKNOWN: 0,
     CONFLICTING: 0,
   };
+  const edgeKinds: Record<EdgeKind, number> = {
+    SOURCE_TRUTH: 0,
+    DERIVED_RULE: 0,
+    PERSONALIZED_DECISION: 0,
+    UNKNOWN: 0,
+  };
 
   for (const rel of relations) {
     const key = `${rel.site}|${rel.type}|${rel.from_id}|${rel.to_id}`;
@@ -128,6 +146,7 @@ export function auditGraph() {
       conflicting: store.conflicts.some((c) => c.entity_id === rel.from_id || c.entity_id === rel.to_id),
     });
     truth[status] += 1;
+    edgeKinds[classifyEdgeKind(rel)] += 1;
   }
 
   for (const entity of entities) {
@@ -151,6 +170,7 @@ export function auditGraph() {
 
   const pageStates: Record<string, number> = {
     INDEXABLE: 0,
+    SEO_CANDIDATE: 0,
     NOINDEX_PRODUCT: 0,
     GRAPH_ONLY: 0,
     REVIEW_REQUIRED: 0,
@@ -265,6 +285,60 @@ export function auditGraph() {
       decision_degree_median: median(decisionVals),
     },
     truth,
+    edge_kinds: edgeKinds,
+    provenance_v2: (() => {
+      const facts = [...entities, ...relations];
+      let exact_url = 0;
+      let exact_document = 0;
+      let field_level = 0;
+      let generic_only = 0;
+      let none = 0;
+      let verified_exact_primary = 0;
+      let verified_exact_regulatory = 0;
+      let trusted_dataset = 0;
+      let cross = 0;
+      let single = 0;
+      let conflicted = store.conflicts.length;
+      for (const row of facts) {
+        const rec = row.provenance[0];
+        if (!rec) {
+          none += 1;
+          continue;
+        }
+        const v = validateFactProvenance({
+          source_type: rec.source_type,
+          source_url: rec.source_url,
+          source_name: rec.source_name,
+          retrieved_at: rec.retrieved_at,
+          verified_at: rec.verified_at,
+          verification_method: rec.verification_method,
+          inferred: "inferred" in row ? Boolean((row as { inferred?: boolean }).inferred) : false,
+        });
+        if (v.verified_primary && v.level === "PRIMARY_EXACT") verified_exact_primary += 1;
+        if (v.level === "REGULATORY_EXACT") verified_exact_regulatory += 1;
+        if (v.level === "TRUSTED_DATASET_EXACT") trusted_dataset += 1;
+        if (v.level === "CROSS_SOURCE_CONFIRMED") cross += 1;
+        if (rec.source_url && !isGenericSourceUrl(rec.source_url)) exact_url += 1;
+        else if (rec.source_url && isGenericSourceUrl(rec.source_url)) generic_only += 1;
+        if (rec.source_name) exact_document += 1;
+        if (rec.source_url || rec.source_name) field_level += 1;
+        if (row.provenance.length === 1) single += 1;
+      }
+      return {
+        facts: facts.length,
+        exact_url,
+        exact_document,
+        field_level,
+        generic_only,
+        none,
+        verified_exact_primary,
+        verified_exact_regulatory,
+        trusted_dataset,
+        cross,
+        single,
+        conflicted,
+      };
+    })(),
     pages: pageStates,
     quality: {
       mean: scores.length ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10 : 0,
@@ -308,7 +382,10 @@ export function renderAuditMarkdown(audit = auditGraph()): string {
   lines.push(`- Relations: **${audit.relations.total}** (unique ${audit.relations.unique}, duplicate ${audit.relations.duplicate})`);
   lines.push(`- Relations/entity avg **${audit.relations.avg_per_entity}** · median **${audit.relations.median_per_entity}** · P25 ${audit.relations.p25} · P75 ${audit.relations.p75} · P90 ${audit.relations.p90}`);
   lines.push(`- Decision-relevant relations: **${audit.relations.decision_relevant}** (${audit.relations.decision_per_entity}/entity, median degree ${audit.relations.decision_degree_median})`);
-  lines.push(`- Pages INDEXABLE **${audit.pages.INDEXABLE}** · NOINDEX_PRODUCT **${audit.pages.NOINDEX_PRODUCT}** · GRAPH_ONLY **${audit.pages.GRAPH_ONLY}** · REVIEW_REQUIRED **${audit.pages.REVIEW_REQUIRED ?? 0}** · CONFLICTED **${audit.pages.CONFLICTED ?? 0}** · STALE **${audit.pages.STALE ?? 0}**`);
+  lines.push(`- Pages INDEXABLE **${audit.pages.INDEXABLE}** · SEO_CANDIDATE **${audit.pages.SEO_CANDIDATE ?? 0}** · NOINDEX_PRODUCT **${audit.pages.NOINDEX_PRODUCT}** · GRAPH_ONLY **${audit.pages.GRAPH_ONLY}** · REVIEW_REQUIRED **${audit.pages.REVIEW_REQUIRED ?? 0}** · CONFLICTED **${audit.pages.CONFLICTED ?? 0}** · STALE **${audit.pages.STALE ?? 0}**`);
+  if (audit.edge_kinds) {
+    lines.push(`- Edge kinds SOURCE_TRUTH **${audit.edge_kinds.SOURCE_TRUTH}** · DERIVED_RULE **${audit.edge_kinds.DERIVED_RULE}** · PERSONALIZED_DECISION **${audit.edge_kinds.PERSONALIZED_DECISION}** · UNKNOWN **${audit.edge_kinds.UNKNOWN}**`);
+  }
   lines.push("");
   lines.push("### Entity degree");
   lines.push("");
@@ -386,6 +463,7 @@ export function renderHealthTable(audit = auditGraph()): string {
     row("Inferred facts", (s) => s.inferred_facts),
     row("Conflicts", (s) => s.conflicts),
     row("INDEX", (s) => s.pages_by_state.INDEXABLE ?? 0),
+    row("SEO_CANDIDATE", (s) => s.pages_by_state.SEO_CANDIDATE ?? 0),
     row("NOINDEX", (s) => s.pages_by_state.NOINDEX_PRODUCT ?? 0),
     row("GRAPH_ONLY", (s) => s.pages_by_state.GRAPH_ONLY ?? 0),
     row("REVIEW_REQUIRED", (s) => s.pages_by_state.REVIEW_REQUIRED ?? 0),

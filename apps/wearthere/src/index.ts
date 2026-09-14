@@ -514,7 +514,21 @@ export function allWeartherePages(): PageRecord[] {
         title: `What to Wear in ${dest.city} in ${slug[0].toUpperCase()}${slug.slice(1)}`,
         meta_description: `Typical ${dest.city} ${slug}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
         entity_ids: [dest.id],
-        structured_payload: { ...w, city: dest.city, slug: dest.slug, distinct_reason: `${dest.slug}-${month}`, kind: "CLIMATE_NORMAL", period: "1991-2020", aggregation: "monthly_mean", sample_years: 30 },
+        structured_payload: {
+          ...w,
+          city: dest.city,
+          slug: dest.slug,
+          distinct_reason: `${dest.slug}-${month}`,
+          kind: "CLIMATE_NORMAL",
+          period: "1991-2020",
+          aggregation: "monthly_mean",
+          sample_years: 30,
+          layers: capsuleFor(dest, month, "classic").pieces.map((p) => p.id),
+          dataset: CLIMATE_DATASET.dataset,
+          dataset_version: CLIMATE_DATASET.dataset_version,
+          station_or_grid: CLIMATE_DATASET.station_or_grid,
+          source_url: CLIMATE_DATASET.source_url,
+        },
         quality_score: quality.score,
         search_demand: searchDemandScore({ seed_research: dest.demand }),
         index_state: quality.index_state,
@@ -530,15 +544,41 @@ export function allWeartherePages(): PageRecord[] {
   return pages;
 }
 
+export type ClimateDatasetCitation = {
+  dataset: string;
+  dataset_version: string;
+  station_or_grid: string | null;
+  period: string;
+  variable: string;
+  unit: string;
+  source_url: string | null;
+  retrieved_at: string;
+  interpolation_method: string | null;
+  derived_method: string | null;
+};
+
+export const CLIMATE_DATASET: ClimateDatasetCitation = {
+  dataset: "compiled-monthly-normals",
+  dataset_version: "penta-climate-v1",
+  station_or_grid: null,
+  period: "1991-2020",
+  variable: "monthly_mean_temperature_precip",
+  unit: "degC / mm / days",
+  source_url: null,
+  retrieved_at: RETRIEVED,
+  interpolation_method: null,
+  derived_method: null,
+};
+
 export const CLIMATE_PROVENANCE = provenance({
   source_id: "climate-normals-compiled",
-  source_type: "TRUSTED_THIRD_PARTY",
-  source_name: "Compiled monthly climate normals",
+  source_type: "PRIMARY_DATABASE",
+  source_name: "compiled-monthly-normals",
   retrieved_at: RETRIEVED,
   verified_at: RETRIEVED,
   confidence: 78,
   raw_value: "monthly climate normals",
   normalized_value: "CLIMATE_NORMAL",
-  verification_method: "CROSS_SOURCE",
-  notes: "Period 1991-2020 monthly means, ~30 sample years. Typical weather, not a live forecast.",
+  verification_method: "UNVERIFIED",
+  notes: "Period 1991-2020 monthly means compiled in-repo. Not a WMO station citation. source_url is unknown.",
 });

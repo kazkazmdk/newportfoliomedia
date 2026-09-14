@@ -287,3 +287,195 @@ export function provenance(partial: Omit<ProvenanceRecord, "confidence_level"> &
       partial.confidence_level ?? confidenceLevelFromScore(partial.confidence),
   };
 }
+
+export const PROVENANCE_LEVELS = [
+  "PRIMARY_EXACT",
+  "PRIMARY_GENERAL",
+  "REGULATORY_EXACT",
+  "TRUSTED_DATASET_EXACT",
+  "TRUSTED_THIRD_PARTY",
+  "CROSS_SOURCE_CONFIRMED",
+  "DERIVED_DETERMINISTIC",
+  "DERIVED_HEURISTIC",
+  "EDITORIAL",
+  "AI_INFERRED",
+  "UNKNOWN",
+] as const;
+export type ProvenanceLevel = (typeof PROVENANCE_LEVELS)[number];
+
+export const AGREEMENT_STATUSES = [
+  "SINGLE_SOURCE",
+  "MULTI_SOURCE_CONFIRMED",
+  "MULTI_SOURCE_CONFLICT",
+  "UNVERIFIED",
+] as const;
+export type AgreementStatus = (typeof AGREEMENT_STATUSES)[number];
+
+export type FieldLocator = {
+  document_title?: string;
+  document_version?: string;
+  publication_date?: string;
+  page?: number | string;
+  section?: string;
+  table?: string;
+  dataset?: string;
+  dataset_version?: string;
+  station_or_grid?: string;
+  period?: string;
+};
+
+export type FactObservation = {
+  id: string;
+  entity_id: string;
+  field: string;
+  value: string;
+  provenance: ProvenanceRecord;
+  locator?: FieldLocator;
+};
+
+export type CanonicalFact = {
+  entity_id: string;
+  field: string;
+  observations: FactObservation[];
+  status: "CONFIRMED" | "CONFLICTED" | "UNRESOLVED" | "ESTIMATED";
+  selectedValue?: string;
+  resolution?: "NONE" | "EXPLICIT";
+};
+
+export type ProvenanceValidation = {
+  valid: boolean;
+  level: ProvenanceLevel;
+  verified_primary: boolean;
+  missing_fields: string[];
+  warnings: string[];
+  evidence_score: number;
+  generic_url: boolean;
+};
+
+const GENERIC_PATHS = new Set(["", "/", "/us", "/en", "/fr", "/support", "/us/support", "/en/support"]);
+
+export function isGenericSourceUrl(url?: string | null): boolean {
+  if (!url) return true;
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.replace(/\/+$/, "") || "/";
+    if (GENERIC_PATHS.has(path.toLowerCase())) return true;
+    const parts = path.split("/").filter(Boolean);
+    return parts.length < 2;
+  } catch {
+    return true;
+  }
+}
+
+export function validateFactProvenance(input: {
+  source_type: SourceType;
+  source_url?: string;
+  source_name?: string;
+  retrieved_at?: string;
+  verified_at?: string;
+  verification_method?: VerificationMethod;
+  locator?: FieldLocator;
+  inferred?: boolean;
+}): ProvenanceValidation {
+  const missing: string[] = [];
+  const warnings: string[] = [];
+  const generic_url = isGenericSourceUrl(input.source_url);
+  if (!input.source_url) missing.push("source_url");
+  if (!input.source_name && !input.locator?.document_title && !input.locator?.dataset) {
+    missing.push("identifiable_document");
+  }
+  if (!input.retrieved_at) missing.push("retrieved_at");
+  if (input.source_type === "AI_INFERRED" || input.inferred) {
+    return {
+      valid: false,
+      level: "AI_INFERRED",
+      verified_primary: false,
+      missing_fields: missing,
+      warnings: ["AI_INFERRED cannot be VERIFIED_PRIMARY"],
+      evidence_score: 5,
+      generic_url,
+    };
+  }
+  const hasLocator = Boolean(
+    input.locator?.page ||
+      input.locator?.section ||
+      input.locator?.table ||
+      input.locator?.dataset ||
+      input.locator?.document_title,
+  );
+  const primaryType = input.source_type === "MANUFACTURER" || input.source_type === "OFFICIAL";
+  const regulatory = input.source_type === "REGULATORY";
+  let level: ProvenanceLevel = "UNKNOWN";
+  if (primaryType && !generic_url && hasLocator && input.verified_at) level = "PRIMARY_EXACT";
+  else if (primaryType && generic_url) level = "PRIMARY_GENERAL";
+  else if (primaryType) level = "PRIMARY_GENERAL";
+  else if (regulatory && !generic_url && hasLocator) level = "REGULATORY_EXACT";
+  else if (input.source_type === "PRIMARY_DATABASE" && input.locator?.dataset && !generic_url) {
+    level = "TRUSTED_DATASET_EXACT";
+  } else if (input.source_type === "TRUSTED_THIRD_PARTY") level = "TRUSTED_THIRD_PARTY";
+  else if (input.verification_method === "CROSS_SOURCE") level = "CROSS_SOURCE_CONFIRMED";
+  else if (input.verification_method === "HEURISTIC") level = "DERIVED_HEURISTIC";
+  else if (input.source_type === "THIRD_PARTY") level = "TRUSTED_THIRD_PARTY";
+  else level = "UNKNOWN";
+
+  if (generic_url) warnings.push("source_url is a generic domain/support root — not PRIMARY_EXACT");
+  if (!hasLocator) warnings.push("no document/dataset locator");
+  if (!input.verified_at && level === "PRIMARY_EXACT") missing.push("verified_at");
+
+  const verified_primary = level === "PRIMARY_EXACT" || level === "REGULATORY_EXACT";
+  const evidence_score =
+    (verified_primary ? 70 : level === "TRUSTED_DATASET_EXACT" ? 55 : level === "PRIMARY_GENERAL" ? 25 : 15) +
+    (hasLocator ? 15 : 0) +
+    (generic_url ? -20 : 10);
+  return {
+    valid: missing.length === 0 && level !== "UNKNOWN" && level !== "AI_INFERRED",
+    level,
+    verified_primary,
+    missing_fields: missing,
+    warnings,
+    evidence_score: Math.max(0, Math.min(100, evidence_score)),
+    generic_url,
+  };
+}
+
+export function agreementStatus(observations: FactObservation[]): AgreementStatus {
+  if (observations.length === 0) return "UNVERIFIED";
+  const values = new Set(observations.map((o) => o.value));
+  if (observations.length === 1) return "SINGLE_SOURCE";
+  if (values.size === 1) return "MULTI_SOURCE_CONFIRMED";
+  return "MULTI_SOURCE_CONFLICT";
+}
+
+export function canonicalizeFact(observations: FactObservation[]): CanonicalFact {
+  if (!observations.length) {
+    return { entity_id: "", field: "", observations, status: "UNRESOLVED", resolution: "NONE" };
+  }
+  const status = agreementStatus(observations);
+  if (status === "MULTI_SOURCE_CONFLICT") {
+    return {
+      entity_id: observations[0].entity_id,
+      field: observations[0].field,
+      observations,
+      status: "CONFLICTED",
+      resolution: "NONE",
+    };
+  }
+  if (status === "MULTI_SOURCE_CONFIRMED") {
+    return {
+      entity_id: observations[0].entity_id,
+      field: observations[0].field,
+      observations,
+      status: "CONFIRMED",
+      selectedValue: observations[0].value,
+      resolution: "EXPLICIT",
+    };
+  }
+  return {
+    entity_id: observations[0].entity_id,
+    field: observations[0].field,
+    observations,
+    status: observations[0].provenance.verification_method === "HEURISTIC" ? "ESTIMATED" : "UNRESOLVED",
+    selectedValue: observations[0].value,
+    resolution: "NONE",
+  };
+}

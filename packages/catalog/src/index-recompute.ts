@@ -6,10 +6,13 @@ import {
   outputSimilarity,
   structuredSimilarity,
   densityRequired,
+  climateDeltaVsAdjacent,
+  countVerifiedExact,
+  detectProductAction,
   type PageQualityInput,
   type SearchDemandEvidence,
 } from "@penta/quality-gate";
-import { isFresh } from "@penta/data-provenance";
+import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data-provenance";
 
 export type NeighborRow = {
   url: string;
@@ -21,8 +24,6 @@ export type NeighborRow = {
 };
 
 function demandEvidence(page: PageRecord): SearchDemandEvidence {
-  // PageRecord.search_demand is already the output of searchDemandScore().
-  // Passing that number back as seed_research would apply the 0.4 editorial cap twice.
   return { seed_research: Math.min(100, Math.round(page.search_demand / 0.4)) };
 }
 
@@ -39,10 +40,10 @@ export function nearestNeighbors(store: GraphStore, page: PageRecord, n = 5): Ne
       const intent = sameIntent ? Math.max(0.9, structured) : page.family === other.family ? structured : 0.2;
       const output = outputSimilarity(page.structured_payload, other.structured_payload);
       const factsA = new Set(Object.keys(page.structured_payload));
-      const factsB = new Set(Object.keys(other.structured_payload));
-      const unique_facts = [...factsA].filter((k) => JSON.stringify(page.structured_payload[k]) !== JSON.stringify(other.structured_payload[k]));
+      const unique_facts = [...factsA].filter(
+        (k) => JSON.stringify(page.structured_payload[k]) !== JSON.stringify(other.structured_payload[k]),
+      );
       const pass = !(structured > 0.85 && sameIntent && output >= 0.8 && unique_facts.length < 2);
-      void factsB;
       return { url: other.url, structured, intent, output, unique_facts, pass };
     })
     .sort((a, b) => b.structured + b.intent - (a.structured + a.intent))
@@ -78,11 +79,70 @@ function staleCurrent(store: GraphStore, page: PageRecord): boolean {
   });
 }
 
+function parentPage(store: GraphStore, page: PageRecord): PageRecord | undefined {
+  if (page.family === "wear-month") {
+    const slug = String(page.structured_payload.slug ?? "");
+    return [...store.pages.values()].find(
+      (p) =>
+        p.site === "wearthere" &&
+        p.family === "destination-hub" &&
+        (p.structured_payload.slug === slug || p.url === `/wearthere/${slug}`),
+    );
+  }
+  if (page.family === "can-charger-charge") {
+    const device = String(page.structured_payload.device ?? "");
+    return [...store.pages.values()].find((p) => p.url === `/chargematch/${device}`);
+  }
+  if (page.family === "error-code") {
+    const brand = String(page.structured_payload.brand ?? "").toLowerCase();
+    const appliance = String(page.structured_payload.appliance ?? "").toLowerCase();
+    return [...store.pages.values()].find((p) => p.family === "appliance-hub" && p.url.endsWith(`/${brand}/${appliance}`));
+  }
+  return undefined;
+}
+
 function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: NeighborRow | undefined): PageQualityInput {
   const ents = page.entity_ids.map((id) => store.get(id)).filter(Boolean);
   const rels = pageRelations(store, page);
   const decision = rels.filter((r) => classifyRelation(r) === "DECISION_RELEVANT");
-  const provenance_valid = ents.some((e) => (e?.provenance.length ?? 0) > 0) || rels.some((r) => r.provenance.length > 0);
+  const parent = parentPage(store, page);
+  const action = detectProductAction(page.family, page.structured_payload);
+  const urls = [
+    ...ents.flatMap((e) => e!.provenance.map((p) => p.source_url)),
+    ...rels.flatMap((r) => r.provenance.map((p) => p.source_url)),
+  ].filter((u): u is string => Boolean(u));
+  const exactUrls = urls.filter((u) => !isGenericSourceUrl(u));
+  const verifiedExact = countVerifiedExact(rels);
+  const provenance_valid =
+    exactUrls.length > 0 ||
+    verifiedExact > 0 ||
+    rels.some((r) => {
+      const rec = r.provenance[0];
+      if (!rec) return false;
+      const v = validateFactProvenance({
+        source_type: rec.source_type,
+        source_url: rec.source_url,
+        source_name: rec.source_name,
+        retrieved_at: rec.retrieved_at,
+        verified_at: rec.verified_at,
+        verification_method: rec.verification_method,
+        inferred: r.inferred,
+      });
+      return v.valid && v.level !== "PRIMARY_GENERAL" && v.level !== "UNKNOWN";
+    }) ||
+    ents.some((e) =>
+      e!.provenance.some((p) => {
+        const v = validateFactProvenance({
+          source_type: p.source_type,
+          source_url: p.source_url,
+          source_name: p.source_name,
+          retrieved_at: p.retrieved_at,
+          verified_at: p.verified_at,
+          verification_method: p.verification_method,
+        });
+        return v.level !== "UNKNOWN" && !v.generic_url;
+      }),
+    );
   const aiAsOfficial = [...ents, ...rels].some((row) =>
     row!.provenance.some((p) => p.source_type === "AI_INFERRED" && (p.notes ?? "").toLowerCase().includes("official")),
   );
@@ -95,36 +155,28 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     ...Object.keys(page.structured_payload),
     ...ents.flatMap((e) => Object.keys(e!.properties)),
   ]).size;
-  const requiredTotal = page.family === "error-code" ? 9 : 8;
-  const requiredPresent = Math.min(requiredTotal, unique);
-  const product_action =
-    page.family === "error-code" ||
-    page.family === "symptom" ||
-    page.family.includes("oil") ||
-    page.family === "vehicle-hub" ||
-    page.family === "wear-month" ||
-    page.family === "packing-month" ||
-    page.family === "can-charger-charge" ||
-    page.family.startsWith("route") ||
-    page.family === "device-wattage" ||
-    page.family === "device-hub" ||
-    page.family === "maintenance-schedule" ||
-    page.family === "tyre-pressure" ||
-    page.family === "battery" ||
-    page.family === "common-problems" ||
-    page.family === "recalls" ||
-    page.family === "appliance-hub";
+  const wearSiblings =
+    page.site === "wearthere" && page.family === "wear-month"
+      ? [...store.pages.values()].filter((p) => p.site === "wearthere" && p.family === "wear-month")
+      : [];
+  const climate = wearSiblings.length ? climateDeltaVsAdjacent(page, wearSiblings) : undefined;
 
   return {
     site: page.site,
     family: page.family,
+    page_id: page.id,
+    title: page.title,
+    structured_payload: page.structured_payload,
+    parent_id: parent?.id,
+    parent_payload: parent?.structured_payload,
     unique_fields: unique,
-    required_fields_present: requiredPresent,
-    required_fields_total: requiredTotal,
+    required_fields_present: 0,
+    required_fields_total: 1,
     search_demand: demandEvidence(page),
-    product_cta: product_action,
-    interactive: product_action,
-    distinct_from_parent: true,
+    product_cta: action.present,
+    interactive: action.present,
+    product_action: action.present,
+    distinct_from_parent: false,
     near_duplicate: neighbor ? !neighbor.pass : false,
     year_only_variant: false,
     city_without_specifics: page.site === "wearthere" && !page.structured_payload.tmin_c && page.family === "wear-month",
@@ -134,7 +186,12 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     freshness_days,
     freshness_ttl_days: page.site === "tripcost" ? 30 : 365,
     provenance_valid,
-    distinct_reason: String(page.structured_payload.distinct_reason ?? page.id),
+    provenance_urls: urls,
+    distinct_reason:
+      typeof page.structured_payload.distinct_reason === "string" &&
+      page.structured_payload.distinct_reason !== page.id
+        ? String(page.structured_payload.distinct_reason)
+        : undefined,
     stale_presented_as_current: staleCurrent(store, page),
     unresolved_critical_conflict: conflict,
     ai_inferred_as_official: aiAsOfficial,
@@ -144,14 +201,11 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     depends_on_self_declared_score: false,
     http_viable: page.url.startsWith("/") && page.canonical === page.url,
     sitemap_robots_ok: page.canonical === page.url,
-    product_action,
     sibling_structured_similarity: neighbor?.structured,
     same_intent_sibling: neighbor ? neighbor.intent >= 0.9 : false,
     same_decision_output: neighbor ? neighbor.output >= 0.8 : false,
     density_ok: densityOk(store, page),
-    verified_fact_count: ents.filter((e) =>
-      e!.provenance.some((p) => ["OFFICIAL", "MANUFACTURER", "REGULATORY", "TESTED"].includes(p.source_type)),
-    ).length + decision.filter((r) => !r.inferred).length,
+    verified_fact_count: verifiedExact,
     decision_relation_count: decision.length,
     canonical_self_valid: page.canonical === page.url && Boolean(page.canonical),
     forecast_as_climate: page.structured_payload.kind === "FORECAST" && page.family === "wear-month",
@@ -161,7 +215,15 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
       !page.structured_payload.engine &&
       !page.structured_payload.vehicle,
     hub_necessity: page.family.includes("hub"),
+    wearthere_climate_delta_c: climate?.climate_delta_c,
+    wearthere_rain_delta: climate?.rain_delta,
   };
+}
+
+function publishState(state: IndexState): PageRecord["publish_state"] {
+  if (state === "INDEXABLE") return "PUBLISHED";
+  if (state === "SEO_CANDIDATE") return "READY";
+  return "DRAFT";
 }
 
 export function applyIndexGates(store: GraphStore): void {
@@ -178,20 +240,22 @@ export function applyIndexGates(store: GraphStore): void {
     page.quality_score = result.score;
     page.index_state = state;
     page.noindex = state !== "INDEXABLE";
-    page.publish_state = state === "INDEXABLE" ? "PUBLISHED" : "DRAFT";
+    page.publish_state = publishState(state);
     page.structured_payload = {
       ...page.structured_payload,
       quality_why: result.why,
       nearest_sibling: neighbors[0]?.url ?? null,
       neighbor_structured: neighbors[0]?.structured ?? null,
       hard_blockers: result.blockers,
+      gate_evidence: result.gate_evidence,
+      axes: result.axes,
     };
   }
 }
 
 export function similarityReport(store: GraphStore) {
   return [...store.pages.values()]
-    .filter((page) => page.index_state === "INDEXABLE" || page.structured_payload.nearest_sibling)
+    .filter((page) => page.index_state === "INDEXABLE" || page.index_state === "SEO_CANDIDATE" || page.structured_payload.nearest_sibling)
     .map((page) => {
       const neighbors = nearestNeighbors(store, page, 5);
       const nearest = neighbors[0];

@@ -7,6 +7,41 @@ export type Place = { id: string; name: string; slug: string; country: string };
 
 export type ModeId = "car" | "ev" | "train" | "bus" | "flight" | "rideshare";
 
+export const PRICE_KINDS = [
+  "OBSERVED_PRICE",
+  "CURRENT_PROVIDER_PRICE",
+  "HISTORICAL_PRICE",
+  "ESTIMATED_PRICE",
+  "HEURISTIC_PRICE",
+] as const;
+export type PriceKind = (typeof PRICE_KINDS)[number];
+
+export type CostBreakdown = {
+  base_transport: number;
+  fuel: number;
+  tolls: number;
+  parking: number;
+  tickets: number;
+  fees: number;
+  transfers: number;
+  local_transport: number;
+  time_cost: number;
+  door_to_door: number;
+};
+
+export type PriceSnapshot = {
+  source: string;
+  observed_at: string;
+  valid_from?: string;
+  valid_to?: string | null;
+  currency: "EUR";
+  party_size: number;
+  booking_window?: string;
+  constraints?: string[];
+  price_kind: PriceKind;
+  live_fare: false;
+};
+
 export type ModeQuote = {
   mode: ModeId;
   cash_eur: number;
@@ -22,6 +57,10 @@ export type ModeQuote = {
   stale: boolean;
   currency: "EUR";
   source_id: string;
+  price_kind: PriceKind;
+  live_fare: false;
+  cost_breakdown?: CostBreakdown;
+  snapshot?: PriceSnapshot;
 };
 
 export type RouteRecord = {
@@ -300,6 +339,19 @@ export function compareRoute(
     stale: PRICE_PROVENANCE.valid_until ? new Date(PRICE_PROVENANCE.valid_until).getTime() < now.getTime() : false,
     currency: "EUR" as const,
     source_id: PRICE_PROVENANCE.source_id,
+    price_kind: "HEURISTIC_PRICE" as const,
+    live_fare: false as const,
+    snapshot: {
+      source: PRICE_PROVENANCE.source_id,
+      observed_at: PRICE_PROVENANCE.retrieved_at,
+      valid_from: PRICE_PROVENANCE.retrieved_at,
+      valid_to: PRICE_PROVENANCE.valid_until,
+      currency: "EUR" as const,
+      party_size: travellers,
+      price_kind: "HEURISTIC_PRICE" as const,
+      live_fare: false as const,
+      constraints: ["seed snapshot — not a live GDS fare"],
+    },
   };
 
   const allModes: ModeQuote[] = [
@@ -320,6 +372,18 @@ export function compareRoute(
       confidence: "MEDIUM",
       available: true,
       ...priceMeta,
+      cost_breakdown: {
+        base_transport: 0,
+        fuel: round(fuel),
+        tolls: route.tolls_eur,
+        parking: route.parking_eur,
+        tickets: 0,
+        fees: 0,
+        transfers: 0,
+        local_transport: 0,
+        time_cost: 0,
+        door_to_door: round(carCash),
+      },
     },
     {
       mode: "ev",

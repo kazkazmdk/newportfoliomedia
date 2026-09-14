@@ -1,6 +1,6 @@
 # Deep graph baseline
 
-Generated: 2026-09-14T09:59:51.167Z
+Generated: 2026-09-14T12:46:21.756Z
 
 Recalculated from in-memory GraphStore after populateDecisionGraph + page builders. Stored README/JSON reports were not read. quality_score comes from evaluatePageQuality at page-build/recompute time, not from a previous markdown.
 

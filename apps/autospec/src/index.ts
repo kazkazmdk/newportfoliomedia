@@ -1,4 +1,4 @@
-export { VEHICLES, MockVinProvider, fitmentStatus } from "./data";
+export { VEHICLES, MockVinProvider, VIN_SUPPORT, fitmentStatus } from "./data";
 export {
   allAutospecPages,
   assistantAnswer,
