@@ -19,7 +19,9 @@ Une app Next.js (`apps/web`) expose les cinq identités visuelles, l’admin int
 ```bash
 pnpm install
 pnpm test
-pnpm deep-qa   # régénère docs/DEEP_GRAPH_QA.md
+pnpm graph:audit    # recalcule les métriques → docs/DEEP_GRAPH_BASELINE.md
+pnpm graph:health   # tableau entités / relations / INDEX
+pnpm deep-qa        # rapport QA (ne pas traiter un markdown précédent comme source)
 pnpm dev
 ```
 
@@ -49,7 +51,7 @@ Hard gates first, then a soft score (max 100). A page with 95/100 still fails if
 
 Hard gates: unique structured data, valid provenance, no critical unknown demand (unless hub necessity), not an unexplained duplicate, valid family, no invented LLM claims, no LLM safety claim, no year-only variant, not city-without-specifics, not obscure-without-demand, climate ≠ forecast, not stale-as-current, engine determined (AutoSpec), causes sourced (FixCode).
 
-Soft score dimensions (max 100): verified facts 18, product utility 16, decision relations 14, demand 12 (editorial seed capped at 40 and labeled EDITORIAL_JUDGMENT), confidence 12, completeness 10, unique structured fields 8, differentiation 6, freshness 4. Word count, title uniqueness, and internal link count are ignored. Editorial scores are capped at 84. INDEXABLE if all hard gates pass and score ≥ 75.
+Soft score (max 100): intent 15, unique structured 15, decision utility 20, graph depth 15, provenance 15, completeness 10, differentiation 5, freshness 5. Word count / title uniqueness / link count are ignored. Editorial demand is capped; total editorial scores cap at 84. INDEXABLE only if **all** hard gates pass **and** score ≥ **80**. A 99 soft score cannot override a failed hard gate.
 
 - `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex (meta, X-Robots-Tag, robots.txt, empty sitemap).
 - `NOINDEX_PRODUCT` / product-only tools (garage, trip, kit) stay private.

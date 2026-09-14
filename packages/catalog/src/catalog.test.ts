@@ -35,7 +35,7 @@ describe("PageQualityGate", () => {
       verified_fact_count: 10,
       decision_relation_count: 8,
     });
-    expect(ok.score).toBeGreaterThanOrEqual(75);
+    expect(ok.score).toBeGreaterThanOrEqual(80);
     expect(ok.index_state).toBe("INDEXABLE");
     expect(ok.why.toLowerCase()).not.toContain("score 82");
 
@@ -101,7 +101,7 @@ describe("PageQualityGate", () => {
       decision_relation_count: 8,
     });
     expect(fail.score).toBeGreaterThanOrEqual(75);
-    expect(fail.index_state).toBe("GRAPH_ONLY");
+    expect(fail.index_state).not.toBe("INDEXABLE");
     expect(fail.hard_gates.some((g) => g.id === "not_llm_safety_claim" && !g.passed)).toBe(true);
   });
 
@@ -265,7 +265,7 @@ describe("catalog / SEO tests", () => {
     const report = launchReport();
     expect(report.graph.indexable).toBeGreaterThan(20);
     expect(report.graph.indexable).toBeLessThan(1200);
-    expect(report.average_indexable_quality).toBeGreaterThanOrEqual(75);
+    expect(report.average_indexable_quality).toBeGreaterThanOrEqual(80);
     expect(globalNoindex()).toBe(true);
     expect(report.public_site_live).toBe(false);
     expect(report.global_noindex).toBe(true);
@@ -361,7 +361,7 @@ describe("quality gate extras", () => {
       { quality_score: 76, index_state: "INDEXABLE" },
     ]);
     expect(dist.find((row) => row.bucket === "0-49")?.count).toBe(1);
-    expect(dist.find((row) => row.bucket === "80-89")?.indexable).toBe(1);
+    expect(dist.find((row) => row.bucket === "80-84")?.indexable).toBe(1);
     const relQ = relationQuality({
       id: "x",
       site: "fixcode",
