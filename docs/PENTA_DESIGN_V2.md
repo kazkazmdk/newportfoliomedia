@@ -46,4 +46,4 @@ None of these are a clean 9. A 9 would need named Unsplash photographers, offici
 - Wardrobe is a coherent SVG system, not licensed cutout photography.
 - ChargeMatch has no official SKU photography.
 - TripCost land mass is reduced, not Natural Earth geometry.
-- Screenshot QA set is regenerated after this pass.
+- Screenshot QA: 31 local captures in `docs/design-qa-v2/` (1440×1000, 1440×1600, 390×844).

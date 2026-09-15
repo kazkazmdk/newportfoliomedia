@@ -42,6 +42,35 @@ export function geodesic(a: { x: number; y: number }, b: { x: number; y: number 
   return `M${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`;
 }
 
-/** Reduced Europe land — decorative coastline, cities stay on real coordinates. */
-export const EUROPE_LAND =
-  "M 210 70 L 250 78 L 268 62 L 310 70 L 340 58 L 390 80 L 430 70 L 470 90 L 510 110 L 560 130 L 620 160 L 680 210 L 700 270 L 690 330 L 640 380 L 600 430 L 540 470 L 480 510 L 420 540 L 360 560 L 300 540 L 250 500 L 200 470 L 150 430 L 110 380 L 80 320 L 90 260 L 70 210 L 90 160 L 140 120 L 180 90 Z";
+const COAST: Array<[number, number]> = [
+  [37.0, -8.9],
+  [38.7, -9.4],
+  [43.3, -9.0],
+  [48.4, -4.8],
+  [51.7, -10.2],
+  [55.3, -7.3],
+  [58.6, -5.2],
+  [55.0, -1.5],
+  [53.0, 1.4],
+  [51.2, 3.8],
+  [53.5, 6.8],
+  [57.7, 8.5],
+  [54.8, 13.2],
+  [54.4, 16.4],
+  [49.0, 16.2],
+  [45.4, 13.7],
+  [41.9, 16.0],
+  [38.1, 15.5],
+  [37.5, 12.5],
+  [43.3, 10.0],
+  [43.7, 7.3],
+  [41.4, 2.2],
+  [36.7, -2.5],
+  [36.2, -5.6],
+  [37.0, -8.9],
+];
+
+export const EUROPE_LAND = COAST.map(([lat, lon], i) => {
+  const p = project(lat, lon);
+  return `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+}).join(" ") + " Z";

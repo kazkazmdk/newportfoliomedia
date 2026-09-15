@@ -256,6 +256,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   fill: var(--fc-mute);
+  stroke: none;
 }
 
 .fc-callout.is-hot { fill: var(--fc-signal); }
