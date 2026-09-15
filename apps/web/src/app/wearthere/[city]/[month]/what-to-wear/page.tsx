@@ -4,7 +4,6 @@ import {
   DESTINATIONS,
   allWeartherePages,
   capsuleFor,
-  climateModelOf,
   destinationSurfaces,
   resolveWearPeriod,
 } from "@penta/wearthere";
@@ -42,7 +41,6 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
   if (!resolved) notFound();
   const w = resolved.climate;
   const cap = capsuleFor(dest, resolved.representativeMonth, "classic");
-  const model = climateModelOf(dest);
   const skip = cap.pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.name);
   const label = resolved.surface.label;
   const mood = climateMood(w, dest.slug);
