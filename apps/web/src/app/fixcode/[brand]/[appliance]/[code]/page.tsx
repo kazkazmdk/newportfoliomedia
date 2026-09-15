@@ -5,7 +5,7 @@ import { allFixcodePages } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
 import { ViewportScene } from "@/components/creative";
-import { CheckDiagram, checkKindFromText } from "../../../components/machine-visual";
+import { CheckDiagram, checkKindFromText } from "../../../components/machine-diagrams";
 import { ErrorHero } from "../../../components/error-hero";
 
 export function generateStaticParams() {
