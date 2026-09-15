@@ -28,7 +28,8 @@
     "seo:audit": "tsx scripts/seo-audit.ts",
     "sitemap:audit": "tsx scripts/sitemap-audit.ts",
     "state": "tsx scripts/penta-state.ts",
-    "state:check": "tsx scripts/penta-state.ts --check"
+    "state:check": "tsx scripts/penta-state.ts --check",
+    "vercel:previews": "node scripts/create-penta-vercel-projects.mjs"
   },
   "dependencies": {
     "@penta/catalog": "workspace:*",
