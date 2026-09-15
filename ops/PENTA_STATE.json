@@ -1,6 +1,6 @@
 {
-  "sha": "b12f49645545f066407f8122dd44bd5a46938643",
-  "generatedAt": "2026-09-15T11:46:18.512Z",
+  "sha": "a940001d68fb7881e7c4f1ed3a89864ddd5f5ef3",
+  "generatedAt": "2026-09-15T11:46:34.631Z",
   "pages": 806,
   "entities": 5512,
   "relations": 14047,
@@ -135,5 +135,5 @@
       "value": 0.0643
     }
   ],
-  "hash": "3e0dc816203f3f42"
+  "hash": "b9764f20f76a7c4b"
 }
