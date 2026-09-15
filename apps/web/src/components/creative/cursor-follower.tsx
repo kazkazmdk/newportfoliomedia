@@ -12,16 +12,16 @@ export function CursorFollower({
 }) {
   const fine = useFinePointer();
   const reduced = useReducedMotion();
-  const [pos, setPos] = useState({ x: -80, y: -80 });
+  const [pos, setPos] = useState({ x: -80, y: -80, seen: false });
 
   useEffect(() => {
     if (!fine || reduced) return;
-    const move = (event: PointerEvent) => setPos({ x: event.clientX, y: event.clientY });
+    const move = (event: PointerEvent) => setPos({ x: event.clientX, y: event.clientY, seen: true });
     window.addEventListener("pointermove", move);
     return () => window.removeEventListener("pointermove", move);
   }, [fine, reduced]);
 
-  if (!fine || reduced) return null;
+  if (!fine || reduced || !pos.seen) return null;
 
   return (
     <div

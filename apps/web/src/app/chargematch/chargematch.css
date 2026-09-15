@@ -84,8 +84,13 @@
 .cm-hero {
   min-height: calc(100svh - 4.2rem);
   display: grid;
-  padding: 2rem 1.2rem 2.5rem;
+  padding: 1.4rem 1.2rem 2rem;
   align-content: center;
+  background:
+    linear-gradient(#c9c8c0 1px, transparent 1px),
+    linear-gradient(90deg, #c9c8c0 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-color: var(--cm-paper);
 }
 
 .cm-connect {
@@ -102,8 +107,9 @@
 
 .cm-node {
   border: 1px solid var(--cm-ink);
-  padding: 1.3rem;
-  min-height: 12rem;
+  padding: 1.5rem 1.4rem;
+  min-height: 14rem;
+  background: #f7f6f1;
 }
 
 .cm-cable {

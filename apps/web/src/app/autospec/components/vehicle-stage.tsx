@@ -9,16 +9,17 @@ export function VehicleStage({ focus = "body" }: { focus?: (typeof ZONES)[number
   return (
     <div className="as-stage">
       <svg className="as-car" viewBox="0 0 640 240" role="img" aria-label="Vehicle silhouette">
-        <path d="M86 150 H120 C150 150 168 96 210 92 H410 C460 92 486 128 522 140 H574 V168 H86 Z" />
-        <path d="M210 92 L236 58 H392 L430 92" />
-        <path d="M250 58 V92 M360 58 V92" />
-        <circle className={zone === "tyres" ? "hot" : ""} cx="176" cy="168" r="28" />
-        <circle cx="176" cy="168" r="12" />
-        <circle className={zone === "tyres" ? "hot" : ""} cx="500" cy="168" r="28" />
-        <circle cx="500" cy="168" r="12" />
-        <rect className={zone === "engine" ? "hot" : ""} x="132" y="108" width="62" height="28" />
-        <rect className={zone === "battery" ? "hot" : ""} x="300" y="150" width="46" height="16" />
-        <path className={zone === "service" ? "hot" : ""} d="M300 70 H360" />
+        <path d="M70 168 H112 C132 168 148 118 188 108 C214 72 248 58 292 56 H404 C458 56 492 78 524 112 C556 120 580 138 592 154 V176 H70 Z" />
+        <path d="M214 108 C236 78 260 62 292 60 H390 C430 62 456 82 478 108" />
+        <path d="M292 60 V108 M390 62 V108 M248 108 H470" />
+        <circle className={zone === "tyres" ? "hot" : ""} cx="176" cy="176" r="26" />
+        <circle cx="176" cy="176" r="11" />
+        <circle className={zone === "tyres" ? "hot" : ""} cx="500" cy="176" r="26" />
+        <circle cx="500" cy="176" r="11" />
+        <rect className={zone === "engine" ? "hot" : ""} x="124" y="122" width="58" height="26" />
+        <rect className={zone === "battery" ? "hot" : ""} x="318" y="154" width="44" height="14" />
+        <path className={zone === "service" ? "hot" : ""} d="M318 78 H392" />
+        <path d="M70 168 H592" />
       </svg>
       <div className="mt-6 flex flex-wrap gap-3">
         {ZONES.filter((z) => z !== "body").map((z) => (

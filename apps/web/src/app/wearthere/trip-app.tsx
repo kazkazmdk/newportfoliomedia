@@ -38,8 +38,8 @@ export function TripApp() {
   }, [dest, start, end, daysAhead]);
 
   useEffect(() => {
-    if (capsule) setMood(climateMood(capsule.weather));
-  }, [capsule, setMood]);
+    if (capsule && dest) setMood(climateMood(capsule.weather, dest.slug));
+  }, [capsule, dest, setMood]);
 
   if (!dest || !capsule) return <p className="wt-scene">Unknown destination in this batch.</p>;
   const air = airlineFit(capsule.volume_l, capsule.weight_kg, AIRLINES[0]);

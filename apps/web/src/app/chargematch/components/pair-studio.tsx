@@ -32,7 +32,10 @@ export function PairStudio({
     <div>
       <section className="cm-hero">
         <p className="cm-mono text-[11px] uppercase tracking-[0.2em]">{result.tag.replaceAll("_", " ")}</p>
-        <h1 className="mt-3 text-5xl">{result.match.replaceAll("_", " ")}</h1>
+        <div className="mt-3 flex flex-wrap items-end gap-6">
+          <h1 className="text-5xl">{result.match.replaceAll("_", " ")}</h1>
+          <p className="cm-mono text-6xl">{chain.watts}W</p>
+        </div>
         <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--cm-mute)]">{result.safety_note}</p>
         <div className="cm-connect mt-10">
           <div className="cm-node">

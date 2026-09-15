@@ -27,13 +27,16 @@ export function MachineVisual({
     <div className="fc-machine" role="img" aria-label={`${appliance} schematic`}>
       <svg viewBox="0 0 320 360" fill="none">
         <rect className={`fc-part ${hot("door")}`} x="48" y="28" width="224" height="292" rx="10" />
-        <rect className={`fc-part ${hot("door")}`} x="78" y="58" width="164" height="164" rx="82" />
-        <circle className={`fc-part ${hot("motor")}`} cx="160" cy="140" r="46" />
-        <circle className={`fc-part ${hot("motor")}`} cx="160" cy="140" r="18" />
-        <path className={`fc-part ${hot("inlet")}`} d="M48 78 H18 V58 H48" />
-        <path className={`fc-part ${hot("pump")}`} d="M160 246 V292 H92 V268 H128" />
-        <rect className={`fc-part ${hot("heater")}`} x="188" y="252" width="62" height="18" />
-        <circle className={`fc-part ${hot("sensor")}`} cx="232" cy="118" r="6" />
+        <rect className={`fc-part ${hot("door")}`} x="70" y="44" width="180" height="28" />
+        <rect className={`fc-part ${hot("door")}`} x="78" y="86" width="164" height="164" rx="82" />
+        <circle className={`fc-part ${hot("motor")}`} cx="160" cy="168" r="52" />
+        <circle className={`fc-part ${hot("motor")}`} cx="160" cy="168" r="28" />
+        <circle className={`fc-part ${hot("motor")}`} cx="160" cy="168" r="8" />
+        <path className={`fc-part ${hot("inlet")}`} d="M48 70 H12 V46 H48" />
+        <path className={`fc-part ${hot("inlet")}`} d="M12 46 H4" />
+        <path className={`fc-part ${hot("pump")}`} d="M160 268 V304 H80 V276 H118 V268" />
+        <rect className={`fc-part ${hot("heater")}`} x="188" y="268" width="70" height="16" />
+        <circle className={`fc-part ${hot("sensor")}`} cx="228" cy="128" r="7" />
         <text className={`fc-callout ${hot("inlet")}`} x="8" y="52">
           inlet
         </text>

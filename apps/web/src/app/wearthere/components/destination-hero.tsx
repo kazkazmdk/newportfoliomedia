@@ -20,7 +20,7 @@ export function DestinationHero({
   const dest = DESTINATIONS.find((d) => d.slug === city) ?? DESTINATIONS[0];
   const month = Number(start.slice(5, 7)) || 11;
   const weather = useMemo(() => typicalWeather(dest, month), [dest, month]);
-  const mood = climateMood(weather);
+  const mood = climateMood(weather, dest.slug);
   const { setMood } = useClimateMood();
   useEffect(() => {
     setMood(mood);

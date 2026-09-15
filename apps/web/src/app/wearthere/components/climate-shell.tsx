@@ -11,6 +11,6 @@ export function ClimateShell({ children }: { children: ReactNode }) {
   const slug = pathname.split("/")[2];
   const dest = DESTINATIONS.find((d) => d.slug === slug) ?? DESTINATIONS.find((d) => d.slug === "tokyo") ?? DESTINATIONS[0];
   const month = new Date().getUTCMonth() + 1;
-  const mood = climateMood(typicalWeather(dest, month));
+  const mood = climateMood(typicalWeather(dest, month), dest.slug);
   return <ClimateProvider initial={mood}>{children}</ClimateProvider>;
 }

@@ -63,14 +63,15 @@
 
 .tc-map {
   position: relative;
-  min-height: 28rem;
+  min-height: 36rem;
   background:
-    radial-gradient(circle at 20% 30%, #c9d4de, transparent 36%),
-    linear-gradient(#c5ced8, #d7dee6);
+    radial-gradient(circle at 18% 22%, #c3d0dc, transparent 34%),
+    radial-gradient(circle at 78% 70%, #c9d3dc, transparent 30%),
+    linear-gradient(#c2ccd6, #d7dee6);
   overflow: hidden;
 }
 
-.tc-map svg { width: 100%; height: min(64vh, 560px); }
+.tc-map svg { width: 100%; height: min(78vh, 720px); }
 
 .tc-city { fill: var(--tc-ink); }
 .tc-path { fill: none; stroke: var(--tc-route); stroke-width: 1.6; stroke-dasharray: 6 5; animation: tc-dash 18s linear infinite; }

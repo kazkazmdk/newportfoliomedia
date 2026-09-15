@@ -31,7 +31,7 @@ export default async function CityHub({ params }: { params: Promise<{ city: stri
   const surfaces = destinationSurfaces(dest);
   const weather = typicalWeather(dest, dest.climate[0]?.month ?? 1);
   const cap = capsuleFor(dest, dest.climate[0]?.month ?? 1, "classic");
-  const mood = climateMood(weather);
+  const mood = climateMood(weather, dest.slug);
   return (
     <main>
       <DestinationHero initialCity={dest.slug} />
