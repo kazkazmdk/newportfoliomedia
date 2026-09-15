@@ -164,7 +164,9 @@ This is the **only** current source of truth for live metrics. Older reports in 
 
 ## Source depth (this pass)
 
-- FixCode exact OEM locators attached: **${exactFixcode}** error pages
+- exact OEM pages: **${exactFixcode}**
+- exact source documents: **4** (Samsung washer table, Samsung 4E article, LG washer list, Bosch E15)
+- PRIMARY_EXACT graph facts: **${snapshot.PRIMARY_EXACT}** (projections, not independent OEM documents)
 - WearThere climate: compiled in-repo normals classified as **DATASET_GENERAL**, not TRUSTED_DATASET_EXACT
 - WearThere surfaces after consolidation: **${wearSurfaces}** season/month pages + city hubs
 - AutoSpec EXACT facts (oil/tyre/battery scopes): **${autospecExact}**

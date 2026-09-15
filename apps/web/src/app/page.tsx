@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { launchReport } from "@penta/catalog";
+import { previewProduct } from "@/lib/preview-product";
 
 const PRODUCTS = [
   {
@@ -45,6 +47,8 @@ const PRODUCTS = [
 ];
 
 export default function HubPage() {
+  const preview = previewProduct();
+  if (preview) redirect(`/${preview}`);
   const report = launchReport();
   return (
     <div className="min-h-screen bg-[#f3f1ea] text-[#1c1b18]">

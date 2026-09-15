@@ -55,15 +55,17 @@ export default async function TopicPage({
         <p className="uppercase tracking-[0.14em]">Fitment scope · {scope.confidence}</p>
         <p className="mt-2">
           {scope.make} {scope.model}
-          {scope.generation ? ` · ${scope.generation}` : ""}
-          {scope.engineCode ? ` · ${scope.engineCode}` : " · engine UNKNOWN"}
-          {scope.yearFrom ? ` · ${scope.yearFrom}–${scope.yearTo}` : ""}
-          {scope.market?.length ? ` · ${scope.market.join("/")}` : " · market UNKNOWN"}
-          {scope.wheelConfig ? ` · ${scope.wheelConfig}` : ""}
+          {scope.generation ? ` · generation ${scope.generation}` : ""}
+          {scope.engineCode ? ` · engine ${scope.engineCode}` : " · engine UNKNOWN"}
+          {scope.yearFrom ? ` · years ${scope.yearFrom}–${scope.yearTo}` : ""}
+          {scope.market?.length ? ` · market ${scope.market.join("/")}` : " · market UNKNOWN"}
+          {scope.trim?.length ? ` · trim ${scope.trim.join("/")}` : ""}
+          {scope.wheelConfig ? ` · wheel ${scope.wheelConfig}` : ""}
         </p>
         <p className="mt-2 text-[#6a6258]">
+          Confidence {scope.confidence} · verification UNVERIFIED. EXACT is not VERIFIED.
           Required: {scope.requiredDimensions.join(", ")}. Missing: {scope.missingDimensions.join(", ") || "none"}.
-          HIGH confidence is not VERIFIED. VIN decode is {VIN_SUPPORT}.
+          VIN decode is {VIN_SUPPORT}.
         </p>
       </aside>
       {topic === "oil" ? (

@@ -13,6 +13,7 @@ function exactOem(input: {
   section: string;
   table?: string;
   page?: string;
+  publication_date?: string;
 }): ProvenanceRecord {
   return provenance({
     source_id: `${input.brand.toLowerCase()}-oem-exact:${input.code.toLowerCase()}`,
@@ -30,7 +31,7 @@ function exactOem(input: {
       section: input.section,
       table: input.table,
       page: input.page,
-      publication_date: "2025-02-19",
+      publication_date: input.publication_date,
     },
   });
 }
@@ -41,6 +42,7 @@ const SAMSUNG_WASHER_TABLE = {
   section: "Error code table",
   table: "washing-machine-error-codes",
   page: "support-article",
+  publication_date: "2025-02-19",
 };
 
 const SAMSUNG_4E_ARTICLE = {

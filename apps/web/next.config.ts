@@ -18,6 +18,13 @@ const nextConfig: NextConfig = {
     "@penta/wearthere",
   ],
   images: { unoptimized: true },
+  async redirects() {
+    const product = (process.env.PENTA_PREVIEW_PRODUCT ?? "").trim().toLowerCase();
+    if (!["fixcode", "wearthere", "chargematch", "autospec", "tripcost"].includes(product)) {
+      return [];
+    }
+    return [{ source: "/", destination: `/${product}`, permanent: false }];
+  },
   async headers() {
     if (process.env.PUBLIC_SITE_LIVE === "true") return [];
     return [

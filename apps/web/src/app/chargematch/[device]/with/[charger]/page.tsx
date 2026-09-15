@@ -61,8 +61,8 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
           <dd className="cm-mono mt-1 text-2xl">{result.max_power ?? "—"} W</dd>
         </div>
         <div className="cm-box p-4">
-          <dt className="text-sm">Measured</dt>
-          <dd className="cm-mono mt-1 text-2xl">UNKNOWN</dd>
+          <dt className="text-sm">Lab measured</dt>
+          <dd className="cm-mono mt-1 text-2xl">NONE</dd>
         </div>
         <div className="cm-box p-4">
           <dt className="text-sm">Best port</dt>
@@ -91,8 +91,16 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
           </p>
         ) : null}
         <p className="cm-mono my-3 text-2xl">
-          {chain.watts} W {chain.powerKind.replaceAll("_", " ")} · measured UNKNOWN
+          {chain.watts} W delivered rated · {chain.powerKind.replaceAll("_", " ")}
         </p>
+        <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+          <div>device cap {chain.deviceCap}W</div>
+          <div>port cap {chain.portCap}W</div>
+          <div>protocol {chain.protocol}</div>
+          <div>cable cap {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"}</div>
+          <div>allocation cap {chain.allocationCap}W</div>
+          <div>limiting {chain.limitingComponent}</div>
+        </dl>
         <p className="cm-mono text-sm">{device.name}</p>
         <p className="cm-mono my-2 text-2xl">↓ {result.max_power ?? "?"} W</p>
         <p className="cm-mono">{charger.name}</p>

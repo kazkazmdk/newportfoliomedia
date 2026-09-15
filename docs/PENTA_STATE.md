@@ -2,9 +2,9 @@
 
 > Generated report. Do not edit by hand.
 >
-> git SHA: `df08e7743199a20a49410c6b18fa6b20a0cb9d3b`
-> generated: `2026-09-15T07:03:25.996Z`
-> metrics snapshot hash: `bdbe60f41bec1320`
+> git SHA: `b12f49645545f066407f8122dd44bd5a46938643`
+> generated: `2026-09-15T11:46:18.512Z`
+> metrics snapshot hash: `3e0dc816203f3f42`
 
 This is the **only** current source of truth for live metrics. Older reports in `docs/` are historical unless they carry this same SHA + hash.
 
@@ -42,7 +42,9 @@ This is the **only** current source of truth for live metrics. Older reports in 
 
 ## Source depth (this pass)
 
-- FixCode exact OEM locators attached: **25** error pages
+- exact OEM pages: **25**
+- exact source documents: **4** (Samsung washer table, Samsung 4E article, LG washer list, Bosch E15)
+- PRIMARY_EXACT graph facts: **379** (projections, not independent OEM documents)
 - WearThere climate: compiled in-repo normals classified as **DATASET_GENERAL**, not TRUSTED_DATASET_EXACT
 - WearThere surfaces after consolidation: **300** season/month pages + city hubs
 - AutoSpec EXACT facts (oil/tyre/battery scopes): **63**

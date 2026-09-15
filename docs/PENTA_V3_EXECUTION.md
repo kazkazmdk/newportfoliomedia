@@ -40,7 +40,7 @@ This pass did **not** rebuild the framework. It closed five structural QA defect
 
 ## Source depth
 
-- **FixCode exact OEM docs:** 25 pages. Samsung UK washer table (verified 2025-02-19) + dedicated 4E article + LG washer list + Bosch E15. HE/HC meanings aligned to the official “water temperature” row. Mismatched codes (8E, 11E, UC, dC, LC, …) stay GENERAL.
+- **FixCode exact OEM docs:** 25 pages, **4** source documents (Samsung washer table dated 2025-02-19, Samsung 4E article, LG washer list, Bosch E15). PRIMARY_EXACT graph facts (379) are projections, not 379 documents. HE/HC meanings aligned to the official “water temperature” row. Mismatched codes stay GENERAL.
 - **AutoSpec exact handbook facts:** 0. Fitment can be EXACT by required dimensions; verification stays UNVERIFIED without a page/table locator. Queue: `ops/AUTOSPEC_SOURCE_QUEUE.csv`.
 - **WearThere traceable climate records:** compiled in-repo monthly normals, now **DATASET_GENERAL**. No invented ERA5/station mapping. Consolidation applied (Singapore hub-only; temperate seasons).
 - **ChargeMatch exact manufacturer specs:** 2 verified Apple support articles (iPhone 16 tech specs, iPhone charge speeds) as PRIMARY_GENERAL. No invented MacBook URLs (false IDs rejected). MEASURED_CURVES remains `[]`.

@@ -280,6 +280,15 @@ describe("FixCode diagnostic + exact source QA", () => {
     expect(v.level).toBe("PRIMARY_EXACT");
     expect(ALL_ERRORS.filter((e) => e.provenance.some((p) => p.verified_at && p.locator && p.source_url && !p.source_url.endsWith("/support/"))).length).toBeGreaterThanOrEqual(25);
   });
+
+  it("publication_date is source-specific and not copied onto LG/Bosch", () => {
+    const samsung = getError("samsung", "washer", "4C")!.provenance[0];
+    const lg = getError("lg", "washer", "OE")!.provenance[0];
+    const bosch = getError("bosch", "dishwasher", "E15")!.provenance[0];
+    expect(samsung.locator?.publication_date).toBe("2025-02-19");
+    expect(lg.locator?.publication_date).toBeUndefined();
+    expect(bosch.locator?.publication_date).toBeUndefined();
+  });
 });
 
 describe("TripCost mixed evidence QA", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { breakEvenByTravellers, compareRoute, costLabel, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
+import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 
@@ -34,6 +34,7 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
   const train = result.modes.find((m) => m.mode === "train");
   const car = result.modes.find((m) => m.mode === "car");
   const be = train && car ? timeValueBreakEven(train, car) : null;
+  const costs = routeCosts(route);
 
   return (
     <div>
@@ -51,6 +52,12 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
       <p className="mt-4 text-sm text-[#3d4f63]">
         Cash = fuel + tolls + parking. True cost adds wear. Train/bus/flight figures are typical estimates, not current tickets.
       </p>
+      <ul className="mt-3 grid gap-1 text-xs uppercase tracking-wide text-[#3d4f63] md:grid-cols-2">
+        <li>Fuel — {costs.fuel.evidence} · {costLabel(costs.fuel.evidence)}</li>
+        <li>Tolls — {costs.tolls.evidence} · {costLabel(costs.tolls.evidence)}</li>
+        <li>Parking — {costs.parking.evidence} · {costLabel(costs.parking.evidence)}</li>
+        <li>Train — {costs.train.evidence} · {costLabel(costs.train.evidence)}</li>
+      </ul>
       <label className="mt-8 grid max-w-md gap-2 text-sm">
         Travellers
         <input type="range" min={1} max={6} value={travellers} onChange={(e) => setTravellers(Number(e.target.value))} />
