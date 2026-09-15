@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CABLES, compatibility, getCharger, getDevice, powerChain } from "@penta/chargematch";
-import { allChargematchPages } from "@penta/chargematch";
+import { CABLES, allChargematchPages, compatibility, getCharger, getDevice } from "@penta/chargematch";
 import { pageMeta } from "@/lib/seo";
-import { Feedback } from "@/components/feedback";
-import { ExpertToggle } from "./expert-toggle";
+import { PairStudio } from "../../../components/pair-studio";
 
 export function generateStaticParams() {
   return allChargematchPages()
@@ -32,98 +29,6 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
   const device = getDevice(dSlug);
   const charger = getCharger(cSlug);
   if (!device || !charger) notFound();
-  const result = compatibility(device, charger, CABLES[0]);
-  const chain = powerChain({ device, charger, cable: CABLES[0] });
-  const alloc = charger.allocations;
-  return (
-    <main>
-      <Link href={`/chargematch/${device.slug}`} className="text-sm">
-        {device.name}
-      </Link>
-      <p className="cm-mono mt-4 text-sm">{result.tag.replaceAll("_", " ")}</p>
-      <h1 className="mt-2 text-4xl md:text-5xl">{result.match}</h1>
-      <p className="mt-3 max-w-xl text-sm leading-6 text-[#555]">{result.safety_note}</p>
-      <dl className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="cm-box p-4">
-          <dt className="text-sm">Compatible</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.compatible ? "YES" : "NO"}</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Certified path</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.safe ? "YES" : "UNKNOWN"}</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Evidence</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.evidence.replaceAll("_", " ")}</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Rated max</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.max_power ?? "—"} W</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Lab measured</dt>
-          <dd className="cm-mono mt-1 text-2xl">NONE</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Best port</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.best_port}</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Cable</dt>
-          <dd className="cm-mono mt-1 text-2xl">{result.cable_ok ? "OK" : "LIMIT"}</dd>
-        </div>
-        <div className="cm-box p-4">
-          <dt className="text-sm">Bottleneck</dt>
-          <dd className="mt-1">{result.bottleneck}</dd>
-        </div>
-      </dl>
-      <section className="mt-10 cm-box p-5">
-        <p className="cm-mono text-sm">
-          Negotiated {chain.protocol} · port {chain.port} · limiter {chain.limitingComponent}
-        </p>
-        <p className="mt-2 text-sm leading-6">
-          device {chain.deviceCap}W ∩ selected-port PDO {chain.protocolCap}W ∩ port {chain.portCap}W ∩ cable{" "}
-          {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"} ∩ allocation {chain.allocationCap}W
-        </p>
-        {chain.voltage != null ? (
-          <p className="mt-2 text-sm">
-            Selected PDO {chain.voltage}V × {chain.current}A
-          </p>
-        ) : null}
-        <p className="cm-mono my-3 text-2xl">
-          {chain.watts} W delivered rated · {chain.powerKind.replaceAll("_", " ")}
-        </p>
-        <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
-          <div>device cap {chain.deviceCap}W</div>
-          <div>port cap {chain.portCap}W</div>
-          <div>protocol {chain.protocol}</div>
-          <div>cable cap {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"}</div>
-          <div>allocation cap {chain.allocationCap}W</div>
-          <div>limiting {chain.limitingComponent}</div>
-        </dl>
-        <p className="cm-mono text-sm">{device.name}</p>
-        <p className="cm-mono my-2 text-2xl">↓ {result.max_power ?? "?"} W</p>
-        <p className="cm-mono">{charger.name}</p>
-        <ul className="mt-4 grid gap-1 text-sm">
-          {alloc.map((a) => (
-            <li key={a.ports.join("+")} className="cm-mono">
-              {a.ports.join(" + ")}: {a.watts.map((w, i) => `${a.ports[i]} ${w}W`).join(" · ")}
-            </li>
-          ))}
-        </ul>
-      </section>
-      <p className="mt-6 max-w-xl leading-7">{result.explanation} Wattage is negotiated, not measured, unless a lab row exists.</p>
-      <section className="mt-6 text-xs leading-6 text-[#666]">
-        <p>Trace {result.rule_version}</p>
-        <p>{result.trace.facts.join(" · ")}</p>
-      </section>
-      <ExpertToggle chargerName={charger.name} pd={charger.pd_version} ports={charger.ports} />
-      <Link className="cm-cta mt-8 inline-block" href="/chargematch/kit">
-        Add to My Power Kit
-      </Link>
-      <div className="mt-10">
-        <Feedback site="chargematch" />
-      </div>
-    </main>
-  );
+  compatibility(device, charger, CABLES[0]);
+  return <PairStudio device={device} charger={charger} />;
 }

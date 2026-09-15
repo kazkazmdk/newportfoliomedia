@@ -10,12 +10,12 @@ export function KitApp() {
   const ranked = useMemo(() => kitOptimize(devices.filter((d) => d.connector !== "Watch"), CHARGERS, goal), [devices, goal]);
 
   return (
-    <div>
-      <p className="cm-mono text-xs tracking-[0.18em]">PRIVATE KIT · NOINDEX</p>
-      <h1 className="mt-3 text-4xl">My Power Kit</h1>
-      <ul className="mt-6 grid gap-2">
+    <div className="cm-scene">
+      <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">Private kit · noindex</p>
+      <h1 className="mt-3 text-5xl">My Power Kit</h1>
+      <ul className="mt-8">
         {devices.map((d) => (
-          <li key={d.id} className="cm-box px-4 py-3 flex justify-between">
+          <li key={d.id} className="flex justify-between border-b border-[var(--cm-line)] py-3">
             <span>{d.name}</span>
             <span className="cm-mono text-sm">{d.max_watts} W in</span>
           </li>
@@ -24,20 +24,20 @@ export function KitApp() {
       <p className="mt-4 text-sm">Apple Watch still needs its puck. A USB-C brick does not replace it.</p>
       <div className="mt-8 flex flex-wrap gap-2">
         {(["MINIMUM_WEIGHT", "MINIMUM_COST", "FASTEST_CHARGING"] as const).map((g) => (
-          <button key={g} className={`px-3 py-2 text-sm ${goal === g ? "cm-cta" : "cm-box"}`} onClick={() => setGoal(g)} type="button">
+          <button key={g} className={`px-3 py-2 text-xs uppercase tracking-[0.14em] ${goal === g ? "cm-cta" : "border border-[var(--cm-ink)]"}`} onClick={() => setGoal(g)} type="button">
             {g.replaceAll("_", " ")}
           </button>
         ))}
       </div>
       <ol className="mt-6 grid gap-3">
         {ranked.slice(0, 3).map((row) => (
-          <li key={row.charger.id} className="cm-box p-4">
+          <li key={row.charger.id} className="border border-[var(--cm-line)] p-4">
             <p className="cm-mono">{row.charger.name}</p>
             <p className="mt-1 text-sm">{row.allOk ? "Covers USB-C devices in this kit" : "Does not cover every device"}</p>
           </li>
         ))}
       </ol>
-      <section className="mt-10 cm-box p-5">
+      <section className="mt-10 border border-[var(--cm-line)] p-5">
         <h2 className="text-xl">Scan a charger label</h2>
         <p className="mt-2 text-sm">OCR is confirmation-gated. We will not invent PDOs from a blurry photo.</p>
         <input type="file" accept="image/*" className="mt-3 block text-sm" />

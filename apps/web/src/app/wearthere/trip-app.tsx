@@ -4,6 +4,11 @@ import { AIRLINES, DESTINATIONS, airlineFit, capsuleFor, fetchForecast, weatherS
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { ClimateRibbon } from "./components/climate-ribbon";
+import { DestinationHero } from "./components/destination-hero";
+import { WardrobeBoard } from "./components/wardrobe-board";
+import { useClimateMood } from "./components/climate-context";
+import { climateMood } from "./components/climate-theme";
 
 export function TripApp() {
   const params = useSearchParams();
@@ -16,6 +21,7 @@ export function TripApp() {
   const [now] = useState(() => Date.now());
   const daysAhead = Math.round((new Date(start).getTime() - now) / 86400000);
   const [forecast, setForecast] = useState<string | null>(null);
+  const { setMood } = useClimateMood();
 
   const capsule = useMemo(() => (dest ? capsuleFor(dest, month, style) : null), [dest, month, style]);
   const source = weatherSourceLabel({ hasForecast: Boolean(forecast), daysAhead });
@@ -31,58 +37,44 @@ export function TripApp() {
     });
   }, [dest, start, end, daysAhead]);
 
-  if (!dest || !capsule) return <p>Unknown destination in this batch.</p>;
+  useEffect(() => {
+    if (capsule) setMood(climateMood(capsule.weather));
+  }, [capsule, setMood]);
+
+  if (!dest || !capsule) return <p className="wt-scene">Unknown destination in this batch.</p>;
   const air = airlineFit(capsule.volume_l, capsule.weight_kg, AIRLINES[0]);
 
   return (
     <div>
-      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">Private trip · noindex</p>
-      <h1 className="mt-3 text-6xl">{dest.city}</h1>
-      <p className="mt-2 text-xl">
-        {start} – {end}
-      </p>
-      <div className="mt-8 grid gap-4 md:grid-cols-3">
-        <article className="wt-card p-5 md:col-span-2">
-          <p className="text-sm">{source.label}</p>
-          <p className="mt-3 font-[family-name:var(--font-wt-serif)] text-5xl">
-            {capsule.weather.tmin_c}–{capsule.weather.tmax_c}°C
-          </p>
-          <p className="mt-2">
-            Rain likely? {capsule.weather.rain_days >= 8 ? "Typical month is wet." : "Typical month is drier."}
-          </p>
-          {forecast ? <p className="mt-3 text-sm">{forecast}</p> : null}
-        </article>
-        <article className="wt-card p-5">
-          <p className="font-[family-name:var(--font-wt-serif)] text-4xl">{capsule.pieces.length} pieces</p>
-          <p className="mt-2">{capsule.outfits} outfits</p>
-          <p>{capsule.weight_kg} kg · {capsule.volume_l} L</p>
-        </article>
-      </div>
-      <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {capsule.pieces.map((p) => (
-          <li key={p.id} className="wt-card p-4">
-            <p className="font-[family-name:var(--font-wt-serif)] text-2xl">{p.name}</p>
-            <p className="text-sm">
-              {p.category} · warmth {p.warmth}
-            </p>
-          </li>
-        ))}
-      </ul>
-      {capsule.remove_hint ? <p className="mt-6">{capsule.remove_hint}</p> : null}
-      {capsule.missing.map((m) => (
-        <p key={m} className="mt-3">
-          {m} Affiliation is offered only after this gap.
+      <DestinationHero initialCity={dest.slug} />
+      <ClimateRibbon weather={capsule.weather} />
+      <section className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Private trip · noindex · {source.label}</p>
+        <h1 className="wt-serif mt-4 text-6xl">{dest.city}</h1>
+        <p className="mt-2 text-xl">
+          {start} – {end}
         </p>
-      ))}
-      <p className="mt-6 text-sm">{air.message}</p>
-      <section className="mt-10 wt-card p-5">
-        <h2 className="text-3xl">Scan my wardrobe</h2>
-        <p className="mt-2 text-sm leading-6">Photograph a garment. Confirm category, colour, warmth. Nothing is added silently.</p>
-        <input type="file" accept="image/*" className="mt-3 block text-sm" />
+        {forecast ? <p className="mt-3 text-sm">{forecast}</p> : null}
+        <p className="mt-6 text-sm opacity-80">
+          {capsule.pieces.length} pieces · {capsule.outfits} outfits · {capsule.weight_kg} kg · {capsule.volume_l} L
+        </p>
       </section>
-      <div className="mt-10">
-        <Feedback site="wearthere" />
-      </div>
+      <WardrobeBoard pieces={capsule.pieces} />
+      <section className="wt-scene">
+        {capsule.remove_hint ? <p>{capsule.remove_hint}</p> : null}
+        {capsule.missing.map((m) => (
+          <p key={m} className="mt-3">
+            {m} Affiliation is offered only after this gap.
+          </p>
+        ))}
+        <p className="mt-6 text-sm">{air.message}</p>
+        <h2 className="wt-serif mt-12 text-4xl">Scan my wardrobe</h2>
+        <p className="mt-2 text-sm leading-6 opacity-80">Photograph a garment. Confirm category, colour, warmth. Nothing is added silently.</p>
+        <input type="file" accept="image/*" className="mt-3 block text-sm" />
+        <div className="mt-10">
+          <Feedback site="wearthere" />
+        </div>
+      </section>
     </div>
   );
 }

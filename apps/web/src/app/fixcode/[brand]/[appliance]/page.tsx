@@ -33,32 +33,37 @@ export default async function ApplianceHub({
   const symptoms = ALL_SYMPTOMS.filter((item) => item.brand_slug === brand && item.appliance_slug === appliance);
   if (!name || !errors.length) notFound();
   return (
-    <main>
-      <nav className="text-sm text-[#6a6a64]">
+    <main className="fc-scene">
+      <nav className="fc-kicker">
         <Link href={`/fixcode/${brand}`}>{name}</Link> / {applianceName}
       </nav>
-      <h1 className="mt-3 text-4xl">
-        {name} {applianceName}
+      <h1 className="fc-display mt-4">
+        {name}
+        <br />
+        {applianceName}
       </h1>
-      <p className="mt-3 max-w-lg leading-7">Pick a code to see ranked causes, then start the interactive diagnosis.</p>
-      <ul className="mt-8 grid gap-2">
+      <p className="mt-5 max-w-lg leading-7">Pick a code. The machine becomes the diagnosis.</p>
+      <ul className="mt-12">
         {errors.map((item) => (
           <li key={item.id}>
-            <Link href={`/fixcode/${brand}/${appliance}/${item.code_slug}`} className="flex justify-between border border-[#e2ddd4] bg-[#fffcf7] px-4 py-3">
-              <span>{item.code}</span>
-              <span className="text-sm text-[#5c5c56]">{item.meaning}</span>
+            <Link href={`/fixcode/${brand}/${appliance}/${item.code_slug}`} className="fc-hypo">
+              <span className="fixcode-mono">{item.code}</span>
+              <span className="text-[var(--fc-mute)]">{item.meaning}</span>
+              <span className="fixcode-mono text-xs">{item.confidence}</span>
             </Link>
           </li>
         ))}
       </ul>
       {symptoms.length ? (
-        <section className="mt-10">
-          <h2 className="text-sm tracking-[0.14em] uppercase">Symptoms</h2>
-          <ul className="mt-3 grid gap-2">
+        <section className="mt-14">
+          <p className="fc-kicker">Symptoms</p>
+          <ul className="mt-4">
             {symptoms.map((item) => (
               <li key={item.id}>
-                <Link href={`/fixcode/${brand}/${appliance}/${item.symptom_slug}`} className="block border border-[#e2ddd4] px-4 py-3">
-                  {item.symptom}
+                <Link href={`/fixcode/${brand}/${appliance}/${item.symptom_slug}`} className="fc-hypo">
+                  <span className="fixcode-mono text-xs">SY</span>
+                  <span>{item.symptom}</span>
+                  <span />
                 </Link>
               </li>
             ))}

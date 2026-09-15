@@ -1,22 +1,187 @@
+.tripcost {
+  --tc-paper: #d7dee6;
+  --tc-ink: #0a1628;
+  --tc-mute: #4a5b70;
+  --tc-line: #b4c0cc;
+  --tc-route: #e23b2e;
+  --tc-win: #145c3c;
+  background: var(--tc-paper);
+  color: var(--tc-ink);
+  font-family: var(--font-tc-sans), "Barlow", sans-serif;
+}
+
 .tripcost h1 {
   letter-spacing: -0.04em;
   font-weight: 500;
 }
 
-.tc-card {
-  background: white;
-  border: 1px solid #c5d0dc;
+.tc-mono {
+  font-family: var(--font-tc-mono), "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.tc-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0.85rem 1.2rem;
+  background: color-mix(in srgb, var(--tc-paper) 90%, transparent);
+  border-bottom: 1px solid var(--tc-line);
+}
+
+.tc-logo {
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tc-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.tc-nav a { color: inherit; text-decoration: none; }
+
+.tc-live {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.tc-hero {
+  min-height: calc(100svh - 3.6rem);
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+.tc-map {
+  position: relative;
+  min-height: 28rem;
+  background:
+    radial-gradient(circle at 20% 30%, #c9d4de, transparent 36%),
+    linear-gradient(#c5ced8, #d7dee6);
+  overflow: hidden;
+}
+
+.tc-map svg { width: 100%; height: min(64vh, 560px); }
+
+.tc-city { fill: var(--tc-ink); }
+.tc-path { fill: none; stroke: var(--tc-route); stroke-width: 1.6; stroke-dasharray: 6 5; animation: tc-dash 18s linear infinite; }
+.tc-path-draw { fill: none; stroke: var(--tc-ink); stroke-width: 1.2; }
+
+@keyframes tc-dash { to { stroke-dashoffset: -220; } }
+
+.tc-form {
+  display: grid;
+  gap: 1rem;
+  padding: 1.2rem;
+  border-top: 1px solid var(--tc-line);
+}
+
+@media (min-width: 800px) {
+  .tc-form { grid-template-columns: 1fr 1fr 1fr auto; align-items: end; padding: 1.2rem 1.6rem 1.6rem; }
+}
+
+.tc-form label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.tc-form select, .tc-form input[type="range"] {
+  border: 0;
+  border-bottom: 1px solid var(--tc-ink);
+  background: transparent;
+  font: inherit;
+  padding: 0.5rem 0;
+  border-radius: 0;
 }
 
 .tc-cta {
-  background: #0b3a6a;
-  color: white;
+  background: var(--tc-ink);
+  color: var(--tc-paper);
   border: 0;
-  padding: 0.85rem 1.2rem;
+  padding: 0.85rem 1.1rem;
   font: inherit;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
   cursor: pointer;
 }
 
-.tc-mono {
-  font-family: var(--font-tc-mono), ui-monospace, monospace;
+.tc-scene { padding: 4.2rem 1.2rem; }
+@media (min-width: 900px) { .tc-scene { padding: 5.4rem 1.8rem; } }
+
+.tc-time {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.tc-bar {
+  height: 10px;
+  background: color-mix(in srgb, var(--tc-ink) 12%, transparent);
+}
+
+.tc-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--tc-ink);
+}
+
+.tc-bar.is-win > span { background: var(--tc-win); }
+
+.tc-race {
+  display: grid;
+  gap: 1rem;
+}
+
+.tc-mode {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tc-mode.is-win { color: var(--tc-win); }
+
+.tc-footer {
+  border-top: 1px solid var(--tc-line);
+  padding: 2.4rem 1.2rem 3rem;
+  display: grid;
+  gap: 1.6rem;
+}
+
+@media (min-width: 800px) {
+  .tc-footer { grid-template-columns: 1fr 1.4fr; padding-inline: 1.8rem; }
+}
+
+.tc-menu { display: none; }
+
+@media (max-width: 820px) {
+  .tc-header { grid-template-columns: 1fr auto; }
+  .tc-nav, .tc-live { display: none; }
+  .tc-menu { display: inline-flex; }
+  .tc-nav.is-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    inset: 100% 0 auto 0;
+    background: var(--tc-paper);
+    padding: 1rem;
+    gap: 0.8rem;
+    border-bottom: 1px solid var(--tc-line);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tc-path { animation: none; }
 }

@@ -10,6 +10,11 @@ import {
 } from "@penta/wearthere";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { ViewportScene } from "@/components/creative";
+import { ClimateRibbon } from "../../../components/climate-ribbon";
+import { DestinationHero } from "../../../components/destination-hero";
+import { WardrobeBoard } from "../../../components/wardrobe-board";
+import { climateCopy, climateMood } from "../../../components/climate-theme";
 
 export function generateStaticParams() {
   return DESTINATIONS.flatMap((d) =>
@@ -40,62 +45,49 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
   const model = climateModelOf(dest);
   const skip = cap.pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.name);
   const label = resolved.surface.label;
+  const mood = climateMood(w);
   return (
     <main>
-      <p className="text-sm tracking-[0.16em] uppercase text-[#8a4b32]">
-        Typical {label} climate — {model.replaceAll("_", " ").toLowerCase()} — compiled normals, not a forecast
-      </p>
-      <h1 className="mt-3 text-5xl md:text-6xl">
-        What to Wear in {dest.city} in {label[0].toUpperCase() + label.slice(1)}
-      </h1>
-      <div className="mt-8 grid gap-4 md:grid-cols-[1.4fr_1fr]">
-        <article className="wt-card p-6">
-          <p className="text-sm tracking-[0.14em] uppercase text-[#8a4b32]">Typical climate</p>
-          <p className="mt-3 font-[family-name:var(--font-wt-serif)] text-5xl">
-            {w.tmin_c}–{w.tmax_c}°C
-          </p>
-          <p className="mt-3 text-lg">Range, not today / tomorrow</p>
-          <p className="mt-2">About {w.rain_days} rain days · {w.rain_mm} mm</p>
-          <p className="mt-3 text-sm leading-6">
-            Source: compiled monthly normals (DATASET_GENERAL). No station ID, no official dataset API locator. Period labelled 1991–2020 in-repo only.
-          </p>
-        </article>
-        <article className="wt-card p-6">
-          <p className="text-sm">Packing decision</p>
-          <p className="mt-2 font-[family-name:var(--font-wt-serif)] text-4xl">{cap.pieces.length} pieces</p>
-          <p>{cap.outfits} outfits · weather coverage {cap.coverage.weather_coverage}%</p>
-        </article>
-      </div>
-      <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {cap.pieces.map((p) => (
-          <li key={p.id} className="wt-card p-4">
-            <p className="font-[family-name:var(--font-wt-serif)] text-2xl">{p.name}</p>
-            <p className="mt-2 text-sm leading-6">
-              warmth {p.warmth} · rain {p.water_resistance} · {p.layer}
-            </p>
-          </li>
-        ))}
-      </ul>
-      <section className="mt-10 grid gap-4 md:grid-cols-3">
-        <article className="wt-card p-5">
-          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">Climate source</p>
-          <p className="mt-2 leading-7">Compiled in-repo normals. Not TRUSTED_DATASET_EXACT. Season model: {model}.</p>
-        </article>
-        <article className="wt-card p-5">
-          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">Packing decision</p>
-          <p className="mt-2 leading-7">Base / mid / shell from those normals. Not a live forecast.</p>
-        </article>
-        <article className="wt-card p-5">
-          <p className="text-sm uppercase tracking-[0.14em] text-[#8a4b32]">What not to pack</p>
-          <p className="mt-2 leading-7">{skip.length ? skip.join(", ") : "No heavy layers flagged for this period."}</p>
-        </article>
-      </section>
-      <Link className="wt-cta mt-8 inline-block" href={`/wearthere/trip?city=${city}&start=2026-10-12&end=2026-10-17&style=classic`}>
-        Travelling on exact dates? Build my packing list
-      </Link>
-      <div className="mt-10">
-        <Feedback site="wearthere" />
-      </div>
+      <DestinationHero initialCity={dest.slug} />
+      <ClimateRibbon weather={w} />
+      <ViewportScene className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">
+          Scene 01 · typical {label} — {model.replaceAll("_", " ").toLowerCase()} — compiled normals
+        </p>
+        <h1 className="mt-4 max-w-4xl text-5xl leading-none md:text-7xl">
+          What to Wear in {dest.city} in {label[0].toUpperCase() + label.slice(1)}
+        </h1>
+        <p className="wt-serif mt-6 text-3xl">{climateCopy(mood)}</p>
+      </ViewportScene>
+      <ViewportScene className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 03 · what it feels like</p>
+        <p className="wt-serif mt-4 text-6xl">
+          {w.tmin_c}–{w.tmax_c}°C
+        </p>
+        <p className="mt-4 max-w-lg leading-7 opacity-80">Range, not today / tomorrow. About {w.rain_days} rain days · {w.rain_mm} mm.</p>
+      </ViewportScene>
+      <ViewportScene className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 04 · capsule · {cap.pieces.length} pieces · {cap.outfits} outfits</p>
+        <WardrobeBoard pieces={cap.pieces} />
+      </ViewportScene>
+      <ViewportScene className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 05 · don&apos;t pack</p>
+        <p className="wt-serif mt-4 max-w-xl text-4xl leading-none">
+          {skip.length ? skip.join(", ") : "No heavy layers flagged for this period."}
+        </p>
+      </ViewportScene>
+      <ViewportScene className="wt-scene">
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 07 · source</p>
+        <p className="mt-4 max-w-xl leading-7 opacity-80">
+          Compiled monthly normals (DATASET_GENERAL). No station ID, no official dataset API locator. Period labelled 1991–2020 in-repo only. Weather coverage {cap.coverage.weather_coverage}%.
+        </p>
+        <Link className="wt-cta mt-8 inline-block" href={`/wearthere/trip?city=${city}&start=2026-10-12&end=2026-10-17&style=classic`}>
+          Exact dates · private capsule
+        </Link>
+        <div className="mt-10">
+          <Feedback site="wearthere" />
+        </div>
+      </ViewportScene>
     </main>
   );
 }

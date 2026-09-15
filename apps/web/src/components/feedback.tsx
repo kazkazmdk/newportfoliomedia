@@ -33,7 +33,7 @@ export function Feedback({ site }: { site: string }) {
     );
   }
   return (
-    <div className="flex flex-wrap items-center gap-3 text-sm">
+    <div className="flex flex-wrap items-center gap-3 text-sm opacity-80">
       <p>Was this correct?</p>
       <button type="button" className="border px-3 py-1" onClick={() => setState("yes")}>
         Yes

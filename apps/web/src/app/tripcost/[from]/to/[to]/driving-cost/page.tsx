@@ -3,6 +3,7 @@ import { ROUTES, getRoute } from "@penta/tripcost";
 import { compareRoute } from "@penta/tripcost";
 import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
+import { RouteMap } from "../../../../components/route-map";
 
 export function generateStaticParams() {
   return ROUTES.map((r) => ({ from: r.from.slug, to: r.to.slug }));
@@ -26,19 +27,22 @@ export default async function DrivingPage({ params }: { params: Promise<{ from: 
   const car = compareRoute(route, 1).modes.find((m) => m.mode === "car")!;
   return (
     <main>
-      <h1 className="text-4xl">
-        {route.from.name} to {route.to.name} driving cost
-      </h1>
-      <p className="mt-4 tc-mono text-5xl">€{car.cash_eur}</p>
-      <p className="mt-2">Cash: fuel + tolls + parking. Wear is optional on the comparison.</p>
-      <ul className="mt-6 tc-card p-4 text-sm leading-7">
-        {car.assumptions.map((a) => (
-          <li key={a}>{a}</li>
-        ))}
-      </ul>
-      <Link className="tc-cta mt-8 inline-block" href={`/tripcost/${from}/to/${to}`}>
-        Compare all modes
-      </Link>
+      <RouteMap from={route.from.slug} to={route.to.slug} />
+      <section className="tc-scene">
+        <h1 className="text-4xl">
+          {route.from.name} to {route.to.name} driving cost
+        </h1>
+        <p className="tc-mono mt-4 text-6xl">€{car.cash_eur}</p>
+        <p className="mt-2">Cash: fuel + tolls + parking. Wear is optional on the comparison.</p>
+        <ul className="mt-6 max-w-xl text-sm leading-7">
+          {car.assumptions.map((a) => (
+            <li key={a}>{a}</li>
+          ))}
+        </ul>
+        <Link className="tc-cta mt-8 inline-block" href={`/tripcost/${from}/to/${to}`}>
+          Compare all modes
+        </Link>
+      </section>
     </main>
   );
 }

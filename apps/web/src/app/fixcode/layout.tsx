@@ -1,5 +1,7 @@
-import { IBM_Plex_Sans } from "next/font/google";
-import Link from "next/link";
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { CursorFollower, ScrollProgress } from "@/components/creative";
+import { FixcodeFooter } from "./components/footer";
+import { FixcodeHeader } from "./components/header";
 import "./fixcode.css";
 
 const plex = IBM_Plex_Sans({
@@ -8,19 +10,20 @@ const plex = IBM_Plex_Sans({
   variable: "--font-fixcode",
 });
 
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-fixcode-mono",
+});
+
 export default function FixcodeLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${plex.variable} ${plex.className} fixcode-shell min-h-screen bg-[#f7f5f1] text-[#1c1c1a]`}>
-      <header className="mx-auto flex max-w-3xl items-baseline justify-between px-5 py-6">
-        <Link href="/fixcode" className="text-[15px] font-medium tracking-tight">
-          FixCode
-        </Link>
-        <nav className="flex gap-5 text-sm text-[#5c5c56]">
-          <Link href="/fixcode/samsung/washer">Washers</Link>
-          <Link href="/ops">Sources</Link>
-        </nav>
-      </header>
-      <div className="mx-auto w-full max-w-3xl px-5 pb-16">{children}</div>
+    <div className={`${plex.variable} ${mono.variable} ${plex.className} fixcode-shell min-h-screen`}>
+      <ScrollProgress className="text-[var(--fc-ink)]" />
+      <CursorFollower label="Scan" color="#161513" />
+      <FixcodeHeader />
+      {children}
+      <FixcodeFooter />
     </div>
   );
 }

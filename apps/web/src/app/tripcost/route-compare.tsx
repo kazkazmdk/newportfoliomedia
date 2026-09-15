@@ -3,6 +3,9 @@
 import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { CostRace } from "./components/cost-race";
+import { DoorToDoorTimeline } from "./components/door-timeline";
+import { RouteMap } from "./components/route-map";
 
 const LABELS: Record<string, string> = {
   car: "Car",
@@ -12,12 +15,6 @@ const LABELS: Record<string, string> = {
   flight: "Flight",
   rideshare: "Rideshare",
 };
-
-function fmt(mins: number) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return `${h}h${String(m).padStart(2, "0")}`;
-}
 
 export function RouteCompare({ route }: { route: RouteRecord }) {
   const [travellers, setTravellers] = useState(4);
@@ -35,102 +32,132 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
   const car = result.modes.find((m) => m.mode === "car");
   const be = train && car ? timeValueBreakEven(train, car) : null;
   const costs = routeCosts(route);
+  const fastest = [...result.modes].sort((a, b) => a.minutes_door - b.minutes_door)[0];
 
   return (
     <div>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-4xl md:text-5xl">
-            {route.from.name} → {route.to.name}
-          </h1>
-          <p className="mt-2 text-[#3d4f63]">{route.km} km · cash vs true cost · {costLabel("HEURISTIC")} — not a live ticket</p>
-        </div>
-        <p className="tc-card px-4 py-3">
-          Best value: <strong>{LABELS[result.best]}</strong>
-        </p>
-      </div>
-      <p className="mt-4 text-sm text-[#3d4f63]">
-        Cash = fuel + tolls + parking. True cost adds wear. Train/bus/flight figures are typical estimates, not current tickets.
-      </p>
-      <ul className="mt-3 grid gap-1 text-xs uppercase tracking-wide text-[#3d4f63] md:grid-cols-2">
-        <li>Fuel — {costs.fuel.evidence} · {costLabel(costs.fuel.evidence)}</li>
-        <li>Tolls — {costs.tolls.evidence} · {costLabel(costs.tolls.evidence)}</li>
-        <li>Parking — {costs.parking.evidence} · {costLabel(costs.parking.evidence)}</li>
-        <li>Train — {costs.train.evidence} · {costLabel(costs.train.evidence)}</li>
-      </ul>
-      <label className="mt-8 grid max-w-md gap-2 text-sm">
-        Travellers
-        <input type="range" min={1} max={6} value={travellers} onChange={(e) => setTravellers(Number(e.target.value))} />
-        <span className="tc-mono text-lg">{travellers}</span>
-      </label>
-      <div className="mt-4 grid max-w-xl gap-3 text-sm md:grid-cols-3">
-        <label>
-          Fuel €/L
-          <input className="mt-1 w-full border px-2 py-1" type="number" step="0.05" value={fuel} onChange={(e) => setFuel(Number(e.target.value))} />
-        </label>
-        <label>
-          Parking €
-          <input className="mt-1 w-full border px-2 py-1" type="number" step="1" value={parking} onChange={(e) => setParking(Number(e.target.value))} />
-        </label>
-        <label>
-          Tolls €
-          <input className="mt-1 w-full border px-2 py-1" type="number" step="1" value={tolls} onChange={(e) => setTolls(Number(e.target.value))} />
-        </label>
-      </div>
-      <ul className="mt-4 text-sm leading-7">
-        {table.map((row) => (
-          <li key={row.travellers}>
-            {row.travellers} traveller{row.travellers > 1 ? "s" : ""}: {row.cheaper === "car" ? "driving cheaper" : "train cheaper"}
-            {row.carCash === row.trainCash ? " (roughly equal)" : ""}
-          </li>
-        ))}
-      </ul>
-      {result.cheaper_from ? (
-        <p className="mt-3">
-          Driving becomes cheaper than {result.cheaper_from.vs} from {result.cheaper_from.from_travellers} travellers.
-        </p>
-      ) : null}
-      <label className="mt-4 flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={trueCost} onChange={(e) => setTrueCost(e.target.checked)} />
-        Show true cost (wear). Cash cost stays the default figure.
-      </label>
-      <ul className="mt-8 grid gap-3">
-        {result.modes.map((m) => (
-          <li key={m.mode} className={`tc-card p-5 ${m.mode === result.best ? "ring-2 ring-[#0b3a6a]" : ""}`}>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <p className="text-xl">{LABELS[m.mode]}</p>
-              <p className="tc-mono text-3xl">
-              {m.stale ? "—" : `€${trueCost ? m.true_eur : m.cash_eur}`}
+      <section className="tc-hero">
+        <RouteMap from={route.from.slug} to={route.to.slug} />
+        <div className="tc-form">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em]">Scene 01 · route</p>
+            <h1 className="mt-2 text-4xl">
+              {route.from.name} → {route.to.name}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--tc-mute)]">
+              {route.km} km · {costLabel("HEURISTIC")} — not a live ticket
             </p>
-            </div>
-            {m.stale ? (
-              <p className="mt-2 text-sm">
-                Fare unavailable as current. Last observed: €{m.cash_eur} ({m.retrieved_at.slice(0, 10)}).
-              </p>
-            ) : (
-              <p className="mt-2 text-sm">
-                {m.price_kind === "HEURISTIC_PRICE" ? "Typical estimate" : m.price_kind.replaceAll("_", " ")}
-                {" — "}
-                not a live ticket · €{m.per_person_cash}/person · door-to-door {fmt(m.minutes_door)}
-              </p>
-            )}
-            <ul className="mt-3 grid gap-1 text-sm text-[#3d4f63]">
-              {m.assumptions.map((a) => (
-                <li key={a}>{a}</li>
-              ))}
-            </ul>
-            <p className="mt-2 text-xs uppercase tracking-wide">{m.confidence} confidence</p>
-          </li>
-        ))}
-      </ul>
-      {be !== null ? (
-        <p className="mt-6 tc-card p-4">
-          Train costs more. Break-even time value ≈ €{be}/hour versus car for this party size.
+          </div>
+          <label>
+            Travellers · {travellers}
+            <input type="range" min={1} max={6} value={travellers} onChange={(e) => setTravellers(Number(e.target.value))} />
+          </label>
+          <p className="tc-mono text-2xl self-end">Best · {LABELS[result.best]}</p>
+        </div>
+      </section>
+      <section className="tc-scene">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 02 · winner</p>
+        <p className="mt-4 text-5xl">{LABELS[result.best]}</p>
+        <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--tc-mute)]">
+          Cash = fuel + tolls + parking. True cost adds wear. Train/bus/flight figures are typical estimates, not current tickets.
         </p>
-      ) : null}
-      <div className="mt-10">
-        <Feedback site="tripcost" />
-      </div>
+      </section>
+      <section className="tc-scene">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 03 · door-to-door time</p>
+        <div className="mt-6">
+          <DoorToDoorTimeline
+            rows={result.modes.map((m) => ({
+              mode: m.mode,
+              label: LABELS[m.mode],
+              minutes: m.minutes_door,
+              win: fastest?.mode === m.mode,
+            }))}
+          />
+        </div>
+      </section>
+      <section className="tc-scene">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 04 · cash cost</p>
+        <div className="mt-6">
+          <CostRace
+            best={result.best}
+            rows={result.modes.map((m) => ({
+              mode: m.mode,
+              label: LABELS[m.mode],
+              cash: trueCost ? m.true_eur : m.cash_eur,
+              trueCost: m.true_eur,
+              stale: m.stale,
+            }))}
+          />
+        </div>
+      </section>
+      <section className="tc-scene">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 05 · true cost</p>
+        <label className="mt-4 flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={trueCost} onChange={(e) => setTrueCost(e.target.checked)} />
+          Show true cost (wear). Cash cost stays the default figure.
+        </label>
+        <div className="mt-6 grid max-w-xl gap-3 text-sm md:grid-cols-3">
+          <label>
+            Fuel €/L
+            <input className="mt-1 w-full border-b border-[var(--tc-ink)] bg-transparent py-1" type="number" step="0.05" value={fuel} onChange={(e) => setFuel(Number(e.target.value))} />
+          </label>
+          <label>
+            Parking €
+            <input className="mt-1 w-full border-b border-[var(--tc-ink)] bg-transparent py-1" type="number" step="1" value={parking} onChange={(e) => setParking(Number(e.target.value))} />
+          </label>
+          <label>
+            Tolls €
+            <input className="mt-1 w-full border-b border-[var(--tc-ink)] bg-transparent py-1" type="number" step="1" value={tolls} onChange={(e) => setTolls(Number(e.target.value))} />
+          </label>
+        </div>
+      </section>
+      <section className="tc-scene">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 06 · when does the car win?</p>
+        <ul className="mt-6 max-w-xl text-lg leading-9">
+          {table.map((row) => (
+            <li key={row.travellers}>
+              {row.travellers} traveller{row.travellers > 1 ? "s" : ""}: {row.cheaper === "car" ? "driving cheaper" : "train cheaper"}
+              {row.carCash === row.trainCash ? " (roughly equal)" : ""}
+            </li>
+          ))}
+        </ul>
+        {result.cheaper_from ? (
+          <p className="mt-4">
+            Driving becomes cheaper than {result.cheaper_from.vs} from {result.cheaper_from.from_travellers} travellers.
+          </p>
+        ) : null}
+        {be !== null ? (
+          <p className="mt-4">Train costs more. Break-even time value ≈ €{be}/hour versus car for this party size.</p>
+        ) : null}
+      </section>
+      <section className="tc-scene" id="assumptions">
+        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 07 · assumptions + evidence</p>
+        <ul className="mt-4 grid gap-1 text-xs uppercase tracking-wide text-[var(--tc-mute)] md:grid-cols-2">
+          <li>Fuel — {costs.fuel.evidence} · {costLabel(costs.fuel.evidence)}</li>
+          <li>Tolls — {costs.tolls.evidence} · {costLabel(costs.tolls.evidence)}</li>
+          <li>Parking — {costs.parking.evidence} · {costLabel(costs.parking.evidence)}</li>
+          <li>Train — {costs.train.evidence} · {costLabel(costs.train.evidence)}</li>
+        </ul>
+        <ul className="mt-8 grid gap-4">
+          {result.modes.map((m) => (
+            <li key={m.mode}>
+              <p className="text-sm">
+                {LABELS[m.mode]} · {m.stale ? "fare unavailable as current" : m.price_kind === "HEURISTIC_PRICE" ? "Typical estimate" : m.price_kind.replaceAll("_", " ")}
+                {" — "}
+                not a live ticket · €{m.per_person_cash}/person · {m.confidence} confidence
+              </p>
+              <ul className="mt-2 text-sm text-[var(--tc-mute)]">
+                {m.assumptions.map((a) => (
+                  <li key={a}>{a}</li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-10">
+          <Feedback site="tripcost" />
+        </div>
+      </section>
     </div>
   );
 }

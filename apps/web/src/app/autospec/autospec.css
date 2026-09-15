@@ -1,19 +1,208 @@
-.autospec h1 {
-  font-family: var(--font-as-display), serif;
-  font-weight: 500;
-  letter-spacing: -0.04em;
+.autospec {
+  --as-paper: #ddd6cb;
+  --as-ink: #101418;
+  --as-mute: #5d615c;
+  --as-line: #b7b0a4;
+  --as-panel: #ece6db;
+  --as-metal: #8a6a3a;
+  background: var(--as-paper);
+  color: var(--as-ink);
+  font-family: var(--font-as-sans), "Source Sans 3", sans-serif;
 }
 
-.as-panel {
-  background: #f7f1e6;
-  border: 1px solid #d9d0c0;
+.autospec h1, .as-display {
+  font-family: var(--font-as-display), "Oswald", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.as-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 1.3rem 1.6rem;
+  background: color-mix(in srgb, var(--as-paper) 88%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.as-logo {
+  letter-spacing: 0.32em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+}
+
+.as-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.as-nav a { color: inherit; text-decoration: none; }
+
+.as-add {
+  border: 1px solid var(--as-ink);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+}
+
+.as-hero {
+  min-height: calc(100svh - 4.4rem);
+  display: grid;
+  align-items: end;
+  padding: 2rem 1.6rem 2.4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 980px) {
+  .as-hero {
+    grid-template-columns: 0.9fr 1.2fr;
+    align-items: center;
+  }
+}
+
+.as-stage {
+  position: relative;
+  min-height: 22rem;
+}
+
+.as-car {
+  width: min(100%, 640px);
+  margin-inline: auto;
+}
+
+.as-car path, .as-car rect, .as-car circle, .as-car ellipse {
+  fill: none;
+  stroke: var(--as-ink);
+  stroke-width: 1.15;
+}
+
+.as-car .hot { stroke: var(--as-metal); stroke-width: 2.1; }
+
+.as-call {
+  position: absolute;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.as-identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.4rem;
+  padding: 1rem 1.6rem;
+  border-top: 1px solid var(--as-line);
+  border-bottom: 1px solid var(--as-line);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.as-field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.as-field input {
+  border: 0;
+  border-bottom: 1px solid var(--as-ink);
+  background: transparent;
+  font: inherit;
+  padding: 0.55rem 0;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 .as-cta {
-  background: #1b242c;
-  color: #efe8dc;
+  background: var(--as-ink);
+  color: var(--as-paper);
   border: 0;
-  padding: 0.85rem 1.4rem;
+  padding: 0.85rem 1.3rem;
   font: inherit;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
   cursor: pointer;
+}
+
+.as-scene { padding: 4.8rem 1.6rem; }
+@media (min-width: 900px) { .as-scene { padding: 6rem 2.2rem; } }
+
+.as-timeline {
+  display: grid;
+  gap: 0;
+  max-width: 28rem;
+}
+
+.as-tl {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-left: 1px solid var(--as-ink);
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+.as-tl::before {
+  content: "";
+  position: absolute;
+  left: -3px;
+  top: 1.15rem;
+  width: 5px;
+  height: 5px;
+  background: var(--as-ink);
+}
+
+.as-tile {
+  min-height: 16rem;
+  padding: 1.4rem;
+  background: var(--as-panel);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.as-footer {
+  display: grid;
+  gap: 2rem;
+  padding: 2.6rem 1.6rem 3.4rem;
+  border-top: 1px solid var(--as-line);
+}
+
+@media (min-width: 900px) {
+  .as-footer { grid-template-columns: 0.8fr 1.4fr; padding-inline: 2.2rem; }
+}
+
+.as-menu { display: none; }
+
+@media (max-width: 820px) {
+  .as-header { grid-template-columns: 1fr auto; }
+  .as-nav { display: none; }
+  .as-menu { display: inline-flex; }
+  .as-nav.is-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    inset: 100% 0 auto 0;
+    background: var(--as-paper);
+    padding: 1rem 1.6rem;
+    gap: 1rem;
+  }
 }

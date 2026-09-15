@@ -4,6 +4,8 @@ import { ALL_ERRORS, ALL_SYMPTOMS, buildDiagnosticTree, getError, getSymptom } f
 import { allFixcodePages } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { ViewportScene } from "@/components/creative";
+import { ErrorHero } from "../../../components/error-hero";
 
 export function generateStaticParams() {
   const errors = ALL_ERRORS.map((item) => ({
@@ -55,73 +57,66 @@ export default async function ErrorPage({
         about: `${profile.brand} ${profile.appliance} error ${error!.code}`,
       }
     : null;
+  const tree = buildDiagnosticTree(profile);
+  const diyStop = tree.boundaries.length > 0;
 
   return (
     <main>
       {schema ? (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ) : null}
-      <nav className="text-sm text-[#6a6a64]">
-        <Link href={`/fixcode/${brand}`}>{profile.brand}</Link>
-        {" / "}
-        <Link href={`/fixcode/${brand}/${appliance}`}>{profile.appliance}</Link>
-      </nav>
-      <p className="mt-6 text-sm">
-        {isError ? `Error ${error!.code}` : symptom!.symptom} · {profile.confidence} confidence
-      </p>
-      <h1 className="mt-2 text-4xl leading-tight">
-        {isError ? error!.code : symptom!.symptom}
-      </h1>
-      <p className="mt-4 max-w-xl text-xl leading-8">{profile.meaning}</p>
-      <aside className="mt-6 max-w-xl border border-[#e2ddd4] bg-[#fffcf7] p-4">
-        <p className="text-sm uppercase tracking-[0.14em]">What to do now</p>
-        <p className="mt-2 text-[17px] leading-7">
-          Run the safe checks first. This is a structured diagnostic tree — not a ChatGPT guess.
+      <ErrorHero profile={profile} brand={brand} appliance={appliance} />
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 01 · meaning</p>
+        <p className="mt-5 max-w-2xl text-3xl leading-tight">{profile.meaning}</p>
+        <p className="mt-6 max-w-xl text-sm leading-7 text-[var(--fc-mute)]">
+          Run the safe checks first. This is a structured diagnostic tree — not a language-model guess.
         </p>
-        {buildDiagnosticTree(profile).boundaries.length ? (
-          <p className="mt-2 text-sm text-[#8a1f11]">
-            Stop self-service if the tree hits a professional or stop-use boundary.
-          </p>
-        ) : null}
-      </aside>
-      <Link
-        href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
-        className="fixcode-btn mt-8 inline-block"
-      >
-        Start diagnosis
-      </Link>
-      <section className="mt-12">
-        <h2 className="text-sm tracking-[0.14em] uppercase">Common possibilities</h2>
-        <ol className="mt-4 grid gap-3">
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 02 · possible causes</p>
+        <ol className="mt-8">
           {profile.causes.map((cause, index) => (
-            <li key={cause.id} className="border border-[#e2ddd4] bg-[#fffcf7] p-4">
-              <p>
-                {index + 1}. {cause.name}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[#555]">{cause.summary}</p>
-              <p className="mt-2 text-sm">
-                {cause.safety.replaceAll("_", " ")} · {cause.time_minutes} min · €{cause.cost_eur_min}–{cause.cost_eur_max || 0}
+            <li key={cause.id} className="fc-hypo">
+              <span className="fixcode-mono text-xs">{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <p>{cause.name}</p>
+                <p className="mt-1 text-sm leading-6 text-[var(--fc-mute)]">{cause.summary}</p>
+              </div>
+              <p className="text-right text-xs text-[var(--fc-mute)]">
+                {cause.safety.replaceAll("_", " ")}
+                <br />
+                {cause.time_minutes} min · €{cause.cost_eur_min}–{cause.cost_eur_max || 0}
               </p>
             </li>
           ))}
         </ol>
-      </section>
-      <section className="mt-10">
-        <h2 className="text-sm tracking-[0.14em] uppercase">Diagnostic checks</h2>
-        <ol className="mt-3 list-decimal pl-5 text-[17px] leading-8">
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 03 · safe check</p>
+        <ol className="mt-6 max-w-2xl list-decimal pl-5 text-lg leading-9">
           {profile.questions.map((q) => (
             <li key={q.id}>
               {q.text}
-              <span className="block text-sm text-[#6a6a64]">{q.why}</span>
+              <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
             </li>
           ))}
         </ol>
-      </section>
-      <section className="mt-10 text-sm leading-6">
-        <h2 className="text-sm tracking-[0.14em] uppercase">Sources</h2>
-        <ul className="mt-3">
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 04 · diagnostic narrowing</p>
+        <Link
+          href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
+          className="fc-run mt-8 inline-block"
+        >
+          Start diagnosis
+        </Link>
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 05 · OEM source</p>
+        <ul className="mt-6 max-w-xl text-sm leading-7">
           {profile.provenance.map((row) => (
-            <li key={row.source_id}>
+            <li key={row.source_id} className="border-t border-[var(--fc-line)] py-3">
               {row.source_type} · {row.verification_method} · {row.retrieved_at.slice(0, 10)}
               {row.locator?.section ? ` · ${row.locator.section}` : ""}
               {row.verified_at ? " · verified locator" : " · general / unverified"}
@@ -136,24 +131,31 @@ export default async function ErrorPage({
             </li>
           ))}
         </ul>
-      </section>
-      {"related_symptoms" in profile && profile.related_symptoms.length ? (
-        <section className="mt-8">
-          <h2 className="text-sm tracking-[0.14em] uppercase">Related</h2>
-          <ul className="mt-3 flex flex-wrap gap-2">
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 06 · when to stop DIY</p>
+        {diyStop ? (
+          <p className="mt-5 max-w-xl text-2xl text-[var(--fc-signal)]">
+            Stop self-service if the tree hits a professional or stop-use boundary.
+          </p>
+        ) : (
+          <p className="mt-5 max-w-xl text-2xl">No stop-use boundary on this tree. Risk still sits on each cause.</p>
+        )}
+        {"related_symptoms" in profile && profile.related_symptoms.length ? (
+          <ul className="mt-8 flex flex-wrap gap-3">
             {profile.related_symptoms.map((slug) => (
               <li key={slug}>
-                <Link className="border px-3 py-1 text-sm" href={`/fixcode/${brand}/${appliance}/${slug}`}>
+                <Link className="border-b border-[var(--fc-ink)] text-sm" href={`/fixcode/${brand}/${appliance}/${slug}`}>
                   {slug}
                 </Link>
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
-      <div className="mt-12">
-        <Feedback site="fixcode" />
-      </div>
+        ) : null}
+        <div className="mt-12">
+          <Feedback site="fixcode" />
+        </div>
+      </ViewportScene>
     </main>
   );
 }

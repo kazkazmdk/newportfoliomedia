@@ -23,10 +23,10 @@ export function GarageEntry() {
   }
 
   return (
-    <div className="mt-8 grid gap-4">
-      <label className="grid gap-2 text-sm">
+    <div className="mt-10 grid max-w-md gap-5">
+      <label className="as-field">
         Make / model / generation
-        <input className="as-panel px-4 py-3 text-base" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input value={q} onChange={(e) => setQ(e.target.value)} />
       </label>
       <ul className="grid gap-2">
         {hits.map((v) => (
@@ -46,14 +46,14 @@ export function GarageEntry() {
         ))}
       </ul>
       <form onSubmit={onVin} className="grid gap-2">
-        <label className="grid gap-2 text-sm">
+        <label className="as-field">
           VIN
-          <input className="as-panel px-4 py-3" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
+          <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
         </label>
-        <button className="justify-self-start border border-[#1b242c] px-4 py-2 text-sm" type="submit">
+        <button className="justify-self-start border border-[var(--as-ink)] px-4 py-2 text-[11px] uppercase tracking-[0.16em]" type="submit">
           Decode VIN
         </button>
-        {note ? <p className="text-sm text-[#6a6258]">{note}</p> : null}
+        {note ? <p className="text-sm text-[var(--as-mute)]">{note}</p> : null}
       </form>
     </div>
   );

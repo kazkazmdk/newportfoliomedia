@@ -1,6 +1,8 @@
-import { VEHICLES } from "@penta/autospec";
+import Link from "next/link";
+import { VEHICLES, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import { GarageEntry } from "./garage-entry";
+import { VehicleStage } from "./components/vehicle-stage";
 
 export const metadata = pageMeta({
   title: "AutoSpec — What do you drive?",
@@ -9,36 +11,47 @@ export const metadata = pageMeta({
 });
 
 export default function AutospecHome() {
+  const featured = VEHICLES[0];
   return (
-    <main className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-      <div>
-        <p className="text-xs tracking-[0.2em] uppercase text-[#6a6258]">Car ownership copilot</p>
-        <h1 className="mt-5 text-5xl leading-[1.02] md:text-7xl">What do you drive?</h1>
-        <p className="mt-5 max-w-md text-lg leading-8 text-[#4d564e]">
-          Not a spec dump. The car stays in the centre. Add it once — oil, tyres, brakes, recalls, and what is due next.
-        </p>
-        <GarageEntry />
-      </div>
-      <div className="as-panel relative min-h-[320px] p-8">
-        <p className="text-xs tracking-[0.16em] uppercase">Covered identities</p>
-        <ul className="mt-6 grid gap-4">
+    <main>
+      <section className="as-hero">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--as-mute)]">Digital garage</p>
+          <h1 className="mt-5 text-6xl leading-[0.9] md:text-7xl">
+            Your car,
+            <br />
+            understood.
+          </h1>
+          {featured ? (
+            <p className="mt-6 text-[11px] uppercase tracking-[0.2em] text-[var(--as-mute)]">
+              {featured.make} {featured.variant} · {featured.generation} · {featured.engine_code}
+            </p>
+          ) : null}
+          <GarageEntry />
+        </div>
+        <VehicleStage />
+      </section>
+      <section className="as-scene">
+        <p className="text-[11px] uppercase tracking-[0.2em]">Covered identities</p>
+        <ul className="mt-8 grid gap-3 md:grid-cols-2">
           {VEHICLES.slice(0, 8).map((v) => (
-            <li key={v.id} className="flex items-baseline justify-between border-b border-[#d9d0c0] pb-3">
-              <span>
-                {v.make} {v.model}
-              </span>
-              <span className="text-sm text-[#6a6258]">
-                {v.generation} {v.engine_code}
-              </span>
+            <li key={v.id}>
+              <Link href={vehicleUrl(v)} className="as-tile">
+                <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation} {v.engine_code}</p>
+                <p className="as-display text-4xl">
+                  {v.make}
+                  <br />
+                  {v.variant}
+                </p>
+              </Link>
             </li>
           ))}
         </ul>
-        {VEHICLES.length > 8 ? (
-          <p className="mt-6 text-sm text-[#6a6258]">{VEHICLES.length - 8} more generation/engine pages. Other markets are not invented.</p>
-        ) : (
-          <p className="mt-6 text-sm text-[#6a6258]">Other markets and models are not invented.</p>
-        )}
-      </div>
+        <p className="mt-8 text-sm text-[var(--as-mute)]">
+          {VEHICLES.length > 8 ? `${VEHICLES.length - 8} more generation/engine pages. ` : ""}
+          Other markets are not invented.
+        </p>
+      </section>
     </main>
   );
 }

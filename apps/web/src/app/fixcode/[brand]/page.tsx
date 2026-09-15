@@ -25,17 +25,21 @@ export default async function BrandHub({ params }: { params: Promise<{ brand: st
   const errors = ALL_ERRORS.filter((item) => item.brand_slug === brand);
   const appliances = [...new Set(errors.map((item) => item.appliance_slug))];
   return (
-    <main>
-      <p className="text-sm text-[#6a6a64]">Brand hub</p>
-      <h1 className="mt-2 text-4xl">{row.name}</h1>
-      <p className="mt-3 max-w-lg leading-7">
+    <main className="fc-scene">
+      <p className="fc-kicker">Brand instrument</p>
+      <h1 className="fc-display mt-4">{row.name}</h1>
+      <p className="mt-5 max-w-lg leading-7">
         {errors.length} verified error trees. Missing codes are omitted on purpose.
       </p>
-      <ul className="mt-8 grid gap-2">
+      <ul className="mt-12">
         {appliances.map((appliance) => (
           <li key={appliance}>
-            <Link className="border border-[#e2ddd4] bg-[#fffcf7] px-4 py-3 block" href={`/fixcode/${brand}/${appliance}`}>
-              {row.name} {appliance}
+            <Link className="fc-hypo" href={`/fixcode/${brand}/${appliance}`}>
+              <span className="fixcode-mono text-xs">AP</span>
+              <span>
+                {row.name} {appliance}
+              </span>
+              <span className="fixcode-mono">{errors.filter((e) => e.appliance_slug === appliance).length}</span>
             </Link>
           </li>
         ))}

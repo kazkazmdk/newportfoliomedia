@@ -1,5 +1,5 @@
 import { pageMeta } from "@/lib/seo";
-import { CheckForm } from "./check-form";
+import { ConnectHero } from "./components/connect-hero";
 
 export const metadata = pageMeta({
   title: "ChargeMatch — What are you trying to connect?",
@@ -10,12 +10,7 @@ export const metadata = pageMeta({
 export default function ChargematchHome() {
   return (
     <main>
-      <p className="cm-mono text-xs tracking-[0.22em]">POWER COMPATIBILITY ENGINE</p>
-      <h1 className="mt-4 text-5xl md:text-6xl">What are you trying to connect?</h1>
-      <p className="mt-4 max-w-lg text-lg leading-8 text-[#444]">
-        Will it work? Then: make the kit smaller. We do not declare compatibility from a language model.
-      </p>
-      <CheckForm />
+      <ConnectHero />
     </main>
   );
 }

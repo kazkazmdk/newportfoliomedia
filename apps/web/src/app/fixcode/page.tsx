@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { APPLIANCES, BRANDS, ALL_ERRORS } from "@penta/fixcode";
+import { APPLIANCES, ALL_ERRORS, BRANDS } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
-import { HomeForm } from "./home-form";
+import { ViewportScene } from "@/components/creative";
+import { HomeScanner } from "./components/home-scanner";
 
 export const metadata = pageMeta({
   title: "FixCode — What's wrong?",
@@ -13,41 +14,41 @@ export default function FixcodeHome() {
   const popular = [...ALL_ERRORS].sort((a, b) => b.search_demand - a.search_demand).slice(0, 8);
   return (
     <main>
-      <p className="text-sm text-[#6a6a64]">Appliance diagnostic engine</p>
-      <h1 className="mt-4 text-5xl leading-[1.05] md:text-6xl">What&apos;s wrong?</h1>
-      <p className="mt-4 max-w-md text-[17px] leading-7 text-[#4f4f49]">
-        Show us the code, the screen, or the symptom. We rank likely causes. We will say when we don&apos;t know.
-      </p>
-      <HomeForm />
-      <section className="mt-16">
-        <h2 className="text-sm tracking-[0.14em] uppercase text-[#6a6a64]">Popular problems</h2>
-        <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-          {popular.map((item) => (
+      <HomeScanner />
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 02 · frequent trees</p>
+        <h2 className="mt-4 max-w-xl text-4xl leading-none">Ranked codes. Not a blog of symptoms.</h2>
+        <ol className="mt-10 grid gap-0 md:grid-cols-2">
+          {popular.map((item, i) => (
             <li key={item.id}>
               <Link
                 href={`/fixcode/${item.brand_slug}/${item.appliance_slug}/${item.code_slug}`}
-                className="flex items-baseline justify-between border border-[#e2ddd4] bg-[#fffcf7] px-4 py-3"
+                className="fc-hypo"
               >
+                <span className="fixcode-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
                 <span>
                   {item.brand} {item.appliance}
                 </span>
-                <span className="font-medium">{item.code}</span>
+                <span className="fixcode-mono">{item.code}</span>
               </Link>
             </li>
           ))}
-        </ul>
-      </section>
-      <section className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {APPLIANCES.map((item) => (
-          <div key={item.slug} className="border border-[#e6e1d8] px-3 py-4">
-            <p className="font-medium">{item.name}</p>
-            <p className="mt-1 text-sm text-[#6a6a64]">{item.blurb}</p>
-          </div>
-        ))}
-      </section>
-      <p className="mt-10 text-sm text-[#6a6a64]">
-        Coverage: {BRANDS.length} brands verified ({BRANDS.map((b) => b.name).join(", ")}). Missing brands are not invented.
-      </p>
+        </ol>
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Scene 03 · coverage</p>
+        <div className="mt-6 grid gap-8 md:grid-cols-4">
+          {APPLIANCES.map((item) => (
+            <article key={item.slug}>
+              <p className="text-2xl">{item.name}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--fc-mute)]">{item.blurb}</p>
+            </article>
+          ))}
+        </div>
+        <p className="mt-12 text-sm text-[var(--fc-mute)]">
+          Coverage: {BRANDS.length} brands verified ({BRANDS.map((b) => b.name).join(", ")}). Missing brands are not invented.
+        </p>
+      </ViewportScene>
     </main>
   );
 }

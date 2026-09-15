@@ -1,9 +1,13 @@
 "use client";
 
-import { assistantAnswer, getVehicle, nextService, ownershipScore } from "@penta/autospec";
+import { VEHICLES, assistantAnswer, getVehicle, nextService, ownershipScore, vehicleUrl } from "@penta/autospec";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { IdentityStrip } from "./components/identity-strip";
+import { OwnershipTimeline } from "./components/ownership-timeline";
+import { VehicleStage } from "./components/vehicle-stage";
 
 export function GarageApp() {
   const params = useSearchParams();
@@ -16,7 +20,6 @@ export function GarageApp() {
   const [km] = useState(87432);
   const [question, setQuestion] = useState("What oil should I buy?");
   const [answer, setAnswer] = useState("");
-  const [tab, setTab] = useState("Overview");
 
   const score = useMemo(
     () =>
@@ -32,76 +35,61 @@ export function GarageApp() {
   );
 
   if (!vehicle) {
-    return <p>We don&apos;t have verified data for that vehicle yet.</p>;
+    return <p className="as-scene">We don&apos;t have verified data for that vehicle yet.</p>;
   }
 
   const due = nextService(vehicle, km, 48);
-  const tabs = ["Overview", "Maintenance", "Parts", "Problems", "Recalls", "History", "Costs", "Assistant"];
 
   return (
     <div>
-      <p className="text-xs tracking-[0.18em] uppercase">My Garage · private · noindex</p>
-      <div className="mt-4 grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
+      <section className="as-hero">
         <div>
-          <h1 className="text-5xl md:text-6xl">
-            {vehicle.make} {vehicle.variant} {vehicle.generation}
+          <p className="text-[11px] uppercase tracking-[0.18em]">My Garage · private · noindex</p>
+          <h1 className="mt-4 text-5xl leading-[0.9] md:text-7xl">
+            {vehicle.make} {vehicle.variant}
           </h1>
-          <p className="mt-3 text-lg text-[#5c564c]">
-            {km.toLocaleString()} km · {vehicle.engine_code} · years {vehicle.years[0]}–{vehicle.years.at(-1)} share this page
+          <p className="mt-3 text-lg text-[var(--as-mute)]">
+            {km.toLocaleString()} km · {vehicle.engine_code} · {vehicle.years[0]}–{vehicle.years.at(-1)}
           </p>
-        </div>
-        <div className="as-panel p-6">
-          <p className="text-xs uppercase tracking-[0.16em]">Road-trip readiness</p>
-          <p className="mt-2 font-[family-name:var(--font-as-display)] text-5xl">{score.score}/100</p>
+          <p className="as-display mt-8 text-6xl">{score.score}/100</p>
           <ul className="mt-4 grid gap-1 text-sm">
             {score.factors.map((f) => (
               <li key={f}>{f}</li>
             ))}
           </ul>
         </div>
-      </div>
-      <div className="mt-10 flex flex-wrap gap-2">
-        {tabs.map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setTab(item)}
-            className={`px-3 py-2 text-sm ${tab === item ? "bg-[#1b242c] text-[#efe8dc]" : "as-panel"}`}
-          >
-            {item}
-          </button>
-        ))}
-      </div>
-      {tab === "Overview" || tab === "Maintenance" ? (
-        <ul className="mt-8 grid gap-3 md:grid-cols-2">
-          {due.map((item) => (
-            <li key={item.id} className="as-panel p-5">
-              <p className="text-sm text-[#6a6258]">{item.name}</p>
-              <p className="mt-1 text-2xl">{item.spec ?? "Inspect"}</p>
-              <p className="mt-2 text-sm">Next in {item.km_left.toLocaleString()} km / {item.months_left} months</p>
+        <VehicleStage />
+      </section>
+      <IdentityStrip vehicle={vehicle} />
+      <section className="as-scene">
+        <p className="text-[11px] uppercase tracking-[0.2em]">Fleet</p>
+        <ul className="mt-6 grid gap-3 md:grid-cols-3">
+          {VEHICLES.slice(0, 3).map((v) => (
+            <li key={v.id}>
+              <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-tile">
+                <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation}</p>
+                <p className="as-display text-3xl">{v.make} {v.variant}</p>
+              </Link>
             </li>
           ))}
         </ul>
-      ) : null}
-      {tab === "Problems" ? (
-        <ul className="mt-8 grid gap-3">
-          {vehicle.issues.length ? (
-            vehicle.issues.map((issue) => (
-              <li key={issue.id} className="as-panel p-5">
+      </section>
+      <section className="as-scene">
+        <OwnershipTimeline items={due} />
+        {vehicle.issues.length ? (
+          <ul className="mt-10 grid gap-3">
+            {vehicle.issues.map((issue) => (
+              <li key={issue.id} className="border-b border-[var(--as-line)] py-4">
                 <p>{issue.title}</p>
                 <p className="mt-2 text-sm leading-6">{issue.summary}</p>
                 <p className="mt-2 text-sm text-[#7a2e2e]">{issue.when_to_stop}</p>
               </li>
-            ))
-          ) : (
-            <li>No structured known issues in this batch.</li>
-          )}
-        </ul>
-      ) : null}
-      {tab === "Recalls" ? (
+            ))}
+          </ul>
+        ) : null}
         <ul className="mt-8 grid gap-3">
           {vehicle.recalls.map((r) => (
-            <li key={r.id} className="as-panel p-5">
+            <li key={r.id} className="border-b border-[var(--as-line)] py-4">
               <p>{r.title}</p>
               <p className="mt-2 text-sm">{r.status} — VIN specific. We do not guess a clean bill of health.</p>
               <a className="mt-2 inline-block text-sm underline" href={r.source_url}>
@@ -110,37 +98,26 @@ export function GarageApp() {
             </li>
           ))}
         </ul>
-      ) : null}
-      {tab === "History" ? (
-        <section className="mt-8 as-panel p-5">
-          <h2 className="text-xl">Invoice scan</h2>
-          <p className="mt-2 text-sm leading-6">
-            Upload a garage invoice. We will ask you to confirm date, mileage, and operations before anything is stored.
-          </p>
-          <input type="file" accept="image/*,.pdf" className="mt-3 block text-sm" />
-        </section>
-      ) : null}
-      {tab === "Assistant" || tab === "Overview" ? (
-        <section className="mt-8 as-panel p-5">
-          <h2 className="text-xl">Ask</h2>
-          <form
-            className="mt-3 grid gap-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setAnswer(assistantAnswer(vehicle, question));
-            }}
-          >
-            <input className="border border-[#d9d0c0] bg-transparent px-3 py-2" value={question} onChange={(e) => setQuestion(e.target.value)} />
-            <button className="as-cta w-fit" type="submit">
-              Answer from the vehicle graph
-            </button>
-          </form>
-          {answer ? <p className="mt-4 leading-7">{answer}</p> : null}
-        </section>
-      ) : null}
-      <div className="mt-10">
-        <Feedback site="autospec" />
-      </div>
+        <form
+          className="mt-10 grid max-w-lg gap-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setAnswer(assistantAnswer(vehicle, question));
+          }}
+        >
+          <input className="border-b border-[var(--as-ink)] bg-transparent py-2" value={question} onChange={(e) => setQuestion(e.target.value)} />
+          <button className="as-cta w-fit" type="submit">
+            Answer from the vehicle graph
+          </button>
+        </form>
+        {answer ? <p className="mt-4 max-w-xl leading-7">{answer}</p> : null}
+        <Link className="mt-8 inline-block text-sm underline" href={vehicleUrl(vehicle)}>
+          Open public identity
+        </Link>
+        <div className="mt-10">
+          <Feedback site="autospec" />
+        </div>
+      </section>
     </div>
   );
 }
