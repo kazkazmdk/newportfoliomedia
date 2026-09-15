@@ -38,3 +38,5 @@ jobs:
         run: pnpm seo:audit
       - name: Sitemap audit
         run: pnpm sitemap:audit
+      - name: Canonical report consistency
+        run: pnpm state:check

@@ -23,13 +23,59 @@ export type CostValue = {
   currency: string;
   evidence: CostEvidence;
   observedAt?: string;
+  validUntil?: string;
   sourceId?: string;
 };
+
+export function costValue(
+  value: number,
+  evidence: CostEvidence = "HEURISTIC",
+  extra: Partial<CostValue> = {},
+): CostValue {
+  return { value, currency: "EUR", evidence, ...extra };
+}
+
+export function costNumber(input: number | CostValue): number {
+  return typeof input === "number" ? input : input.value;
+}
+
+export type RouteCosts = {
+  fuel: CostValue;
+  tolls: CostValue;
+  parking: CostValue;
+  train: CostValue;
+  bus: CostValue;
+  flight: CostValue;
+  rideshare: CostValue;
+  ev_electricity: CostValue;
+};
+
+export function routeCosts(route: RouteRecord): RouteCosts {
+  if (route.costs) return route.costs;
+  return {
+    fuel: costValue(route.fuel_eur_per_l, "HEURISTIC", { sourceId: "seed-fuel" }),
+    tolls: costValue(route.tolls_eur, "HEURISTIC", { sourceId: "seed-toll" }),
+    parking: costValue(route.parking_eur, "HEURISTIC", { sourceId: "seed-parking" }),
+    train: costValue(route.train_eur_pp, "HEURISTIC", { sourceId: "seed-train" }),
+    bus: costValue(route.bus_eur_pp, "HEURISTIC", { sourceId: "seed-bus" }),
+    flight: costValue(route.flight_eur_pp, "HEURISTIC", { sourceId: "seed-flight" }),
+    rideshare: costValue(route.rideshare_eur, "HEURISTIC", { sourceId: "seed-rideshare" }),
+    ev_electricity: costValue(route.ev_eur_per_kwh, "HEURISTIC", { sourceId: "seed-ev" }),
+  };
+}
+
+export function priceKindFrom(evidence: CostEvidence): PriceKind {
+  if (evidence === "LIVE") return "CURRENT_PROVIDER_PRICE";
+  if (evidence === "RECENT_SNAPSHOT") return "HISTORICAL_PRICE";
+  if (evidence === "STATIC_REFERENCE") return "ESTIMATED_PRICE";
+  if (evidence === "DERIVED") return "ESTIMATED_PRICE";
+  return "HEURISTIC_PRICE";
+}
 
 export function costLabel(evidence: CostEvidence): string {
   if (evidence === "LIVE") return "Live fare";
   if (evidence === "RECENT_SNAPSHOT") return "Recent snapshot";
-  if (evidence === "STATIC_REFERENCE") return "Static reference";
+  if (evidence === "STATIC_REFERENCE") return "Published reference";
   if (evidence === "DERIVED") return "Derived";
   return "Typical estimate";
 }
@@ -106,6 +152,7 @@ export type RouteRecord = {
   city_transfer_minutes: number;
   security_buffer_minutes: number;
   rideshare_eur: number;
+  costs?: RouteCosts;
 };
 
 export const CORE_PLACES: Place[] = [
@@ -351,26 +398,27 @@ export function compareRoute(
         route.city_transfer_minutes
       : 0;
 
-  const priceMeta = {
-    retrieved_at: PRICE_PROVENANCE.retrieved_at,
+  const costs = routeCosts(route);
+  const priceMeta = (evidence: CostEvidence, sourceId: string) => ({
+    retrieved_at: costs.fuel.observedAt ?? PRICE_PROVENANCE.retrieved_at,
     valid_until: PRICE_PROVENANCE.valid_until,
     stale: PRICE_PROVENANCE.valid_until ? new Date(PRICE_PROVENANCE.valid_until).getTime() < now.getTime() : false,
     currency: "EUR" as const,
-    source_id: PRICE_PROVENANCE.source_id,
-    price_kind: "HEURISTIC_PRICE" as const,
+    source_id: sourceId,
+    price_kind: priceKindFrom(evidence),
     live_fare: false as const,
     snapshot: {
-      source: PRICE_PROVENANCE.source_id,
+      source: sourceId,
       observed_at: PRICE_PROVENANCE.retrieved_at,
       valid_from: PRICE_PROVENANCE.retrieved_at,
       valid_to: PRICE_PROVENANCE.valid_until,
       currency: "EUR" as const,
       party_size: travellers,
-      price_kind: "HEURISTIC_PRICE" as const,
+      price_kind: priceKindFrom(evidence),
       live_fare: false as const,
-      constraints: ["seed snapshot — not a live GDS fare"],
+      constraints: [evidence === "HEURISTIC" ? "heuristic — not a live fare" : `${evidence} — not a live GDS fare`],
     },
-  };
+  });
 
   const allModes: ModeQuote[] = [
     {
@@ -383,13 +431,13 @@ export function compareRoute(
       assumptions: [
         `Cash: fuel + tolls + parking. True cost adds wear at ${route.wear_eur_per_km} €/km.`,
         `${route.fuel_l_per_100} L/100 km`,
-        `${route.fuel_eur_per_l.toFixed(2)} €/L snapshot ${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}`,
-        `Tolls ${route.tolls_eur} €`,
-        `Parking ${route.parking_eur} €`,
+        `Fuel ${route.fuel_eur_per_l.toFixed(2)} €/L — ${costLabel(costs.fuel.evidence)}`,
+        `Tolls ${route.tolls_eur} € — ${costLabel(costs.tolls.evidence)}`,
+        `Parking ${route.parking_eur} € — ${costLabel(costs.parking.evidence)}`,
       ],
       confidence: "MEDIUM",
       available: true,
-      ...priceMeta,
+      ...priceMeta(costs.fuel.evidence, costs.fuel.sourceId ?? "seed-fuel"),
       cost_breakdown: {
         base_transport: 0,
         fuel: round(fuel),
@@ -417,7 +465,7 @@ export function compareRoute(
       ],
       confidence: "LOW",
       available: true,
-      ...priceMeta,
+      ...priceMeta(costs.ev_electricity.evidence, costs.ev_electricity.sourceId ?? "seed-ev"),
     },
     {
       mode: "train",
@@ -427,11 +475,11 @@ export function compareRoute(
       minutes_in_vehicle: route.train_minutes,
       per_person_cash: round(route.train_eur_pp),
       assumptions: [
-        `Last observed typical fare ${route.train_eur_pp} €/person (${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}). Not a live ticket.`,
+        `Train ${route.train_eur_pp} €/person — ${costLabel(costs.train.evidence)}. Not a live ticket.`,
       ],
       confidence: "MEDIUM",
       available: route.train_eur_pp > 0,
-      ...priceMeta,
+      ...priceMeta(costs.train.evidence, costs.train.sourceId ?? "seed-train"),
     },
     {
       mode: "bus",
@@ -440,10 +488,10 @@ export function compareRoute(
       minutes_door: route.bus_minutes + 30,
       minutes_in_vehicle: route.bus_minutes,
       per_person_cash: round(route.bus_eur_pp),
-      assumptions: [`Coach typical fare ${route.bus_eur_pp} €/person, snapshot ${PRICE_PROVENANCE.retrieved_at.slice(0, 10)}.`],
+      assumptions: [`Coach ${route.bus_eur_pp} €/person — ${costLabel(costs.bus.evidence)}.`],
       confidence: "MEDIUM",
       available: route.bus_eur_pp > 0,
-      ...priceMeta,
+      ...priceMeta(costs.bus.evidence, costs.bus.sourceId ?? "seed-bus"),
     },
     {
       mode: "flight",
@@ -458,7 +506,7 @@ export function compareRoute(
       ],
       confidence: "MEDIUM",
       available: route.flight_eur_pp > 0,
-      ...priceMeta,
+      ...priceMeta(costs.flight.evidence, costs.flight.sourceId ?? "seed-flight"),
     },
     {
       mode: "rideshare",
@@ -470,7 +518,7 @@ export function compareRoute(
       assumptions: ["Point estimate. Live Uber/Bolt not connected."],
       confidence: "LOW",
       available: route.rideshare_eur > 0,
-      ...priceMeta,
+      ...priceMeta(costs.rideshare.evidence, costs.rideshare.sourceId ?? "seed-rideshare"),
     },
   ];
 

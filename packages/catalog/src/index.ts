@@ -375,6 +375,8 @@ export function catalogScaleStops() {
     relations: relations.length,
     unknownCritical: facts.filter((f) => f.level === "UNKNOWN" || !f.valid).length,
     demandValidated: pages.filter((p) => p.seo_validation === "PRELAUNCH" || p.seo_validation === "POSTLAUNCH").length,
+    trustedDatasetExact: facts.filter((f) => f.level === "TRUSTED_DATASET_EXACT").length,
+    primaryExact: facts.filter((f) => f.level === "PRIMARY_EXACT").length,
   };
   return evaluateScaleStops(snap);
 }

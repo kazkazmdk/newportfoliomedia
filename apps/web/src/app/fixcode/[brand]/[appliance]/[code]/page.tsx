@@ -123,6 +123,8 @@ export default async function ErrorPage({
           {profile.provenance.map((row) => (
             <li key={row.source_id}>
               {row.source_type} · {row.verification_method} · {row.retrieved_at.slice(0, 10)}
+              {row.locator?.section ? ` · ${row.locator.section}` : ""}
+              {row.verified_at ? " · verified locator" : " · general / unverified"}
               {row.source_url ? (
                 <>
                   {" · "}

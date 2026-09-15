@@ -128,6 +128,11 @@ export type DiagnosisResult = {
   safety_ceiling: SafetyClass;
   rule_version: string;
   display_probabilities: boolean;
+  self_service_blocked: boolean;
+  stop_boundary?: string;
+  recommend_technician: boolean;
+  next_safe_check?: string;
+  source_ids: string[];
   trace: {
     facts: string[];
     relations: string[];

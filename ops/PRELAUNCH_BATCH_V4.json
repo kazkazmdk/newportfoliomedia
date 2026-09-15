@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-09-15T07:00:55.640Z",
+  "note": "Autocomplete-only. No SERP classification was performed. Path A/B/C remain 0 because STRONG_INTENT SERP was not observed. Do not treat autocomplete as launch validation.",
+  "attempted": 142,
+  "observed": 111,
+  "fresh": 111,
+  "localeValid": 111,
+  "strongIntent": 0,
+  "autocomplete": 111,
+  "paa": 0,
+  "related": 0,
+  "volume": 0,
+  "pathA": 0,
+  "pathB": 0,
+  "pathC": 0,
+  "rows": []
+}

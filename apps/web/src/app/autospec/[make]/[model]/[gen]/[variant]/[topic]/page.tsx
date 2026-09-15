@@ -58,10 +58,12 @@ export default async function TopicPage({
           {scope.generation ? ` · ${scope.generation}` : ""}
           {scope.engineCode ? ` · ${scope.engineCode}` : " · engine UNKNOWN"}
           {scope.yearFrom ? ` · ${scope.yearFrom}–${scope.yearTo}` : ""}
-          {scope.market ? ` · ${scope.market}` : " · market UNKNOWN"}
+          {scope.market?.length ? ` · ${scope.market.join("/")}` : " · market UNKNOWN"}
+          {scope.wheelConfig ? ` · ${scope.wheelConfig}` : ""}
         </p>
         <p className="mt-2 text-[#6a6258]">
-          VIN decode is {VIN_SUPPORT}. Generation-level oil/tyre rows are not silently treated as an exact trim.
+          Required: {scope.requiredDimensions.join(", ")}. Missing: {scope.missingDimensions.join(", ") || "none"}.
+          HIGH confidence is not VERIFIED. VIN decode is {VIN_SUPPORT}.
         </p>
       </aside>
       {topic === "oil" ? (

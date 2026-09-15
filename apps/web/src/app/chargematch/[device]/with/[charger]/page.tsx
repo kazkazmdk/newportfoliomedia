@@ -78,12 +78,21 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
         </div>
       </dl>
       <section className="mt-10 cm-box p-5">
-        <p className="cm-mono text-sm">Power chain · limiter {chain.limiting}</p>
-        <p className="mt-2 text-sm leading-6">
-          device {chain.deviceAcceptance}W → protocol {chain.protocolCap}W → port {chain.portCap}W → cable{" "}
-          {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"} → allocation {chain.allocationCap}W
+        <p className="cm-mono text-sm">
+          Negotiated {chain.protocol} · port {chain.port} · limiter {chain.limitingComponent}
         </p>
-        <p className="cm-mono my-3 text-2xl">delivered {chain.delivered} W · rated, not measured</p>
+        <p className="mt-2 text-sm leading-6">
+          device {chain.deviceCap}W ∩ selected-port PDO {chain.protocolCap}W ∩ port {chain.portCap}W ∩ cable{" "}
+          {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "UNKNOWN"} ∩ allocation {chain.allocationCap}W
+        </p>
+        {chain.voltage != null ? (
+          <p className="mt-2 text-sm">
+            Selected PDO {chain.voltage}V × {chain.current}A
+          </p>
+        ) : null}
+        <p className="cm-mono my-3 text-2xl">
+          {chain.watts} W {chain.powerKind.replaceAll("_", " ")} · measured UNKNOWN
+        </p>
         <p className="cm-mono text-sm">{device.name}</p>
         <p className="cm-mono my-2 text-2xl">↓ {result.max_power ?? "?"} W</p>
         <p className="cm-mono">{charger.name}</p>

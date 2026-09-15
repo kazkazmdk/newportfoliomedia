@@ -14,6 +14,7 @@ import {
   CHARGERS,
   DEVICES,
   POWER_PROVENANCE,
+  deviceProvenanceList,
   buildPowerScenarios,
   compatibility,
   type ChargerProfile,
@@ -1047,7 +1048,7 @@ function populateChargematch(store: GraphStore) {
         slug: device.slug,
         name: device.name,
         properties: { min_watts: device.min_watts, max_watts: device.max_watts, connector: device.connector, tag: device.tag },
-        provenance: [POWER_PROVENANCE],
+        provenance: deviceProvenanceList(device.id, POWER_PROVENANCE),
         confidence: device.tag === "MANUFACTURER_VERIFIED" ? "HIGH" : "MEDIUM",
       }),
     );

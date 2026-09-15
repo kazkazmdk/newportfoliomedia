@@ -382,7 +382,7 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
         isStringOnlyAction(input.structured_payload.intended_action)),
   );
   const productAction = input.structured_payload
-    ? !stringOnlyAction && (actionEvidencePasses(derivedAction) || detectedAction.present)
+    ? !stringOnlyAction && (actionEvidencePasses(derivedAction, input.structured_payload) || detectedAction.present)
     : input.product_action === true || (input.interactive === true && input.product_action !== false);
   const interactiveResult = detectInteractive(input.family, input.structured_payload, {
     product_cta: input.product_cta,
@@ -654,13 +654,12 @@ export function evaluatePageQuality(input: PageQualityInput): QualityResult {
       seo_validation = "NONE";
       reasons.push(scope);
     }
-    const fitment = payload.fitment_scope as { confidence?: string; engineCode?: string } | undefined;
-    const sufficient =
-      fitment?.confidence === "EXACT" || (fitment?.confidence === "GENERATION" && Boolean(fitment.engineCode));
+    const fitment = payload.fitment_scope as { confidence?: string; missingDimensions?: string[] } | undefined;
+    const sufficient = fitment?.confidence === "EXACT" && !(fitment.missingDimensions ?? []).length;
     if (fitment && !sufficient) {
       index_state = "REVIEW_REQUIRED";
       seo_validation = "NONE";
-      reasons.push("AutoSpec fitment scope is not EXACT — generation/model generic cannot index");
+      reasons.push("AutoSpec fitment scope is not EXACT — every required dimension for this fact must match");
     }
   }
   if (input.site === "tripcost" && index_state === "INDEXABLE") {

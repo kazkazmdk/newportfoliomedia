@@ -3,6 +3,7 @@ import {
   GOOGLE_SURFACE_SOURCES,
   POSTLAUNCH_SOURCES,
   QUANTITATIVE_SOURCES,
+  SERP_TTL_DAYS,
   type DemandAssessmentV2,
   type DemandClass,
   type DemandEvidence,
@@ -29,9 +30,47 @@ export function languageOf(locale: string): string {
   return locale.split("-")[0]?.toLowerCase() || "en";
 }
 
+export function countryOf(locale: string): string | undefined {
+  const part = locale.split("-")[1];
+  return part ? part.toUpperCase() : undefined;
+}
+
+export function localeAgnostic(pageLocale: string): boolean {
+  return !countryOf(pageLocale);
+}
+
+export function localeCompatible(
+  evidenceLocale: string,
+  pageLocale = "en",
+  evidenceLanguage?: string,
+  evidenceCountry?: string,
+  agnostic = false,
+): boolean {
+  if (agnostic || localeAgnostic(pageLocale)) {
+    const evLang = (evidenceLanguage ?? languageOf(evidenceLocale)).toLowerCase();
+    return evLang === languageOf(pageLocale);
+  }
+  const evLang = (evidenceLanguage ?? languageOf(evidenceLocale)).toLowerCase();
+  const evCountry = (evidenceCountry ?? countryOf(evidenceLocale))?.toUpperCase();
+  const pageCountry = countryOf(pageLocale);
+  if (evLang !== languageOf(pageLocale)) return false;
+  if (pageCountry && evCountry && evCountry !== pageCountry) return false;
+  if (pageCountry && !evCountry) return false;
+  return true;
+}
+
 export function localeMismatch(evidence: DemandEvidence, pageLocale = "en"): boolean {
-  const evLang = (evidence.language ?? languageOf(evidence.locale)).toLowerCase();
-  return evLang !== languageOf(pageLocale);
+  return !localeCompatible(evidence.locale, pageLocale, evidence.language, evidence.country);
+}
+
+export function isSerpFresh(obs: SerpObservation, now = new Date()): boolean {
+  if (!isValidIsoDate(obs.observedAt)) return false;
+  const age = (now.getTime() - new Date(obs.observedAt).getTime()) / 86400000;
+  return age >= 0 && age <= SERP_TTL_DAYS;
+}
+
+export function serpLocaleMismatch(obs: SerpObservation, pageLocale = "en"): boolean {
+  return !localeCompatible(obs.locale, pageLocale);
 }
 
 export function independentSourceCount(evidence: DemandEvidence[]): number {
@@ -148,7 +187,13 @@ export function assessDemand(input: {
     return { ...row, expired };
   });
   const usable = annotated.filter((e) => !e.expired && !localeMismatch(e, locale) && e.source !== "EDITORIAL");
-  const serp = (input.serpObservations ?? []).filter((s) => isValidIsoDate(s.observedAt));
+  const serp = (input.serpObservations ?? []).filter((s) => {
+    const fresh = isSerpFresh(s, now);
+    const localeOk = !serpLocaleMismatch(s, locale);
+    if (!fresh) expiredEvidenceIds.push(`serp:${s.query}:${s.observedAt}`);
+    if (!localeOk) localeMismatches.push(`serp:${s.query}:${s.locale}`);
+    return fresh && localeOk;
+  });
   const pre = preLaunchDemandScore({ evidence: usable, serp });
   const post = postLaunchDemandScore(usable);
   const pathA = pre.flags.intentMatchObserved && pre.flags.autocompleteObserved;

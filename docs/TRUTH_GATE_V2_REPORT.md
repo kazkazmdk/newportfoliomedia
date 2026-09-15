@@ -1,5 +1,9 @@
 # Truth Gate V2 — report
 
+> **HISTORICAL.** This report is not the current source of truth. Live metrics: [`docs/PENTA_STATE.md`](./PENTA_STATE.md).
+>
+> It recorded 50 SEO_CANDIDATE at an earlier SHA. Do not compare it to live recalculation.
+
 Recalculated 2026-09-14T13:02:31.188Z from in-memory GraphStore.
 Previous markdown was not reused as proof.
 

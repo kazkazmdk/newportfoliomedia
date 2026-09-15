@@ -332,6 +332,9 @@ export const PROVENANCE_LEVELS = [
   "PRIMARY_GENERAL",
   "REGULATORY_EXACT",
   "TRUSTED_DATASET_EXACT",
+  "DATASET_GENERAL",
+  "UNVERIFIED_DATASET",
+  "PRIMARY_DATABASE_GENERAL",
   "TRUSTED_THIRD_PARTY",
   "CROSS_SOURCE_CONFIRMED",
   "DERIVED_DETERMINISTIC",
@@ -359,7 +362,10 @@ export type FieldLocator = {
   table?: string;
   dataset?: string;
   dataset_version?: string;
+  official_dataset_id?: string;
   station_or_grid?: string;
+  coordinates?: string;
+  query?: string;
   period?: string;
 };
 
@@ -406,6 +412,41 @@ export function isGenericSourceUrl(url?: string | null): boolean {
   }
 }
 
+export function hasUsableDatasetLocator(locator?: FieldLocator): boolean {
+  if (!locator) return false;
+  return Boolean(
+    locator.station_or_grid ||
+      locator.coordinates ||
+      locator.query ||
+      locator.official_dataset_id,
+  );
+}
+
+/** A locally named in-repo table is not an official dataset identifier. */
+export function isOfficialDatasetId(locator?: FieldLocator): boolean {
+  const id = locator?.official_dataset_id?.trim();
+  if (!id) return false;
+  const local = /^(compiled|penta|internal|local|seed)/i;
+  return !local.test(id);
+}
+
+export function isTrustedDatasetExact(input: {
+  source_type: SourceType;
+  source_url?: string;
+  retrieved_at?: string;
+  locator?: FieldLocator;
+}): boolean {
+  if (input.source_type !== "PRIMARY_DATABASE") return false;
+  const loc = input.locator;
+  if (!loc?.dataset) return false;
+  if (!input.retrieved_at) return false;
+  if (!loc.dataset_version || !loc.period) return false;
+  const externalUrl = Boolean(input.source_url) && !isGenericSourceUrl(input.source_url);
+  const officialId = isOfficialDatasetId(loc);
+  if (!externalUrl && !officialId) return false;
+  return hasUsableDatasetLocator(loc);
+}
+
 export function validateFactProvenance(input: {
   source_type: SourceType;
   source_url?: string;
@@ -418,9 +459,9 @@ export function validateFactProvenance(input: {
 }): ProvenanceValidation {
   const missing: string[] = [];
   const warnings: string[] = [];
-  const datasetExact = input.source_type === "PRIMARY_DATABASE" && Boolean(input.locator?.dataset);
-  const generic_url = datasetExact ? false : isGenericSourceUrl(input.source_url);
-  if (!input.source_url && !datasetExact) missing.push("source_url");
+  const datasetExact = isTrustedDatasetExact(input);
+  const generic_url = datasetExact ? isGenericSourceUrl(input.source_url) : isGenericSourceUrl(input.source_url);
+  if (!input.source_url && !datasetExact && input.source_type !== "PRIMARY_DATABASE") missing.push("source_url");
   if (!input.source_name && !input.locator?.document_title && !input.locator?.dataset) {
     missing.push("identifiable_document");
   }
@@ -441,7 +482,10 @@ export function validateFactProvenance(input: {
       input.locator?.section ||
       input.locator?.table ||
       input.locator?.dataset ||
-      input.locator?.document_title,
+      input.locator?.document_title ||
+      input.locator?.station_or_grid ||
+      input.locator?.coordinates ||
+      input.locator?.query,
   );
   const primaryType = input.source_type === "MANUFACTURER" || input.source_type === "OFFICIAL";
   const regulatory = input.source_type === "REGULATORY";
@@ -450,8 +494,16 @@ export function validateFactProvenance(input: {
   else if (primaryType && generic_url) level = "PRIMARY_GENERAL";
   else if (primaryType) level = "PRIMARY_GENERAL";
   else if (regulatory && !generic_url && hasLocator) level = "REGULATORY_EXACT";
-  else if (input.source_type === "PRIMARY_DATABASE" && input.locator?.dataset && !generic_url) {
-    level = "TRUSTED_DATASET_EXACT";
+  else if (datasetExact) level = "TRUSTED_DATASET_EXACT";
+  else if (input.source_type === "PRIMARY_DATABASE") {
+    if (input.verification_method === "UNVERIFIED" || !input.source_url) {
+      level = input.locator?.dataset ? "DATASET_GENERAL" : "UNVERIFIED_DATASET";
+    } else {
+      level = "PRIMARY_DATABASE_GENERAL";
+    }
+    warnings.push(
+      "PRIMARY_DATABASE without external URL/official id + version/period + usable locator is not TRUSTED_DATASET_EXACT",
+    );
   } else if (input.source_type === "TRUSTED_THIRD_PARTY") level = "TRUSTED_THIRD_PARTY";
   else if (input.verification_method === "CROSS_SOURCE") level = "CROSS_SOURCE_CONFIRMED";
   else if (input.verification_method === "HEURISTIC") level = "DERIVED_HEURISTIC";
@@ -461,14 +513,23 @@ export function validateFactProvenance(input: {
   if (generic_url) warnings.push("source_url is a generic domain/support root — not PRIMARY_EXACT");
   if (!hasLocator) warnings.push("no document/dataset locator");
   if (!input.verified_at && level === "PRIMARY_EXACT") missing.push("verified_at");
+  if (primaryType && !generic_url && hasLocator && !input.verified_at) {
+    warnings.push("exact locator required with verified_at for PRIMARY_EXACT");
+  }
 
   const verified_primary = level === "PRIMARY_EXACT" || level === "REGULATORY_EXACT";
   const evidence_score =
-    (verified_primary ? 70 : level === "TRUSTED_DATASET_EXACT" ? 55 : level === "PRIMARY_GENERAL" ? 25 : 15) +
+    (verified_primary
+      ? 70
+      : level === "TRUSTED_DATASET_EXACT"
+        ? 55
+        : level === "PRIMARY_GENERAL" || level === "DATASET_GENERAL" || level === "PRIMARY_DATABASE_GENERAL"
+          ? 25
+          : 15) +
     (hasLocator ? 15 : 0) +
     (generic_url ? -20 : 10);
   return {
-    valid: missing.length === 0 && level !== "UNKNOWN",
+    valid: missing.length === 0 && level !== "UNKNOWN" && level !== "UNVERIFIED_DATASET",
     level,
     verified_primary,
     missing_fields: missing,

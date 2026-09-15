@@ -1,1 +1,2 @@
-page_id,query,country,source,observed,value,observed_at,notes,locale,collection_method,confidence,unit
+page_id,query,country,source,observed,value,observed_at,notes,locale,collection_method,confidence,unit,language,raw_label
+veh:vw:golf:mk8:2-0-tdi:oil,vw golf mk8 2-0-tdi oil capacity,US,AUTOCOMPLETE,true,,2026-09-15T07:00:55.640Z,google-suggest status=200 n=3,en-US,API,0.55,,en,vw golf mk8 2.0tdi oil capacity | vw golf 2.0 tdi engine oil capacity | golf 7 2.0 tdi oil capacity

@@ -2,6 +2,7 @@ import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { MORE_CHARGERS, MORE_DEVICES, MORE_PAIRS } from "./catalog-more";
+export { DEVICE_OEM_SOURCES, deviceOemSource, deviceProvenanceList } from "./oem-sources";
 
 export type ConfidenceTag =
   |   "MANUFACTURER_VERIFIED"
@@ -14,6 +15,25 @@ export type ConfidenceTag =
 
 export type Pdo = { volts: number; amps: number; watts: number; pps?: boolean; epr?: boolean };
 
+export type DevicePowerCapability = {
+  protocol:
+    | "USB_PD"
+    | "USB_PD_PPS"
+    | "USB_PD_EPR"
+    | "QC"
+    | "APPLE_2_4A"
+    | "MAGSAFE"
+    | "PROPRIETARY";
+  voltage?: number;
+  minVoltage?: number;
+  maxVoltage?: number;
+  current?: number;
+  maxCurrent?: number;
+  watts: number;
+  requiredCable?: string;
+  sourceId?: string;
+};
+
 export type DeviceProfile = {
   id: string;
   name: string;
@@ -24,6 +44,8 @@ export type DeviceProfile = {
   max_watts: number;
   pd_version?: string;
   pps?: boolean;
+  epr?: boolean;
+  capabilities?: DevicePowerCapability[];
   notes: string;
   demand: number;
   tag: ConfidenceTag;
@@ -39,7 +61,21 @@ export type ChargerPort = {
 export type Allocation = {
   ports: string[];
   watts: number[];
+  byPort?: Record<string, number>;
 };
+
+function allocationMap(ports: string[], watts: number[]): Allocation {
+  const byPort: Record<string, number> = {};
+  ports.forEach((port, i) => {
+    byPort[port] = watts[i] ?? 0;
+  });
+  return { ports, watts, byPort };
+}
+
+export function allocationByPort(alloc: Allocation): Record<string, number> {
+  if (alloc.byPort && Object.keys(alloc.byPort).length) return alloc.byPort;
+  return allocationMap(alloc.ports, alloc.watts).byPort ?? {};
+}
 
 export type ChargerProfile = {
   id: string;
@@ -108,7 +144,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
     demand: 90,
     tag: "MANUFACTURER_VERIFIED",
     ports: [{ id: "c1", label: "C1", watts: 20, pdos: [{ volts: 9, amps: 2.22, watts: 20 }, { volts: 5, amps: 3, watts: 15 }] }],
-    allocations: [{ ports: ["c1"], watts: [20] }],
+    allocations: [allocationMap(["c1"], [20])],
   },
   {
     id: "chg:apple-35w-dual",
@@ -123,10 +159,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
       { id: "c1", label: "C1", watts: 35, pdos: [{ volts: 20, amps: 1.75, watts: 35 }] },
       { id: "c2", label: "C2", watts: 35, pdos: [{ volts: 20, amps: 1.75, watts: 35 }] },
     ],
-    allocations: [
-      { ports: ["c1"], watts: [35] },
-      { ports: ["c1", "c2"], watts: [20, 15] },
-    ],
+    allocations: [allocationMap(["c1"], [35]), allocationMap(["c1", "c2"], [20, 15])],
   },
   {
     id: "chg:apple-70w",
@@ -138,7 +171,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
     demand: 76,
     tag: "MANUFACTURER_VERIFIED",
     ports: [{ id: "c1", label: "C1", watts: 70, pdos: [{ volts: 20, amps: 3.5, watts: 70 }] }],
-    allocations: [{ ports: ["c1"], watts: [70] }],
+    allocations: [allocationMap(["c1"], [70])],
   },
   {
     id: "chg:anker-65w",
@@ -150,7 +183,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
     demand: 85,
     tag: "MANUFACTURER_VERIFIED",
     ports: [{ id: "c1", label: "C1", watts: 65, pdos: [{ volts: 20, amps: 3.25, watts: 65 }, { volts: 15, amps: 3, watts: 45 }] }],
-    allocations: [{ ports: ["c1"], watts: [65] }],
+    allocations: [allocationMap(["c1"], [65])],
   },
   {
     id: "chg:anker-100w-2c",
@@ -165,10 +198,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
       { id: "c1", label: "C1", watts: 100, pdos: [{ volts: 20, amps: 5, watts: 100 }] },
       { id: "c2", label: "C2", watts: 100, pdos: [{ volts: 20, amps: 5, watts: 100 }] },
     ],
-    allocations: [
-      { ports: ["c1"], watts: [100] },
-      { ports: ["c1", "c2"], watts: [65, 30] },
-    ],
+    allocations: [allocationMap(["c1"], [100]), allocationMap(["c1", "c2"], [65, 30])],
   },
   {
     id: "chg:anker-100w-3c1a",
@@ -186,10 +216,10 @@ export const CORE_CHARGERS: ChargerProfile[] = [
       { id: "a", label: "A", watts: 18, pdos: [{ volts: 9, amps: 2, watts: 18 }] },
     ],
     allocations: [
-      { ports: ["c1"], watts: [100] },
-      { ports: ["c2"], watts: [65] },
-      { ports: ["c1", "c2"], watts: [65, 30] },
-      { ports: ["c1", "c2", "a"], watts: [45, 30, 18] },
+      allocationMap(["c1"], [100]),
+      allocationMap(["c2"], [65]),
+      allocationMap(["c1", "c2"], [65, 30]),
+      allocationMap(["c1", "c2", "a"], [45, 30, 18]),
     ],
   },
 ];
@@ -272,56 +302,116 @@ export const RULE_VERSION = "compatibility-v2";
 export function allocate(charger: ChargerProfile, usedPorts: string[]): Allocation {
   const key = [...usedPorts].sort().join("+");
   const hit = charger.allocations.find((row) => [...row.ports].sort().join("+") === key);
-  if (hit) return hit;
-  const single = charger.allocations.find((row) => row.ports.length === 1 && row.ports[0] === usedPorts[0]);
-  return single ?? charger.allocations[0];
+  const raw = hit ?? charger.allocations.find((row) => row.ports.length === 1 && row.ports[0] === usedPorts[0]) ?? charger.allocations[0];
+  const byPort = allocationByPort(raw);
+  return { ports: raw.ports, watts: raw.ports.map((p) => byPort[p] ?? 0), byPort };
+}
+
+export function deviceCapabilities(device: DeviceProfile): DevicePowerCapability[] {
+  if (device.capabilities?.length) return device.capabilities;
+  if (device.connector === "MagSafe") {
+    return [{ protocol: "MAGSAFE", watts: device.max_watts, sourceId: "device-profile" }];
+  }
+  const caps: DevicePowerCapability[] = [
+    { protocol: "USB_PD", watts: device.max_watts, sourceId: "device-profile" },
+  ];
+  if (device.pps) {
+    caps.push({ protocol: "USB_PD_PPS", watts: device.max_watts, sourceId: "device-profile" });
+  }
+  if (device.epr) {
+    caps.push({ protocol: "USB_PD_EPR", watts: device.max_watts, sourceId: "device-profile" });
+  }
+  return caps;
 }
 
 export type PowerChain = {
-  deviceAcceptance: number;
-  protocolCap: number;
+  protocol: string;
+  port: string;
+  voltage: number | null;
+  current: number | null;
+  watts: number;
+  deviceCap: number;
   portCap: number;
   cableCap: number;
   allocationCap: number;
+  limitingComponent: "device" | "protocol" | "port" | "cable" | "allocation";
+  powerKind: PowerKind;
+  measured: null;
+  deviceAcceptance: number;
+  protocolCap: number;
   delivered: number;
   limiting: "device" | "protocol" | "port" | "cable" | "allocation";
-  measured: null;
   rated: true;
 };
+
+function pdoCompatible(pdo: Pdo, caps: DevicePowerCapability[]): boolean {
+  if (pdo.epr && !caps.some((c) => c.protocol === "USB_PD_EPR")) return false;
+  if (pdo.pps && !caps.some((c) => c.protocol === "USB_PD_PPS")) return false;
+  return caps.some((c) =>
+    c.protocol === "USB_PD" ||
+    c.protocol === "USB_PD_PPS" ||
+    c.protocol === "USB_PD_EPR" ||
+    c.protocol === "APPLE_2_4A",
+  );
+}
 
 export function powerChain(input: {
   device: DeviceProfile;
   charger: ChargerProfile;
   cable?: CableProfile;
   usedPorts?: string[];
+  selectedPort?: string;
 }): PowerChain {
   const ports = input.usedPorts?.length ? input.usedPorts : [input.charger.ports[0].id];
+  const selected = input.selectedPort ?? ports[0];
+  const selectedPort = input.charger.ports.find((p) => p.id === selected) ?? input.charger.ports[0];
   const alloc = allocate(input.charger, ports);
-  const allocationCap = alloc.watts[0] ?? input.charger.ports[0].watts;
-  const portCap = input.charger.ports.find((p) => p.id === ports[0])?.watts ?? allocationCap;
-  const protocolCap = Math.max(...input.charger.ports.flatMap((p) => p.pdos.map((d) => d.watts)), 0);
+  const byPort = allocationByPort(alloc);
+  const allocationCap = byPort[selected] ?? selectedPort.watts;
+  const portCap = selectedPort.watts;
+  const caps = deviceCapabilities(input.device);
+  const deviceCap = Math.max(...caps.map((c) => c.watts), input.device.max_watts);
+  const eligiblePdos = selectedPort.pdos.filter((pdo) => pdoCompatible(pdo, caps));
+  const bestPdo = [...eligiblePdos].sort((a, b) => b.watts - a.watts)[0];
+  const protocolCap = bestPdo?.watts ?? 0;
   const cableCap = input.cable?.max_watts ?? Number.POSITIVE_INFINITY;
-  const deviceAcceptance = input.device.max_watts;
-  const delivered = Math.min(deviceAcceptance, protocolCap || deviceAcceptance, portCap, cableCap, allocationCap);
-  const limiting =
-    delivered === cableCap
-      ? "cable"
-      : delivered === allocationCap && allocationCap < portCap
-        ? "allocation"
-        : delivered === portCap
-          ? "port"
-          : delivered === deviceAcceptance
-            ? "device"
-            : "protocol";
+  const delivered = Math.min(
+    deviceCap,
+    protocolCap || 0,
+    portCap,
+    Number.isFinite(cableCap) ? cableCap : portCap,
+    allocationCap,
+  );
+  const limiting: PowerChain["limiting"] =
+    delivered === 0 && protocolCap === 0
+      ? "protocol"
+      : delivered === cableCap
+        ? "cable"
+        : delivered === allocationCap && allocationCap < portCap
+          ? "allocation"
+          : delivered === portCap
+            ? "port"
+            : delivered === deviceCap
+              ? "device"
+              : "protocol";
+  const protocol = bestPdo?.epr ? "USB_PD_EPR" : bestPdo?.pps ? "USB_PD_PPS" : input.device.pd_version ?? "USB_PD";
   return {
-    deviceAcceptance,
-    protocolCap,
+    protocol,
+    port: selected,
+    voltage: bestPdo?.volts ?? null,
+    current: bestPdo?.amps ?? null,
+    watts: delivered,
+    deviceCap,
     portCap,
     cableCap: Number.isFinite(cableCap) ? cableCap : portCap,
     allocationCap,
+    limitingComponent: limiting,
+    powerKind: "CALCULATED_EXPECTED",
+    measured: null,
+    deviceAcceptance: deviceCap,
+    protocolCap,
     delivered,
     limiting,
-    measured: null,
     rated: true,
   };
 }

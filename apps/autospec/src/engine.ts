@@ -88,7 +88,7 @@ export function checkFitment(
       reason: "No verified fitment row. Similarity is not used as compatibility.",
     };
   }
-  const status = hit.status ?? fitmentStatus(hit.confidence);
+  const status = hit.status ?? fitmentStatus(hit.confidence, hit.verificationStatus);
   if (hit.market.length && !hit.market.some((m) => vehicle.market.includes(m))) {
     return {
       compatible: false,
@@ -187,7 +187,7 @@ export function vehicleUrl(v: VehicleIdentity, topic?: string) {
 export function allAutospecPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const vehicle of VEHICLES) {
-    const scope = fitmentScopeOf(vehicle);
+    const scope = fitmentScopeOf(vehicle, "oil");
     const hubPayload = {
       vehicle: vehicle.id,
       engine: vehicle.engine_code,
@@ -258,7 +258,7 @@ export function allAutospecPages(): PageRecord[] {
               generation: vehicle.generation,
               year_from: vehicle.years[0],
               year_to: vehicle.years.at(-1),
-              fitment_scope: scope,
+              fitment_scope: fitmentScopeOf(vehicle, "oil"),
               distinct_reason: `${vehicle.engine_code}-oil`,
               action_evidence: {
                 actionType: "CALCULATE",
@@ -274,7 +274,7 @@ export function allAutospecPages(): PageRecord[] {
                 vehicle: vehicle.id,
                 ...vehicle.tyres,
                 market_scope: vehicle.market,
-                fitment_scope: scope,
+                fitment_scope: fitmentScopeOf(vehicle, "tyre_pressure"),
                 distinct_reason: `${vehicle.engine_code}-tyres`,
               }
             : topic.slug === "battery"
@@ -282,7 +282,7 @@ export function allAutospecPages(): PageRecord[] {
                   vehicle: vehicle.id,
                   ...vehicle.battery,
                   market_scope: vehicle.market,
-                  fitment_scope: scope,
+                  fitment_scope: fitmentScopeOf(vehicle, "battery"),
                   distinct_reason: `${vehicle.engine_code}-battery`,
                 }
               : topic.slug === "maintenance"
@@ -290,7 +290,7 @@ export function allAutospecPages(): PageRecord[] {
                     vehicle: vehicle.id,
                     services: vehicle.services.map((s) => s.id),
                     market_scope: vehicle.market,
-                    fitment_scope: scope,
+                    fitment_scope: fitmentScopeOf(vehicle, "maintenance"),
                     distinct_reason: `${vehicle.engine_code}-maint`,
                   }
                 : {

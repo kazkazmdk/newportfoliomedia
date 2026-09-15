@@ -1,5 +1,5 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
-import { classifyClimateModel, seasonLabel } from "@penta/demand";
+import { classifyClimateModel, recommendWearthereConsolidationV2, seasonLabel } from "@penta/demand";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { climate, type MonthClimate } from "./climate";
@@ -240,10 +240,125 @@ export const MONTHS = [
   "july","august","september","october","november","december",
 ];
 
-/** High-demand destinations get 12 typical-month pages; others keep the launch window. */
+/** Climate rows still exist for every month. Page generation uses destinationSurfaces(). */
 export function indexedMonths(dest: Destination): number[] {
-  if (dest.demand >= 50) return dest.climate.map((row) => row.month);
-  return [3, 4, 5, 6, 7, 9, 10, 11];
+  return [...new Set(destinationSurfaces(dest).flatMap((s) => s.months))];
+}
+
+export type WearSurface = {
+  slug: string;
+  kind: "season" | "month";
+  months: number[];
+  label: string;
+};
+
+function seasonSlug(season: string): string {
+  if (season === "hot-dry") return "hot";
+  if (season === "mild-dry") return "mild";
+  if (season === "year-round-humid") return "year-round";
+  return season;
+}
+
+export function climateModelOf(dest: Destination) {
+  return classifyClimateModel({
+    lat: dest.lat,
+    months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
+  });
+}
+
+export function destinationSurfaces(dest: Destination): WearSurface[] {
+  const model = climateModelOf(dest);
+  if (model === "EQUATORIAL") return [];
+  const recs = recommendWearthereConsolidationV2(
+    dest.climate.map((m) => ({
+      city: dest.slug,
+      lat: dest.lat,
+      month: m.month,
+      tmax: m.tmax_c,
+      tmin: m.tmin_c,
+      rain_mm: m.rain_mm,
+    })),
+  );
+  const surfaces: WearSurface[] = [];
+  const seen = new Set<string>();
+  for (const rec of recs) {
+    if (rec.action === "CITY_GUIDE_ONLY") continue;
+    if (rec.action === "CONSOLIDATE_SEASON") {
+      const slug = seasonSlug(rec.season);
+      if (seen.has(slug)) {
+        const existing = surfaces.find((s) => s.slug === slug);
+        if (existing) existing.months = [...new Set([...existing.months, ...rec.months])].sort((a, b) => a - b);
+        continue;
+      }
+      seen.add(slug);
+      surfaces.push({ slug, kind: "season", months: rec.months, label: rec.season });
+    } else {
+      for (const month of rec.months) {
+        const slug = MONTHS[month - 1];
+        if (seen.has(slug)) continue;
+        seen.add(slug);
+        surfaces.push({ slug, kind: "month", months: [month], label: slug });
+      }
+    }
+  }
+  return surfaces;
+}
+
+export function resolveWearPeriod(
+  dest: Destination,
+  slug: string,
+): { surface: WearSurface; climate: MonthClimate; representativeMonth: number } | null {
+  const surface = destinationSurfaces(dest).find((s) => s.slug === slug);
+  if (!surface) return null;
+  const rows = surface.months.map((m) => dest.climate[m - 1]).filter(Boolean);
+  if (!rows.length) return null;
+  const representativeMonth = rows[Math.floor(rows.length / 2)].month;
+  const climate: MonthClimate = {
+    ...rows[0],
+    month: representativeMonth,
+    tmin_c: Math.round(rows.reduce((a, r) => a + r.tmin_c, 0) / rows.length),
+    tmax_c: Math.round(rows.reduce((a, r) => a + r.tmax_c, 0) / rows.length),
+    rain_mm: Math.round(rows.reduce((a, r) => a + r.rain_mm, 0) / rows.length),
+    rain_days: Math.round(rows.reduce((a, r) => a + r.rain_days, 0) / rows.length),
+  };
+  return { surface, climate, representativeMonth };
+}
+
+export type ClimateMonthlyFact = {
+  city: string;
+  coordinates: { lat: number; lon: number };
+  month: number;
+  variable: "tmin_c" | "tmax_c" | "rain_mm" | "rain_days";
+  value: number;
+  unit: string;
+  dataset: string;
+  datasetVersion: string;
+  period: string;
+  stationOrGrid: string | null;
+  sourceUrl: string | null;
+  retrievedAt: string;
+};
+
+export function climateFactsFor(dest: Destination): ClimateMonthlyFact[] {
+  const facts: ClimateMonthlyFact[] = [];
+  for (const row of dest.climate) {
+    const base = {
+      city: dest.city,
+      coordinates: { lat: dest.lat, lon: dest.lon },
+      month: row.month,
+      dataset: CLIMATE_DATASET.dataset,
+      datasetVersion: CLIMATE_DATASET.dataset_version,
+      period: CLIMATE_DATASET.period,
+      stationOrGrid: CLIMATE_DATASET.station_or_grid,
+      sourceUrl: CLIMATE_DATASET.source_url,
+      retrievedAt: CLIMATE_DATASET.retrieved_at,
+    };
+    facts.push({ ...base, variable: "tmin_c", value: row.tmin_c, unit: "degC" });
+    facts.push({ ...base, variable: "tmax_c", value: row.tmax_c, unit: "degC" });
+    facts.push({ ...base, variable: "rain_mm", value: row.rain_mm, unit: "mm" });
+    facts.push({ ...base, variable: "rain_days", value: row.rain_days, unit: "days" });
+  }
+  return facts;
 }
 
 export const WARDROBE_SEED: ClothingPiece[] = [
@@ -479,8 +594,12 @@ export function allWeartherePages(): PageRecord[] {
       batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
       publish_state: hubQ.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
     });
-    for (const month of indexedMonths(dest)) {
-      const w = dest.climate[month - 1];
+    const model = climateModelOf(dest);
+    for (const surface of destinationSurfaces(dest)) {
+      const resolved = resolveWearPeriod(dest, surface.slug);
+      if (!resolved) continue;
+      const w = resolved.climate;
+      const month = resolved.representativeMonth;
       const quality = evaluatePageQuality({
         site: "wearthere",
         family: "wear-month",
@@ -496,48 +615,45 @@ export function allWeartherePages(): PageRecord[] {
         city_without_specifics: false,
         obscure_without_demand: dest.demand < 50,
         llm_filler: false,
-        confidence: "HIGH",
+        confidence: "MEDIUM",
         freshness_days: 200,
         freshness_ttl_days: 400,
         provenance_valid: true,
-        distinct_reason: `${dest.slug}-${month}`,
+        distinct_reason: `${dest.slug}-${surface.slug}`,
         forecast_as_climate: false,
-        verified_fact_count: 7,
+        verified_fact_count: 4,
         decision_relation_count: 8,
       });
-      const slug = MONTHS[month - 1];
+      const slug = surface.slug;
+      const label = surface.label[0].toUpperCase() + surface.label.slice(1);
       pages.push({
-        id: `${dest.id}:${month}`,
+        id: `${dest.id}:${slug}`,
         site: "wearthere",
         family: "wear-month",
         url: `/wearthere/${dest.slug}/${slug}/what-to-wear`,
         canonical: `/wearthere/${dest.slug}/${slug}/what-to-wear`,
-        title: `What to Wear in ${dest.city} in ${slug[0].toUpperCase()}${slug.slice(1)}`,
-        meta_description: `Typical ${dest.city} ${slug}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
+        title: `What to Wear in ${dest.city} in ${label}`,
+        meta_description: `Typical ${dest.city} ${label}: ${w.tmin_c}–${w.tmax_c}°C, ~${w.rain_days} rain days. Capsule wardrobe then exact-date packing.`,
         entity_ids: [dest.id],
         structured_payload: {
           ...w,
           city: dest.city,
           slug: dest.slug,
           lat: dest.lat,
-          distinct_reason: `${dest.slug}-${month}`,
+          lon: dest.lon,
+          period_slug: slug,
+          surface_kind: surface.kind,
+          months: surface.months,
+          distinct_reason: `${dest.slug}-${slug}`,
           kind: "CLIMATE_NORMAL",
           period: "1991-2020",
-          aggregation: "monthly_mean",
+          aggregation: surface.kind === "season" ? "seasonal_mean" : "monthly_mean",
           sample_years: 30,
           layers: capsuleFor(dest, month, "classic").pieces.map((p) => p.id),
           not_to_pack: capsuleFor(dest, month, "classic").pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.id),
-          climate_season_model: classifyClimateModel({
-            lat: dest.lat,
-            months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
-          }),
-          season: seasonLabel(
-            classifyClimateModel({
-              lat: dest.lat,
-              months: dest.climate.map((m) => ({ month: m.month, tmax: m.tmax_c, tmin: m.tmin_c, rain_mm: m.rain_mm })),
-            }),
-            month,
-          ),
+          climate_season_model: model,
+          season: surface.label,
+          climate_source: "compiled-monthly-normals (DATASET_GENERAL — no station/grid/external URL)",
           dataset: CLIMATE_DATASET.dataset,
           dataset_version: CLIMATE_DATASET.dataset_version,
           station_or_grid: CLIMATE_DATASET.station_or_grid,
@@ -555,7 +671,7 @@ export function allWeartherePages(): PageRecord[] {
         search_demand: searchDemandScore({ seed_research: dest.demand }),
         index_state: quality.index_state,
         noindex: quality.index_state !== "INDEXABLE",
-        similarity_hash: `${dest.slug}-${month}`,
+        similarity_hash: `${dest.slug}-${slug}`,
         freshness: RETRIEVED,
         review_required: false,
         batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
@@ -597,12 +713,11 @@ export const CLIMATE_PROVENANCE = provenance({
   source_type: "PRIMARY_DATABASE",
   source_name: "compiled-monthly-normals",
   retrieved_at: RETRIEVED,
-  verified_at: RETRIEVED,
-  confidence: 78,
+  confidence: 42,
   raw_value: "monthly climate normals",
   normalized_value: "CLIMATE_NORMAL",
   verification_method: "UNVERIFIED",
-  notes: "Period 1991-2020 monthly means compiled in-repo. Not a WMO station citation. source_url is unknown.",
+  notes: "In-repo compiled monthly means. No external URL, no official dataset id, no station/grid. DATASET_GENERAL, not TRUSTED_DATASET_EXACT.",
   locator: {
     dataset: "compiled-monthly-normals",
     dataset_version: "penta-climate-v1",

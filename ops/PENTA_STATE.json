@@ -1,0 +1,139 @@
+{
+  "sha": "940ec6b24ee1c984c22933f2900b200c2009be90",
+  "generatedAt": "2026-09-15T07:02:33.761Z",
+  "pages": 806,
+  "entities": 5512,
+  "relations": 14047,
+  "indexable": 0,
+  "seo_candidate": 255,
+  "review_required": 98,
+  "graph_only": 264,
+  "noindex_product": 189,
+  "PRIMARY_EXACT": 379,
+  "REGULATORY_EXACT": 0,
+  "TRUSTED_DATASET_EXACT": 0,
+  "PRIMARY_GENERAL": 2455,
+  "DATASET_GENERAL": 2381,
+  "HEURISTIC": 302,
+  "UNKNOWN": 0,
+  "real_demand_observations": 111,
+  "validated_demand": 0,
+  "fixcode_exact_pages": 25,
+  "wearthere_surfaces": 300,
+  "autospec_exact_facts": 63,
+  "autospec_scoped_or_exact": 63,
+  "chargematch_devices": 22,
+  "chargematch_chargers": 10,
+  "tripcost_heuristic_fields": 152,
+  "tripcost_nonheuristic_fields": 0,
+  "coverage": {
+    "fixcode": {
+      "entities": 1961,
+      "entities_exact_provenance": 379,
+      "entities_general_provenance": 1961,
+      "entities_no_provenance": 0,
+      "critical_facts_exact": 379,
+      "critical_facts_generic": 1843,
+      "critical_facts_missing": 1632,
+      "truth_ready_entities": 79,
+      "blocked_entities": 170
+    },
+    "autospec": {
+      "entities": 435,
+      "entities_exact_provenance": 0,
+      "entities_general_provenance": 435,
+      "entities_no_provenance": 0,
+      "critical_facts_exact": 0,
+      "critical_facts_generic": 435,
+      "critical_facts_missing": 435,
+      "truth_ready_entities": 0,
+      "blocked_entities": 123
+    },
+    "wearthere": {
+      "entities": 2383,
+      "entities_exact_provenance": 0,
+      "entities_general_provenance": 2383,
+      "entities_no_provenance": 0,
+      "critical_facts_exact": 0,
+      "critical_facts_generic": 0,
+      "critical_facts_missing": 2,
+      "truth_ready_entities": 170,
+      "blocked_entities": 162
+    },
+    "chargematch": {
+      "entities": 175,
+      "entities_exact_provenance": 0,
+      "entities_general_provenance": 175,
+      "entities_no_provenance": 0,
+      "critical_facts_exact": 0,
+      "critical_facts_generic": 177,
+      "critical_facts_missing": 175,
+      "truth_ready_entities": 6,
+      "blocked_entities": 58
+    },
+    "tripcost": {
+      "entities": 558,
+      "entities_exact_provenance": 0,
+      "entities_general_provenance": 558,
+      "entities_no_provenance": 0,
+      "critical_facts_exact": 0,
+      "critical_facts_generic": 0,
+      "critical_facts_missing": 558,
+      "truth_ready_entities": 0,
+      "blocked_entities": 38
+    }
+  },
+  "scaleStops": [
+    {
+      "id": "truth_ready_ratio",
+      "triggered": false,
+      "value": 0.3164
+    },
+    {
+      "id": "critical_provenance",
+      "triggered": false,
+      "value": 0.0643
+    },
+    {
+      "id": "duplicate_rate",
+      "triggered": false,
+      "value": 0
+    },
+    {
+      "id": "sitemap_parity",
+      "triggered": false,
+      "value": 1
+    },
+    {
+      "id": "candidate_growth",
+      "triggered": false,
+      "value": 1
+    },
+    {
+      "id": "source_truth_depth",
+      "triggered": false,
+      "value": 0.978
+    },
+    {
+      "id": "unknown_critical_rate",
+      "triggered": false,
+      "value": 0.4755
+    },
+    {
+      "id": "demand_validated_ratio",
+      "triggered": false,
+      "value": 0
+    },
+    {
+      "id": "trusted_dataset_exact_rate",
+      "triggered": false,
+      "value": 0
+    },
+    {
+      "id": "primary_exact_rate",
+      "triggered": false,
+      "value": 0.0643
+    }
+  ],
+  "hash": "b5cfb20715863695"
+}

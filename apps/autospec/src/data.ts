@@ -28,23 +28,52 @@ export type KnownIssue = {
 };
 
 export type FitmentStatus = "VERIFIED" | "HIGH_CONFIDENCE" | "POSSIBLE" | "UNKNOWN";
+export type VerificationStatus = "VERIFIED" | "UNVERIFIED" | "CONFLICTED";
+export type FitmentConfidence = "EXACT" | "SCOPED" | "GENERATION" | "MODEL_GENERIC" | "UNKNOWN";
 
 export type Fitment = {
   component_id: string;
   component_name: string;
   compatible: boolean;
   confidence: ConfidenceLevel;
+  verificationStatus?: VerificationStatus;
   status?: FitmentStatus;
   market: string[];
   source_id: string;
+  locator?: {
+    document_title?: string;
+    page?: number | string;
+    section?: string;
+    table?: string;
+  };
+  scope?: FitmentScope;
 };
 
-export function fitmentStatus(confidence: ConfidenceLevel): FitmentStatus {
-  if (confidence === "HIGH") return "VERIFIED";
+/** HIGH confidence is not VERIFIED. Only a source locator can verify. */
+export function fitmentStatus(
+  confidence: ConfidenceLevel,
+  verification?: VerificationStatus,
+): FitmentStatus {
+  if (verification === "VERIFIED") return "VERIFIED";
+  if (verification === "CONFLICTED") return "UNKNOWN";
+  if (confidence === "HIGH") return "HIGH_CONFIDENCE";
   if (confidence === "MEDIUM") return "HIGH_CONFIDENCE";
   if (confidence === "LOW") return "POSSIBLE";
   return "UNKNOWN";
 }
+
+export type FitmentDimension =
+  | "make"
+  | "model"
+  | "generation"
+  | "engineCode"
+  | "yearFrom"
+  | "yearTo"
+  | "market"
+  | "trim"
+  | "wheelConfig"
+  | "drivetrain"
+  | "bodyStyle";
 
 export type FitmentScope = {
   make: string;
@@ -53,23 +82,99 @@ export type FitmentScope = {
   engineCode?: string;
   yearFrom?: number;
   yearTo?: number;
-  market?: string;
-  trim?: string;
-  confidence: "EXACT" | "GENERATION" | "MODEL_GENERIC" | "UNKNOWN";
+  market?: string[];
+  trim?: string[];
+  wheelConfig?: string;
+  drivetrain?: string;
+  bodyStyle?: string;
+  requiredDimensions: FitmentDimension[];
+  matchedDimensions: FitmentDimension[];
+  missingDimensions: FitmentDimension[];
+  confidence: FitmentConfidence;
 };
 
-export function fitmentScopeOf(vehicle: {
-  make: string;
-  model: string;
-  generation?: string;
-  engine_code?: string;
-  years?: number[];
-  market?: string[];
-  variant?: string;
-}): FitmentScope {
+export const FACT_FITMENT_REQUIRED: Record<string, FitmentDimension[]> = {
+  oil: ["make", "model", "generation", "engineCode", "yearFrom", "market"],
+  oil_spec: ["make", "model", "generation", "engineCode", "yearFrom", "market"],
+  oil_capacity: ["make", "model", "generation", "engineCode", "yearFrom", "market"],
+  coolant: ["make", "model", "generation", "engineCode", "yearFrom", "market"],
+  tyre_pressure: ["make", "model", "generation", "engineCode", "yearFrom", "market", "wheelConfig"],
+  battery: ["make", "model", "generation", "engineCode", "market"],
+  maintenance: ["make", "model", "generation", "engineCode", "yearFrom", "market"],
+};
+
+const DEFAULT_REQUIRED: FitmentDimension[] = ["make", "model", "generation", "engineCode", "yearFrom", "market"];
+
+function present(value: unknown): boolean {
+  if (value == null) return false;
+  if (Array.isArray(value)) return value.length > 0 && value.every((v) => v != null && String(v).length > 0);
+  if (typeof value === "string") return value.trim().length > 0;
+  return true;
+}
+
+export function requiredDimensionsFor(fact: string): FitmentDimension[] {
+  return FACT_FITMENT_REQUIRED[fact] ?? DEFAULT_REQUIRED;
+}
+
+export function fitmentScopeOf(
+  vehicle: {
+    make: string;
+    model: string;
+    generation?: string;
+    engine_code?: string;
+    years?: number[];
+    market?: string[];
+    variant?: string;
+    tyres?: { front?: string };
+    transmission?: string;
+  },
+  fact = "oil",
+  query?: {
+    year?: number;
+    market?: string;
+    engineCode?: string;
+    trim?: string;
+    wheelConfig?: string;
+  },
+): FitmentScope {
   const yearFrom = vehicle.years?.[0];
   const yearTo = vehicle.years?.at(-1);
-  const exact = Boolean(vehicle.generation && vehicle.engine_code && yearFrom && vehicle.market?.length);
+  const required = requiredDimensionsFor(fact);
+  const values: Record<FitmentDimension, unknown> = {
+    make: vehicle.make,
+    model: vehicle.model,
+    generation: vehicle.generation,
+    engineCode: vehicle.engine_code,
+    yearFrom,
+    yearTo,
+    market: vehicle.market,
+    trim: vehicle.variant ? [vehicle.variant] : undefined,
+    wheelConfig: vehicle.tyres?.front,
+    drivetrain: undefined,
+    bodyStyle: undefined,
+  };
+  const matched = required.filter((dim) => present(values[dim]));
+  const missing = required.filter((dim) => !present(values[dim]));
+  if (query?.year != null && yearFrom && yearTo && (query.year < yearFrom || query.year > yearTo)) {
+    missing.push("yearFrom");
+  }
+  if (query?.market && vehicle.market?.length && !vehicle.market.includes(query.market)) {
+    if (!missing.includes("market")) missing.push("market");
+  }
+  if (query?.engineCode && vehicle.engine_code && query.engineCode !== vehicle.engine_code) {
+    if (!missing.includes("engineCode")) missing.push("engineCode");
+  }
+  if (query?.wheelConfig && fact === "tyre_pressure") {
+    if (query.wheelConfig !== vehicle.tyres?.front && !missing.includes("wheelConfig")) missing.push("wheelConfig");
+  }
+  const uniqueMissing = [...new Set(missing)];
+  const uniqueMatched = required.filter((d) => !uniqueMissing.includes(d));
+  let confidence: FitmentConfidence = "UNKNOWN";
+  if (uniqueMissing.length === 0) confidence = "EXACT";
+  else if (uniqueMissing.length <= 2 && uniqueMatched.includes("generation") && uniqueMatched.includes("engineCode")) {
+    confidence = "SCOPED";
+  } else if (vehicle.generation) confidence = "GENERATION";
+  else if (vehicle.model) confidence = "MODEL_GENERIC";
   return {
     make: vehicle.make,
     model: vehicle.model,
@@ -77,9 +182,13 @@ export function fitmentScopeOf(vehicle: {
     engineCode: vehicle.engine_code,
     yearFrom,
     yearTo,
-    market: vehicle.market?.[0],
-    trim: vehicle.variant,
-    confidence: exact ? "EXACT" : vehicle.generation ? "GENERATION" : vehicle.model ? "MODEL_GENERIC" : "UNKNOWN",
+    market: vehicle.market,
+    trim: vehicle.variant ? [vehicle.variant] : undefined,
+    wheelConfig: vehicle.tyres?.front,
+    requiredDimensions: required,
+    matchedDimensions: uniqueMatched,
+    missingDimensions: uniqueMissing,
+    confidence,
   };
 }
 

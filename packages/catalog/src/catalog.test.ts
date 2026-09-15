@@ -218,9 +218,11 @@ describe("WearThere", () => {
 
   it("does not treat editorial-only city-month pages as INDEXABLE", async () => {
     const { allWeartherePages } = await import("@penta/wearthere");
-    const jan = allWeartherePages().find((p) => p.url === "/wearthere/tokyo/january/what-to-wear");
-    expect(jan?.index_state).not.toBe("INDEXABLE");
-    expect(["SEO_CANDIDATE", "GRAPH_ONLY", "NOINDEX_PRODUCT", "REVIEW_REQUIRED"]).toContain(jan?.index_state);
+    const winter = allWeartherePages().find((p) => p.url === "/wearthere/tokyo/winter/what-to-wear");
+    expect(winter).toBeTruthy();
+    expect(winter?.index_state).not.toBe("INDEXABLE");
+    expect(["SEO_CANDIDATE", "GRAPH_ONLY", "NOINDEX_PRODUCT", "REVIEW_REQUIRED"]).toContain(winter?.index_state);
+    expect(allWeartherePages().find((p) => p.url === "/wearthere/tokyo/january/what-to-wear")).toBeUndefined();
   });
 });
 

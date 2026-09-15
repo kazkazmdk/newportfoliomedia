@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-09-15T07:00:55.640Z",
+  "attempted": 142,
+  "observed": 111,
+  "http200": 142,
+  "bySite": {
+    "fixcode": {
+      "attempted": 60,
+      "observed": 59
+    },
+    "wearthere": {
+      "attempted": 30,
+      "observed": 30
+    },
+    "chargematch": {
+      "attempted": 22,
+      "observed": 21
+    },
+    "autospec": {
+      "attempted": 15,
+      "observed": 1
+    },
+    "tripcost": {
+      "attempted": 15,
+      "observed": 0
+    }
+  }
+}

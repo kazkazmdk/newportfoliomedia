@@ -1,0 +1,11 @@
+priority,device_or_charger,fact,current_level,candidate_url,document_title,section,status,blocker
+1,iPhone 16,fast-charge adapter class,PRIMARY_GENERAL,https://support.apple.com/en-us/121029,iPhone 16 - Tech Specs,Charging and Expansion,verified-article,Apple publishes 20W+ adapter and MagSafe 25W — not a full PDO table
+2,iPhone 15,wired PD class,PRIMARY_GENERAL,https://support.apple.com/en-us/120619,About iPhone charge speeds,Wired charging,verified-article,no exact max wired wattage published
+3,MacBook Air 13 M3,included/config adapters,PRIMARY_GENERAL,,,,blocked,no verified MacBook Air M3 tech-spec URL this pass — guessed IDs rejected
+4,MacBook Pro 14 M3,included/config adapters,PRIMARY_GENERAL,,,,blocked,no verified MacBook Pro M3 tech-spec URL this pass — guessed IDs rejected
+5,Galaxy S24,PPS / Super Fast Charging,PRIMARY_GENERAL,,,,blocked,no exact Samsung PDO table verified this pass
+6,Pixel 8,PPS 27W,PRIMARY_GENERAL,,,,blocked,no exact Google PDO table verified this pass
+7,Steam Deck,official 45W,PRIMARY_GENERAL,,,,blocked,Valve support page not re-fetched this pass
+8,Nintendo Switch,official ~39W dock,PRIMARY_GENERAL,,,,blocked,Nintendo wattage page not re-fetched this pass
+9,Apple 20W USB-C,port PDO,PRIMARY_GENERAL,,,,blocked,Apple does not publish a public PDO table for A2305
+10,Anker 65W / 100W,multiport allocation,PRIMARY_GENERAL,,,,blocked,SKU-specific manuals not attached — do not invent PDO

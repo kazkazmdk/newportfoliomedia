@@ -1,1 +1,1 @@
-page_id,query,country,source,observed,value,observed_at,notes,locale,collection_method,confidence,unit
+page_id,query,country,source,observed,value,observed_at,notes,locale,collection_method,confidence,unit,language,raw_label

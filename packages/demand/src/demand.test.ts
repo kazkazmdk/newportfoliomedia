@@ -170,6 +170,44 @@ describe("pre-launch demand paths", () => {
     expect(demandSatisfiesIndex(a).pass).toBe(true);
   });
 
+  it("stale SERP does not validate Path A/B", () => {
+    const a = assessDemand({
+      pageId: "page-1",
+      queryCluster: ["samsung 4c error"],
+      evidence: [ev({ source: "AUTOCOMPLETE", query: "samsung washer 4c" })],
+      serpObservations: [{ ...strongSerp(), observedAt: "2025-01-01T00:00:00.000Z" }],
+      now: NOW,
+    });
+    expect(a.pathA).toBe(false);
+    expect(a.expiredEvidenceIds.some((id) => id.startsWith("serp:"))).toBe(true);
+  });
+
+  it("locale-mismatch SERP does not validate a country-specific page", () => {
+    const a = assessDemand({
+      pageId: "page-gb",
+      queryCluster: ["samsung 4c error"],
+      evidence: [ev({ source: "AUTOCOMPLETE", query: "samsung washer 4c", locale: "en-GB", language: "en", country: "GB" })],
+      serpObservations: [{ ...strongSerp(), locale: "en-US" }],
+      pageLocale: "en-GB",
+      now: NOW,
+    });
+    expect(a.localeMismatches.some((id) => id.includes("en-US"))).toBe(true);
+    expect(a.pathA).toBe(false);
+  });
+
+  it("fresh matching SERP validates Path A", () => {
+    const a = assessDemand({
+      pageId: "page-1",
+      queryCluster: ["samsung 4c error"],
+      evidence: [ev({ source: "AUTOCOMPLETE", query: "samsung washer 4c", locale: "en-US", language: "en", country: "US" })],
+      serpObservations: [{ ...strongSerp(), locale: "en-US" }],
+      pageLocale: "en-US",
+      now: NOW,
+    });
+    expect(a.pathA).toBe(true);
+    expect(demandSatisfiesIndex(a).pass).toBe(true);
+  });
+
   it("expired evidence does not count and locale mismatch is detected", () => {
     const a = assessDemand({
       pageId: "page-1",

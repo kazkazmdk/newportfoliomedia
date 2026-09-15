@@ -1,0 +1,9 @@
+priority,vehicle,engine,generation,market,years,fact,current_provenance,exact_document_locator,status,blocker
+1,BMW 3 Series 320d,B47D20,G20,EU,2019-2022,oil spec,PRIMARY_GENERAL homepage bmw.com,,queued,need handbook page/table for LL-04
+2,BMW 3 Series 320d,B47D20,G20,EU,2019-2022,oil capacity,PRIMARY_GENERAL homepage bmw.com,,queued,need handbook capacity table
+3,BMW 3 Series 320d,B47D20,G20,EU,2019-2022,tyre pressure,PRIMARY_GENERAL + wheel 225/45R18,,queued,need door-sticker / handbook wheel-specific row
+4,Toyota Corolla 1.8 Hybrid,2ZR-FXE,E210,EU,2019-2023,oil spec,PRIMARY_GENERAL homepage toyota.com,,queued,need OEM fluid spec page
+5,Volkswagen Golf 2.0 TDI,DTSA / EA288,Mk8,EU,2020-2023,oil spec,PRIMARY_GENERAL + engine code uncertain,,blocked,engine code not exact — confirm on data sticker
+6,Honda Civic 1.5 VTEC,L15C,11th gen,EU/US,2022-2024,oil spec,PRIMARY_GENERAL honda.com,,queued,need market-specific handbook
+7,Tesla Model 3 Highland RWD,EV-RWD,Highland,EU/US,2024-2025,tyre pressure,PRIMARY_GENERAL,,queued,need Tesla manual wheel/pressure table
+8,any,any,any,any,any,VIN decode,NOT_IMPLEMENTED,,blocked,licensed VIN decode not implemented

@@ -142,6 +142,8 @@ export interface DemandProvider {
   checkQuery(query: string, context: DemandProviderContext): Promise<DemandEvidence[]>;
 }
 
+export const SERP_TTL_DAYS = 75;
+
 export const DEMAND_TTL_DAYS: Record<DemandEvidenceSource, number> = {
   SERP: 75,
   AUTOCOMPLETE: 75,

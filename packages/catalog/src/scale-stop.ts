@@ -6,7 +6,9 @@ export type ScaleStopId =
   | "candidate_growth"
   | "source_truth_depth"
   | "unknown_critical_rate"
-  | "demand_validated_ratio";
+  | "demand_validated_ratio"
+  | "trusted_dataset_exact_rate"
+  | "primary_exact_rate";
 
 export const SCALE_STOP_THRESHOLDS = {
   truth_ready_ratio_min: 0.04,
@@ -30,6 +32,8 @@ export type ScaleSnapshot = {
   relations: number;
   unknownCritical: number;
   demandValidated: number;
+  trustedDatasetExact?: number;
+  primaryExact?: number;
 };
 
 export type ScaleStopResult = {
@@ -107,6 +111,20 @@ export function evaluateScaleStops(snap: ScaleSnapshot): ScaleStopResult[] {
       value: demandValidated,
       threshold: SCALE_STOP_THRESHOLDS.demand_validated_ratio_min,
       reason: "Demand-validated ratio fell after observations existed",
+    },
+    {
+      id: "trusted_dataset_exact_rate",
+      triggered: false,
+      value: (snap.trustedDatasetExact ?? 0) / Math.max(1, snap.criticalFacts),
+      threshold: 0,
+      reason: "TRUSTED_DATASET_EXACT rate (in-repo compiled tables do not count)",
+    },
+    {
+      id: "primary_exact_rate",
+      triggered: false,
+      value: (snap.primaryExact ?? 0) / Math.max(1, snap.criticalFacts),
+      threshold: 0,
+      reason: "PRIMARY_EXACT rate (separate from trusted dataset exact)",
     },
   ];
 }

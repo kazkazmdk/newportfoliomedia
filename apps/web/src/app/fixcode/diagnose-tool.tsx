@@ -53,9 +53,9 @@ export function DiagnoseTool() {
         {"code" in profile ? `${profile.brand} ${profile.appliance}` : profile.appliance} · {result.confidence_level.toLowerCase()} confidence · {result.rule_version}
         {result.display_probabilities ? "" : " · common possibilities, not calibrated %"}
       </p>
-      {result.safety_ceiling === "STOP_USE" ? (
+      {result.self_service_blocked || result.safety_ceiling === "STOP_USE" ? (
         <p className="mt-3 border border-[var(--danger)] bg-[#fff6f4] p-3 text-sm text-[var(--danger)]">
-          Stop using the appliance. Burning smell, smoke, or shock risk is not a DIY path.
+          {result.stop_boundary ?? "Stop using the appliance. This is not a DIY path."} Book a technician.
         </p>
       ) : null}
       <h1 className="mt-3 text-4xl">
@@ -97,7 +97,7 @@ export function DiagnoseTool() {
                 </dd>
               </div>
             </dl>
-            {isBlocked(cause) ? (
+            {result.self_service_blocked || isBlocked(cause) ? (
               <p className="mt-3 text-sm text-[var(--danger)]">{cause.blocked_reason ?? "Stop. Call a professional."}</p>
             ) : (
               <p className="mt-3 text-sm">{cause.fix}</p>
@@ -106,9 +106,9 @@ export function DiagnoseTool() {
         ))}
       </ol>
 
-      {result.next_question ? (
+      {result.next_question && !result.self_service_blocked ? (
         <section className="mt-10 border-t border-[#e2ddd4] pt-8">
-            <p className="text-sm text-[#6a6a64]">Why we&apos;re asking this</p>
+            <p className="text-sm text-[#6a6a64]">Next safe check · why</p>
           <p className="mt-1 text-sm leading-6">{result.why_this_question}</p>
           <h2 className="mt-4 text-2xl">{result.next_question.text}</h2>
           <div className="mt-4 flex flex-wrap gap-2">

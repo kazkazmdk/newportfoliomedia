@@ -6,6 +6,8 @@ import { MORE_ERRORS } from "./data-more";
 import { SYMPTOMS as SEED_SYMPTOMS } from "./data-symptoms";
 import { BATCH2_ERRORS } from "./batch2";
 import { symptomsFromErrors } from "./families";
+import { attachExactOem } from "./exact-sources";
+import { buildDiagnosticTree, nextSafeCheck, walkTree } from "./diagnostic-tree";
 
 function uniqueById<T extends { id: string }>(rows: T[]): T[] {
   const map = new Map<string, T>();
@@ -19,7 +21,7 @@ export const ALL_ERRORS: ErrorProfile[] = uniqueById([
   ...ERRORS,
   ...MORE_ERRORS,
   ...BATCH2_ERRORS,
-]);
+]).map(attachExactOem);
 
 export const ALL_SYMPTOMS: SymptomProfile[] = uniqueById([
   ...SEED_SYMPTOMS,
@@ -129,11 +131,17 @@ function nextQuestion(
   profile: ErrorProfile | SymptomProfile,
   state: DiagnosisState,
 ) {
-  return (
-    profile.questions.find(
-      (question) => !state.answers.some((answer) => answer.question_id === question.id),
-    ) ?? null
+  const tree = buildDiagnosticTree(profile);
+  const node = walkTree(tree, state.answers);
+  if (node.kind === "STOP" || node.safety === "STOP_USE" || node.safety === "PROFESSIONAL_ONLY") {
+    return null;
+  }
+  const safe = nextSafeCheck(
+    tree,
+    state.answers.map((a) => a.question_id),
   );
+  if (!safe) return null;
+  return profile.questions.find((question) => question.id === safe.questionId) ?? null;
 }
 
 function confidenceFromSpread(causes: RankedCause[]): { pct: number; level: ConfidenceLevel } {
@@ -154,11 +162,24 @@ export function diagnose(
 ): DiagnosisResult {
   const calibrated = outcomeCounts(profile.id).__verified > 0;
   const causes = ranked(profile, state, calibrated);
+  const tree = buildDiagnosticTree(profile);
+  const node = walkTree(tree, state.answers);
   const question = nextQuestion(profile, state);
   const { pct, level } = confidenceFromSpread(causes);
   const safety_ceiling = causes.reduce<SafetyClass>((max, cause) => {
     return SAFETY_RANK[cause.safety] > SAFETY_RANK[max] ? cause.safety : max;
   }, "SAFE_USER_CHECK");
+  const hitStop = node.kind === "STOP" || node.id === "stop" || node.id === "technician";
+  const self_service_blocked = hitStop;
+  const stop_boundary = self_service_blocked
+    ? tree.boundaries.find((b) => b.blocksSelfService)?.text ?? "Stop self-service. Book a technician."
+    : safety_ceiling === "STOP_USE"
+      ? "A stop-use cause remains possible. Do not keep using the appliance if you smell burning, see smoke, or risk shock."
+      : undefined;
+  const safeCheck = nextSafeCheck(
+    tree,
+    state.answers.map((a) => a.question_id),
+  );
 
   recordToolCall({
     tool: "update_diagnosis",
@@ -173,14 +194,19 @@ export function diagnose(
     profile,
     headline_cause: causes[0],
     causes,
-    next_question: question,
+    next_question: self_service_blocked ? null : question,
     confidence_pct: pct,
     confidence_level: level,
-    why_this_question: question?.why,
+    why_this_question: self_service_blocked ? stop_boundary : question?.why,
     unknown: causes.length === 0,
     safety_ceiling,
     rule_version: RULE_VERSION,
     display_probabilities: calibrated,
+    self_service_blocked,
+    stop_boundary,
+    recommend_technician: self_service_blocked || Boolean(causes[0] && isBlocked(causes[0] as RankedCause)),
+    next_safe_check: self_service_blocked ? undefined : safeCheck?.question,
+    source_ids: profile.provenance.map((p) => p.source_id),
     trace: {
       facts: causes.slice(0, 3).map((c) => `${c.id}:${c.likelihood_label}`),
       relations: [`MAY_BE_CAUSED_BY`, `TESTED_BY`, `RISK_LEVEL`],

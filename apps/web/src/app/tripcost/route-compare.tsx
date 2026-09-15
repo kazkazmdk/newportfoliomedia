@@ -102,7 +102,9 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
               </p>
             ) : (
               <p className="mt-2 text-sm">
-                {costLabel("HEURISTIC")} €{m.per_person_cash}/person · door-to-door {fmt(m.minutes_door)} · in-vehicle {fmt(m.minutes_in_vehicle)}
+                {m.price_kind === "HEURISTIC_PRICE" ? "Typical estimate" : m.price_kind.replaceAll("_", " ")}
+                {" — "}
+                not a live ticket · €{m.per_person_cash}/person · door-to-door {fmt(m.minutes_door)}
               </p>
             )}
             <ul className="mt-3 grid gap-1 text-sm text-[#3d4f63]">

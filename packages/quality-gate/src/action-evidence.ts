@@ -127,12 +127,28 @@ export function deriveActionEvidence(payload: Record<string, unknown>): ActionEv
   return null;
 }
 
-export function actionEvidencePasses(evidence: ActionEvidence | null): boolean {
+export function declaredFieldsPresent(payload: Record<string, unknown>, fields: string[]): string[] {
+  return fields.filter((field) => payload[field] == null);
+}
+
+export function actionEvidencePasses(
+  evidence: ActionEvidence | null,
+  payload?: Record<string, unknown>,
+): boolean {
   if (!evidence) return false;
-  return (
-    evidence.inputFields.length > 0 &&
-    evidence.outputFields.length > 0 &&
-    evidence.decisionFields.length > 0 &&
-    (evidence.rendered || evidence.executable)
-  );
+  if (
+    !(
+      evidence.inputFields.length > 0 &&
+      evidence.outputFields.length > 0 &&
+      evidence.decisionFields.length > 0 &&
+      (evidence.rendered || evidence.executable)
+    )
+  ) {
+    return false;
+  }
+  if (payload) {
+    const missing = declaredFieldsPresent(payload, [...evidence.outputFields, ...evidence.decisionFields]);
+    if (missing.length) return false;
+  }
+  return true;
 }

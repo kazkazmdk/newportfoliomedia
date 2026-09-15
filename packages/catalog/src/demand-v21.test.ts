@@ -123,6 +123,7 @@ describe("Truth × demand V2.1", () => {
           value: 80,
           unit: "IMPRESSIONS",
           collectionMethod: "API",
+          observedAt: "2026-09-12T00:00:00.000Z",
         }),
       ],
       serp_observations: [strongSerp],

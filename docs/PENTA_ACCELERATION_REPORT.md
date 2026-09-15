@@ -1,5 +1,9 @@
 # Penta acceleration report
 
+> **HISTORICAL.** This report is not the current source of truth. Live metrics: [`docs/PENTA_STATE.md`](./PENTA_STATE.md).
+>
+> It recorded 217 SEO_CANDIDATE at an earlier SHA. Do not compare it to live recalculation.
+
 Generated: 2026-09-14. Starting commit: `353e5e4bb5597f06f473f0b0139b39ff7e2f3033`.
 `PUBLIC_SITE_LIVE=false` for the entire pass. No domain launched. No public robots change.
 

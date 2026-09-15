@@ -18,7 +18,8 @@ Une app Next.js (`apps/web`) expose les cinq identités visuelles, l’admin int
 
 ```bash
 pnpm install
-pnpm lint           # eslint apps/web + typecheck packages/engines/scripts
+pnpm lint           # eslint apps/web only (pnpm lint:web)
+pnpm lint:packages  # honest: no package ESLint — use typecheck
 pnpm typecheck      # apps/web + workspace packages
 pnpm test
 pnpm build
@@ -76,7 +77,7 @@ pnpm demand:import     # validate data/demand/** CSV/JSON
 pnpm demand:discover   # queue, waves, PRELAUNCH_BATCH, reports
 ```
 
-Rapport unique de cette passe : `docs/PENTA_ACCELERATION_REPORT.md`. Simulation de capacité : `docs/SCALE_SIMULATION.md`. Demand : `docs/DEMAND_DISCOVERY_V2.md`.
+Rapport canonique live : `docs/PENTA_STATE.md`. Exécution V3 : `docs/PENTA_V3_EXECUTION.md`. Les rapports plus anciens sont historiques.
 
 ## Données (catalog, honnête)
 

@@ -1,0 +1,143 @@
+priority,wave,site,pageId,query,locale,signals,status,blocker
+1,A,fixcode,fix:bosch:dishwasher:e15,bosch e15 error,en-US,autocomplete,autocomplete_observed,
+2,A,fixcode,fix:samsung:washer:4c,samsung 4c error,en-US,autocomplete,autocomplete_observed,
+3,A,fixcode,fix:samsung:washer:5c,samsung 5c error,en-US,autocomplete,autocomplete_observed,
+4,A,fixcode,fix:samsung:washer:ue,samsung ue error,en-US,autocomplete,autocomplete_observed,
+5,A,fixcode,fix:lg:washer:ie,lg ie error,en-US,autocomplete,autocomplete_observed,
+6,A,fixcode,fix:lg:washer:oe,lg oe error,en-US,autocomplete,autocomplete_observed,
+7,A,fixcode,fix:lg:washer:ue,lg ue error,en-US,autocomplete,autocomplete_observed,
+8,A,fixcode,fix:samsung:washer:4e,samsung 4e error,en-US,autocomplete,autocomplete_observed,
+9,A,fixcode,fix:samsung:washer:5e,samsung 5e error,en-US,autocomplete,autocomplete_observed,
+10,A,fixcode,fix:lg:washer:de,lg de error,en-US,autocomplete,autocomplete_observed,
+11,A,fixcode,fix:samsung:washer:1c,samsung 1c error,en-US,autocomplete,autocomplete_observed,
+12,A,fixcode,fix:samsung:washer:ub,samsung ub error,en-US,autocomplete,autocomplete_observed,
+13,A,fixcode,fix:samsung:washer:sud,samsung sud error,en-US,autocomplete,autocomplete_observed,
+14,A,fixcode,fix:lg:washer:fe,lg fe error,en-US,autocomplete,autocomplete_observed,
+15,A,fixcode,fix:lg:washer:pe,lg pe error,en-US,autocomplete,autocomplete_observed,
+16,A,fixcode,fix:lg:washer:le,lg le error,en-US,autocomplete,autocomplete_observed,
+17,A,fixcode,fix:samsung:washer:3c,samsung 3c error,en-US,autocomplete,autocomplete_observed,
+18,A,fixcode,fix:samsung:washer:1e,samsung 1e error,en-US,autocomplete,autocomplete_observed,
+19,A,fixcode,fix:samsung:washer:3e,samsung 3e error,en-US,autocomplete,autocomplete_observed,
+20,A,fixcode,fix:samsung:washer:dc1,samsung dc1 error,en-US,autocomplete,autocomplete_observed,
+21,A,fixcode,fix:samsung:washer:he,samsung he error,en-US,autocomplete,autocomplete_observed,
+22,A,fixcode,fix:lg:washer:te,lg te error,en-US,autocomplete,autocomplete_observed,
+23,A,fixcode,fix:samsung:washer:8c,samsung 8c error,en-US,autocomplete,autocomplete_observed,
+24,A,fixcode,fix:samsung:washer:hc,samsung hc error,en-US,autocomplete,autocomplete_observed,
+25,A,fixcode,fix:samsung:washer:4c2,samsung 4c2 error,en-US,autocomplete,autocomplete_observed,
+26,A,fixcode,fix:samsung:washer:dc,samsung dc error,en-US,autocomplete,autocomplete_observed,
+27,A,fixcode,fix:samsung:washer:oe,samsung oe error,en-US,autocomplete,autocomplete_observed,
+28,A,fixcode,fix:samsung:washer:le,samsung le error,en-US,autocomplete,autocomplete_observed,
+29,A,fixcode,fix:samsung:washer:te,samsung te error,en-US,autocomplete,autocomplete_observed,
+30,A,fixcode,fix:bosch:dishwasher:e24,bosch e24 error,en-US,autocomplete,autocomplete_observed,
+31,A,fixcode,fix:bosch:dishwasher:e25,bosch e25 error,en-US,autocomplete,autocomplete_observed,
+32,A,fixcode,fix:bosch:washer:e18,bosch e18 error,en-US,autocomplete,autocomplete_observed,
+33,A,fixcode,fix:miele:washer:f70,miele f70 error,en-US,autocomplete,autocomplete_observed,
+34,A,fixcode,fix:samsung:fridge:5e,samsung 5e error,en-US,autocomplete,autocomplete_observed,
+35,A,fixcode,fix:lg:dryer:d80,lg d80 error,en-US,autocomplete,autocomplete_observed,
+36,A,fixcode,fix:samsung:washer:3c1,samsung 3c1 error,en-US,autocomplete,autocomplete_observed,
+37,A,fixcode,fix:samsung:washer:3c3,samsung 3c3 error,en-US,autocomplete,autocomplete_observed,
+38,A,fixcode,fix:samsung:washer:9c,samsung 9c error,en-US,autocomplete,autocomplete_observed,
+39,A,fixcode,fix:samsung:washer:11e,samsung 11e error,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+40,A,fixcode,fix:samsung:washer:uc,samsung uc error,en-US,autocomplete,autocomplete_observed,
+41,A,fixcode,fix:samsung:washer:lc,samsung lc error,en-US,autocomplete,autocomplete_observed,
+42,A,fixcode,fix:samsung:washer:pf,samsung pf error,en-US,autocomplete,autocomplete_observed,
+43,A,fixcode,fix:samsung:dishwasher:4e,samsung 4e error,en-US,autocomplete,autocomplete_observed,
+44,A,fixcode,fix:samsung:dishwasher:4c,samsung 4c error,en-US,autocomplete,autocomplete_observed,
+45,A,fixcode,fix:samsung:dishwasher:5e,samsung 5e error,en-US,autocomplete,autocomplete_observed,
+46,A,fixcode,fix:samsung:dishwasher:oe,samsung oe error,en-US,autocomplete,autocomplete_observed,
+47,A,fixcode,fix:samsung:dishwasher:le,samsung le error,en-US,autocomplete,autocomplete_observed,
+48,A,fixcode,fix:samsung:dishwasher:he,samsung he error,en-US,autocomplete,autocomplete_observed,
+49,A,fixcode,fix:samsung:dishwasher:te,samsung te error,en-US,autocomplete,autocomplete_observed,
+50,A,fixcode,fix:samsung:dishwasher:3e,samsung 3e error,en-US,autocomplete,autocomplete_observed,
+51,A,fixcode,fix:samsung:dryer:te,samsung te error,en-US,autocomplete,autocomplete_observed,
+52,A,fixcode,fix:samsung:dryer:he,samsung he error,en-US,autocomplete,autocomplete_observed,
+53,A,fixcode,fix:samsung:dryer:de,samsung de error,en-US,autocomplete,autocomplete_observed,
+54,A,fixcode,fix:samsung:dryer:dc,samsung dc error,en-US,autocomplete,autocomplete_observed,
+55,A,fixcode,fix:samsung:dryer:3c,samsung 3c error,en-US,autocomplete,autocomplete_observed,
+56,A,fixcode,fix:samsung:fridge:22e,samsung 22e error,en-US,autocomplete,autocomplete_observed,
+57,A,fixcode,fix:samsung:fridge:88,samsung 88 error,en-US,autocomplete,autocomplete_observed,
+58,A,fixcode,fix:samsung:oven:te,samsung te error,en-US,autocomplete,autocomplete_observed,
+59,A,fixcode,fix:samsung:oven:dc,samsung dc error,en-US,autocomplete,autocomplete_observed,
+60,A,fixcode,fix:lg:washer:ce,lg ce error,en-US,autocomplete,autocomplete_observed,
+61,B,wearthere,dest:paris:winter,what to wear in paris in february,en-US,autocomplete,autocomplete_observed,
+62,B,wearthere,dest:paris:march,what to wear in paris in march,en-US,autocomplete,autocomplete_observed,
+63,B,wearthere,dest:paris:april,what to wear in paris in april,en-US,autocomplete,autocomplete_observed,
+64,B,wearthere,dest:paris:may,what to wear in paris in may,en-US,autocomplete,autocomplete_observed,
+65,B,wearthere,dest:paris:september,what to wear in paris in september,en-US,autocomplete,autocomplete_observed,
+66,B,wearthere,dest:paris:october,what to wear in paris in october,en-US,autocomplete,autocomplete_observed,
+67,B,wearthere,dest:paris:november,what to wear in paris in november,en-US,autocomplete,autocomplete_observed,
+68,B,wearthere,dest:tokyo:winter,what to wear in tokyo in february,en-US,autocomplete,autocomplete_observed,
+69,B,wearthere,dest:tokyo:march,what to wear in tokyo in march,en-US,autocomplete,autocomplete_observed,
+70,B,wearthere,dest:tokyo:april,what to wear in tokyo in april,en-US,autocomplete,autocomplete_observed,
+71,B,wearthere,dest:tokyo:may,what to wear in tokyo in may,en-US,autocomplete,autocomplete_observed,
+72,B,wearthere,dest:tokyo:june,what to wear in tokyo in june,en-US,autocomplete,autocomplete_observed,
+73,B,wearthere,dest:tokyo:september,what to wear in tokyo in september,en-US,autocomplete,autocomplete_observed,
+74,B,wearthere,dest:tokyo:october,what to wear in tokyo in october,en-US,autocomplete,autocomplete_observed,
+75,B,wearthere,dest:tokyo:november,what to wear in tokyo in november,en-US,autocomplete,autocomplete_observed,
+76,B,wearthere,dest:new-york:march,what to wear in new york in march,en-US,autocomplete,autocomplete_observed,
+77,B,wearthere,dest:new-york:april,what to wear in new york in april,en-US,autocomplete,autocomplete_observed,
+78,B,wearthere,dest:new-york:may,what to wear in new york in may,en-US,autocomplete,autocomplete_observed,
+79,B,wearthere,dest:new-york:june,what to wear in new york in june,en-US,autocomplete,autocomplete_observed,
+80,B,wearthere,dest:new-york:september,what to wear in new york in september,en-US,autocomplete,autocomplete_observed,
+81,B,wearthere,dest:new-york:october,what to wear in new york in october,en-US,autocomplete,autocomplete_observed,
+82,B,wearthere,dest:new-york:november,what to wear in new york in november,en-US,autocomplete,autocomplete_observed,
+83,B,wearthere,dest:london:may,what to wear in london in may,en-US,autocomplete,autocomplete_observed,
+84,B,wearthere,dest:london:october,what to wear in london in october,en-US,autocomplete,autocomplete_observed,
+85,B,wearthere,dest:london:november,what to wear in london in november,en-US,autocomplete,autocomplete_observed,
+86,B,wearthere,dest:barcelona:may,what to wear in barcelona in may,en-US,autocomplete,autocomplete_observed,
+87,B,wearthere,dest:barcelona:summer,what to wear in barcelona in july,en-US,autocomplete,autocomplete_observed,
+88,B,wearthere,dest:barcelona:september,what to wear in barcelona in september,en-US,autocomplete,autocomplete_observed,
+89,B,wearthere,dest:barcelona:october,what to wear in barcelona in october,en-US,autocomplete,autocomplete_observed,
+90,B,wearthere,dest:barcelona:november,what to wear in barcelona in november,en-US,autocomplete,autocomplete_observed,
+91,C,chargematch,dev:iphone-16,iphone-16 charger wattage,en-US,autocomplete,autocomplete_observed,
+92,C,chargematch,dev:iphone-15,iphone-15 charger wattage,en-US,autocomplete,autocomplete_observed,
+93,C,chargematch,dev:mba-m3-13,macbook-air-13-m3 charger wattage,en-US,autocomplete,autocomplete_observed,
+94,C,chargematch,dev:mbp-14,macbook-pro-14-m3 charger wattage,en-US,autocomplete,autocomplete_observed,
+95,C,chargematch,dev:ipad-pro-m4,ipad-pro-m4 charger wattage,en-US,autocomplete,autocomplete_observed,
+96,C,chargematch,dev:steam-deck,steam-deck charger wattage,en-US,autocomplete,autocomplete_observed,
+97,C,chargematch,dev:galaxy-s24,galaxy-s24 charger wattage,en-US,autocomplete,autocomplete_observed,
+98,C,chargematch,dev:pixel-8,pixel-8 charger wattage,en-US,autocomplete,autocomplete_observed,
+99,C,chargematch,dev:switch,nintendo-switch charger wattage,en-US,autocomplete,autocomplete_observed,
+100,C,chargematch,dev:airpods-pro,airpods-pro-usbc charger wattage,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+101,C,chargematch,dev:watch,apple-watch charger wattage,en-US,autocomplete,autocomplete_observed,
+102,C,chargematch,dev:iphone-16-pro,iphone-16-pro charger wattage,en-US,autocomplete,autocomplete_observed,
+103,C,chargematch,dev:iphone-14,iphone-14 charger wattage,en-US,autocomplete,autocomplete_observed,
+104,C,chargematch,dev:mba-m3-15,macbook-air-15-m3 charger wattage,en-US,autocomplete,autocomplete_observed,
+105,C,chargematch,dev:ipad-air-m2,ipad-air-m2 charger wattage,en-US,autocomplete,autocomplete_observed,
+106,C,chargematch,dev:pixel-9,pixel-9 charger wattage,en-US,autocomplete,autocomplete_observed,
+107,C,chargematch,dev:s24-ultra,galaxy-s24-ultra charger wattage,en-US,autocomplete,autocomplete_observed,
+108,C,chargematch,dev:steam-deck-oled,steam-deck-oled charger wattage,en-US,autocomplete,autocomplete_observed,
+109,C,chargematch,dev:switch-oled,nintendo-switch-oled charger wattage,en-US,autocomplete,autocomplete_observed,
+110,C,chargematch,dev:framework-13,framework-13 charger wattage,en-US,autocomplete,autocomplete_observed,
+111,C,chargematch,dev:quest-3,quest-3 charger wattage,en-US,autocomplete,autocomplete_observed,
+112,C,chargematch,dev:tab-s9,galaxy-tab-s9 charger wattage,en-US,autocomplete,autocomplete_observed,
+113,D,autospec,veh:bmw:3-series:g20:320d-b47,bmw 3-series g20 320d-b47 service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+114,D,autospec,veh:bmw:3-series:g20:320d-b47:oil,bmw 3-series g20 320d-b47 oil capacity,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+115,D,autospec,veh:bmw:3-series:g20:320d-b47:tyres,bmw 3-series g20 320d-b47 tyre pressure,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+116,D,autospec,veh:bmw:3-series:g20:320d-b47:battery,bmw 3-series g20 320d-b47 battery type,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+117,D,autospec,veh:bmw:3-series:g20:320d-b47:maintenance,bmw 3-series g20 320d-b47 service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+118,D,autospec,veh:bmw:3-series:g20:320d-b47:problems,bmw 3-series g20 320d-b47 service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+119,D,autospec,veh:toyota:corolla:e210:1-8-hybrid,toyota corolla e210 1-8-hybrid service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+120,D,autospec,veh:toyota:corolla:e210:1-8-hybrid:oil,toyota corolla e210 1-8-hybrid oil capacity,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+121,D,autospec,veh:toyota:corolla:e210:1-8-hybrid:tyres,toyota corolla e210 1-8-hybrid tyre pressure,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+122,D,autospec,veh:toyota:corolla:e210:1-8-hybrid:battery,toyota corolla e210 1-8-hybrid battery type,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+123,D,autospec,veh:toyota:corolla:e210:1-8-hybrid:maintenance,toyota corolla e210 1-8-hybrid service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+124,D,autospec,veh:toyota:corolla:e210:1-8-hybrid:problems,toyota corolla e210 1-8-hybrid service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+125,D,autospec,veh:vw:golf:mk8:2-0-tdi,vw golf mk8 2-0-tdi service schedule,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+126,D,autospec,veh:vw:golf:mk8:2-0-tdi:oil,vw golf mk8 2-0-tdi oil capacity,en-US,autocomplete,autocomplete_observed,
+127,D,autospec,veh:vw:golf:mk8:2-0-tdi:tyres,vw golf mk8 2-0-tdi tyre pressure,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+128,E,tripcost,paris-lyon,paris to lyon drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+129,E,tripcost,paris-lyon:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+130,E,tripcost,paris-barcelona,paris to barcelona drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+131,E,tripcost,paris-barcelona:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+132,E,tripcost,london-paris,london to paris drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+133,E,tripcost,london-paris:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+134,E,tripcost,berlin-munich,berlin to munich drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+135,E,tripcost,berlin-munich:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+136,E,tripcost,paris-amsterdam,paris to amsterdam drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+137,E,tripcost,paris-amsterdam:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+138,E,tripcost,paris-brussels,paris to brussels drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+139,E,tripcost,paris-brussels:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+140,E,tripcost,milan-munich,milan to munich drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+141,E,tripcost,milan-munich:driving,to drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
+142,E,tripcost,paris-rome,paris to rome drive vs train cost,en-US,autocomplete,empty_suggest,suggest HTTP 200 or empty
