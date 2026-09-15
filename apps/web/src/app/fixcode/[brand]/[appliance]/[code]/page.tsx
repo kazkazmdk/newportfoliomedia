@@ -5,6 +5,7 @@ import { allFixcodePages } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
 import { ViewportScene } from "@/components/creative";
+import { CheckDiagram, checkKindFromText } from "../../../components/machine-visual";
 import { ErrorHero } from "../../../components/error-hero";
 
 export function generateStaticParams() {
@@ -67,14 +68,14 @@ export default async function ErrorPage({
       ) : null}
       <ErrorHero profile={profile} brand={brand} appliance={appliance} />
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 01 · meaning</p>
+        <p className="fc-kicker">What it means</p>
         <p className="mt-5 max-w-2xl text-3xl leading-tight">{profile.meaning}</p>
         <p className="mt-6 max-w-xl text-sm leading-7 text-[var(--fc-mute)]">
           Run the safe checks first. This is a structured diagnostic tree — not a language-model guess.
         </p>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 02 · possible causes</p>
+        <p className="fc-kicker">Possible causes</p>
         <ol className="mt-8">
           {profile.causes.map((cause, index) => (
             <li key={cause.id} className="fc-hypo">
@@ -93,18 +94,21 @@ export default async function ErrorPage({
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 03 · safe check</p>
-        <ol className="mt-6 max-w-2xl list-decimal pl-5 text-lg leading-9">
+        <p className="fc-kicker">Safe checks first</p>
+        <ol className="mt-6 grid max-w-3xl gap-5">
           {profile.questions.map((q) => (
-            <li key={q.id}>
-              {q.text}
-              <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
+            <li key={q.id} className="fc-check">
+              <CheckDiagram kind={checkKindFromText(`${q.text} ${q.why}`)} />
+              <div>
+                {q.text}
+                <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
+              </div>
             </li>
           ))}
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 04 · diagnostic narrowing</p>
+        <p className="fc-kicker">Narrow the diagnosis</p>
         <Link
           href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
           className="fc-run mt-8 inline-block"
@@ -113,27 +117,29 @@ export default async function ErrorPage({
         </Link>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 05 · OEM source</p>
+        <p className="fc-kicker">Manufacturer source</p>
         <ul className="mt-6 max-w-xl text-sm leading-7">
           {profile.provenance.map((row) => (
-            <li key={row.source_id} className="border-t border-[var(--fc-line)] py-3">
-              {row.source_type} · {row.verification_method} · {row.retrieved_at.slice(0, 10)}
-              {row.locator?.section ? ` · ${row.locator.section}` : ""}
-              {row.verified_at ? " · verified locator" : " · general / unverified"}
+            <li key={row.source_id} className="fc-evidence border-t border-[var(--fc-line)] py-4">
+              <p className="text-lg">{row.source_name ?? "Documented source"}</p>
+              <p className="mt-2 fixcode-mono text-[11px] uppercase tracking-[0.16em] text-[var(--fc-mute)]">
+                {row.source_type === "MANUFACTURER" ? "Official support" : row.source_type.replaceAll("_", " ")}
+                {" · "}
+                {row.verified_at ? "locator verified" : "general / unverified"}
+                {" · "}
+                retrieved {row.retrieved_at.slice(0, 10)}
+              </p>
               {row.source_url ? (
-                <>
-                  {" · "}
-                  <a className="underline" href={row.source_url}>
-                    origin
-                  </a>
-                </>
+                <a className="mt-3 inline-block underline" href={row.source_url}>
+                  Open original source
+                </a>
               ) : null}
             </li>
           ))}
         </ul>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 06 · when to stop DIY</p>
+        <p className="fc-kicker">When to stop DIY</p>
         {diyStop ? (
           <p className="mt-5 max-w-xl text-2xl text-[var(--fc-signal)]">
             Stop self-service if the tree hits a professional or stop-use boundary.

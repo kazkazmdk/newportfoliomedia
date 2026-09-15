@@ -72,6 +72,19 @@
 }
 
 .tc-map svg { width: 100%; height: min(78vh, 720px); }
+.tc-map-note { position: absolute; left: 1rem; bottom: 0.8rem; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.tc-seg { display: flex; min-height: 1.6rem; background: color-mix(in srgb, var(--tc-ink) 10%, transparent); }
+.tc-seg > span { display: grid; place-items: center; font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; border-right: 1px solid var(--tc-paper); background: var(--tc-ink); color: var(--tc-paper); }
+.tc-seg > span:nth-child(2) { background: #2a3c55; }
+.tc-seg > span:nth-child(3) { background: var(--tc-route); }
+.tc-seg > span:nth-child(4) { background: #4a5b70; }
+.tc-be svg { width: min(100%, 640px); height: auto; }
+.tc-be-car { fill: none; stroke: var(--tc-ink); stroke-width: 2; }
+.tc-be-train { fill: none; stroke: var(--tc-route); stroke-width: 2; }
+.tc-be-ev { fill: none; stroke: var(--tc-win); stroke-width: 2; }
+.tc-path.is-flight { stroke-dasharray: 1 8; }
+.tc-path.is-train { stroke-dasharray: none; stroke-width: 2.2; }
+.tc-path.is-car, .tc-path.is-ev, .tc-path.is-bus, .tc-path.is-rideshare { stroke-dasharray: 10 6; }
 
 .tc-city { fill: var(--tc-ink); }
 .tc-path { fill: none; stroke: var(--tc-route); stroke-width: 1.6; stroke-dasharray: 6 5; animation: tc-dash 18s linear infinite; }

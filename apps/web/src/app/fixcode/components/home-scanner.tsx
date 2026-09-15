@@ -3,7 +3,7 @@
 import { ALL_ERRORS } from "@penta/fixcode";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
-import { SpringButton } from "@/components/creative";
+import { CursorCanvas, SpringButton } from "@/components/creative";
 import { MachineVisual, zoneFromText } from "./machine-visual";
 
 export function HomeScanner() {
@@ -29,7 +29,7 @@ export function HomeScanner() {
     <section className="fc-hero">
       <div className="fc-hero-copy">
         <div>
-          <p className="fc-kicker">Premium technical diagnostic · FC.01</p>
+          <p className="fc-kicker">Error-code diagnosis</p>
           <h1 className="fc-display mt-6">
             What is your
             <br />
@@ -89,13 +89,13 @@ export function HomeScanner() {
           )}
         </form>
       </div>
-      <div className="fc-stage">
+      <CursorCanvas label="Trace" color="#161513" className="fc-stage">
         <div className={`fc-scan ${match ? "ready" : ""}`} />
         <MachineVisual zone={zone} ready={Boolean(match)} appliance={appliance} />
         <p className="absolute bottom-5 left-5 fixcode-mono text-[10px] uppercase tracking-[0.2em] text-[var(--fc-mute)]">
           {zone === "none" ? "Scan idle" : `Focus · ${zone}`}
         </p>
-      </div>
+      </CursorCanvas>
     </section>
   );
 }

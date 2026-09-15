@@ -7,6 +7,8 @@ import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 import { IdentityStrip } from "./components/identity-strip";
 import { OwnershipTimeline } from "./components/ownership-timeline";
+import Image from "next/image";
+import { vehicleMediaOf } from "@/lib/media-catalog";
 import { VehicleStage } from "./components/vehicle-stage";
 
 export function GarageApp() {
@@ -58,7 +60,7 @@ export function GarageApp() {
             ))}
           </ul>
         </div>
-        <VehicleStage />
+        <VehicleStage makeSlug={vehicle.make_slug} generationSlug={vehicle.generation_slug} identity={`${vehicle.make} ${vehicle.variant} ${vehicle.generation}`} />
       </section>
       <IdentityStrip vehicle={vehicle} />
       <section className="as-scene">
@@ -67,6 +69,16 @@ export function GarageApp() {
           {VEHICLES.slice(0, 3).map((v) => (
             <li key={v.id}>
               <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-tile">
+                {vehicleMediaOf(v.make_slug, v.generation_slug) ? (
+                  <Image
+                    src={vehicleMediaOf(v.make_slug, v.generation_slug)!.src}
+                    alt={`${v.make} ${v.variant}`}
+                    width={480}
+                    height={240}
+                    sizes="30vw"
+                    className="as-tile-img"
+                  />
+                ) : null}
                 <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation}</p>
                 <p className="as-display text-3xl">{v.make} {v.variant}</p>
               </Link>

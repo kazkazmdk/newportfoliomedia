@@ -16,8 +16,8 @@ export default function FixcodeHome() {
     <main>
       <HomeScanner />
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 02 · frequent trees</p>
-        <h2 className="mt-4 max-w-xl text-4xl leading-none">Ranked codes. Not a blog of symptoms.</h2>
+        <p className="fc-kicker">Verified error trees</p>
+        <h2 className="mt-4 max-w-xl text-4xl leading-none">The codes we can actually diagnose.</h2>
         <ol className="mt-10 grid gap-0 md:grid-cols-2">
           {popular.map((item, i) => (
             <li key={item.id}>
@@ -36,7 +36,7 @@ export default function FixcodeHome() {
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Scene 03 · coverage</p>
+        <p className="fc-kicker">Appliances on file</p>
         <div className="mt-6 grid gap-8 md:grid-cols-4">
           {APPLIANCES.map((item) => (
             <article key={item.slug}>

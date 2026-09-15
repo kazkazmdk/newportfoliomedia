@@ -360,6 +360,29 @@
   }
 }
 
+.fc-part.is-dim { opacity: 0.18; }
+.fc-fill { fill: color-mix(in srgb, var(--fc-ink) 18%, transparent); }
+.fc-diag-path { fill: none; stroke: var(--fc-signal); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.fc-plate-mark {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+}
+.fc-machine { position: relative; }
+.fc-micro { width: 4.2rem; height: auto; }
+.fc-check { display: grid; grid-template-columns: 4.4rem 1fr; gap: 1rem; align-items: start; }
+.fc-pin-wrap {
+  display: grid;
+}
+@media (min-width: 980px) {
+  .fc-pin-wrap { grid-template-columns: 1fr 1fr; }
+  .fc-pin-visual { position: sticky; top: 4.6rem; align-self: start; padding: 2rem; }
+}
+.fc-evidence dt { opacity: 0.65; }
+.fc-evidence dd { margin: 0.15rem 0 0; }
+
 @media (prefers-reduced-motion: reduce) {
   .fc-scan { animation: none; opacity: 0.25; }
 }

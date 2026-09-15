@@ -52,7 +52,7 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
       <ClimateRibbon weather={w} />
       <ViewportScene className="wt-scene">
         <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">
-          Scene 01 · typical {label} — {model.replaceAll("_", " ").toLowerCase()} — compiled normals
+          Typical {label} · compiled climate normals
         </p>
         <h1 className="mt-4 max-w-4xl text-5xl leading-none md:text-7xl">
           What to Wear in {dest.city} in {label[0].toUpperCase() + label.slice(1)}
@@ -60,26 +60,26 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
         <p className="wt-serif mt-6 text-3xl">{climateCopy(mood)}</p>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 03 · what it feels like</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">How it typically feels</p>
         <p className="wt-serif mt-4 text-6xl">
           {w.tmin_c}–{w.tmax_c}°C
         </p>
         <p className="mt-4 max-w-lg leading-7 opacity-80">Range, not today / tomorrow. About {w.rain_days} rain days · {w.rain_mm} mm.</p>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 04 · capsule · {cap.pieces.length} pieces · {cap.outfits} outfits</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Your {dest.city} capsule · {cap.pieces.length} pieces · {cap.outfits} outfits</p>
         <WardrobeBoard pieces={cap.pieces} />
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 05 · don&apos;t pack</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Leave this behind</p>
         <p className="wt-serif mt-4 max-w-xl text-4xl leading-none">
           {skip.length ? skip.join(", ") : "No heavy layers flagged for this period."}
         </p>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 07 · source</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Climate source</p>
         <p className="mt-4 max-w-xl leading-7 opacity-80">
-          Compiled monthly normals (DATASET_GENERAL). No station ID, no official dataset API locator. Period labelled 1991–2020 in-repo only. Weather coverage {cap.coverage.weather_coverage}%.
+          Compiled monthly normals. No station ID, no official dataset API locator. Period labelled 1991–2020 in-repo only. Weather coverage {cap.coverage.weather_coverage}%.
         </p>
         <Link className="wt-cta mt-8 inline-block" href={`/wearthere/trip?city=${city}&start=2026-10-12&end=2026-10-17&style=classic`}>
           Exact dates · private capsule

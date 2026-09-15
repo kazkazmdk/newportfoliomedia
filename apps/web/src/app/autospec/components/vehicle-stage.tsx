@@ -1,26 +1,69 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
+import { CursorCanvas } from "@/components/creative";
+import { vehicleMediaOf } from "@/lib/media-catalog";
 
 const ZONES = ["body", "engine", "tyres", "battery", "service"] as const;
+export type VehicleFocus = (typeof ZONES)[number];
 
-export function VehicleStage({ focus = "body" }: { focus?: (typeof ZONES)[number] }) {
-  const [zone, setZone] = useState<(typeof ZONES)[number]>(focus);
+const CALLOUTS: Record<Exclude<VehicleFocus, "body">, { label: string; x: string; y: string; note: string }> = {
+  engine: { label: "Engine", x: "18%", y: "42%", note: "Front system · graph identity, not an X-ray of this photo" },
+  tyres: { label: "Tyres", x: "22%", y: "78%", note: "Approximate wheel region on this body" },
+  battery: { label: "Battery", x: "78%", y: "36%", note: "Adjacent panel — exact location is not drawn from this photo" },
+  service: { label: "Service", x: "70%", y: "18%", note: "Ownership interval, not a body marker" },
+};
+
+export function VehicleStage({
+  focus = "body",
+  makeSlug,
+  generationSlug,
+  identity,
+}: {
+  focus?: VehicleFocus;
+  makeSlug?: string;
+  generationSlug?: string;
+  identity?: string;
+}) {
+  const [zone, setZone] = useState<VehicleFocus>(focus);
+  const media = makeSlug && generationSlug ? vehicleMediaOf(makeSlug, generationSlug) : vehicleMediaOf("bmw", "g20");
+  const call = zone === "body" ? null : CALLOUTS[zone];
+
   return (
-    <div className="as-stage">
-      <svg className="as-car" viewBox="0 0 640 240" role="img" aria-label="Vehicle silhouette">
-        <path d="M70 168 H112 C132 168 148 118 188 108 C214 72 248 58 292 56 H404 C458 56 492 78 524 112 C556 120 580 138 592 154 V176 H70 Z" />
-        <path d="M214 108 C236 78 260 62 292 60 H390 C430 62 456 82 478 108" />
-        <path d="M292 60 V108 M390 62 V108 M248 108 H470" />
-        <circle className={zone === "tyres" ? "hot" : ""} cx="176" cy="176" r="26" />
-        <circle cx="176" cy="176" r="11" />
-        <circle className={zone === "tyres" ? "hot" : ""} cx="500" cy="176" r="26" />
-        <circle cx="500" cy="176" r="11" />
-        <rect className={zone === "engine" ? "hot" : ""} x="124" y="122" width="58" height="26" />
-        <rect className={zone === "battery" ? "hot" : ""} x="318" y="154" width="44" height="14" />
-        <path className={zone === "service" ? "hot" : ""} d="M318 78 H392" />
-        <path d="M70 168 H592" />
-      </svg>
+    <CursorCanvas label="Inspect" color="#101418" className="as-stage">
+      <div className="as-depth">
+        <div className="as-plane" aria-hidden />
+        {media ? (
+          <div className={`as-car-photo ${zone !== "body" ? "is-inspect" : ""}`}>
+            <Image
+              src={media.src}
+              alt={media.alt}
+              width={1600}
+              height={780}
+              sizes="(max-width: 800px) 94vw, 68vw"
+              className="as-car-img"
+              priority
+            />
+            <div className="as-shadow" aria-hidden />
+            {call ? (
+              <div className="as-callout" style={{ left: call.x, top: call.y }}>
+                <span />
+                <p>
+                  {call.label}
+                  <small>{call.note}</small>
+                </p>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--as-mute)]">No licensed vehicle still for this identity. Silhouette withheld.</p>
+        )}
+        <p className="as-credit">
+          {identity ?? "BMW 320d G20"}
+          {media ? ` · ${media.note}` : ""}
+        </p>
+      </div>
       <div className="mt-6 flex flex-wrap gap-3">
         {ZONES.filter((z) => z !== "body").map((z) => (
           <button
@@ -34,6 +77,6 @@ export function VehicleStage({ focus = "body" }: { focus?: (typeof ZONES)[number
           </button>
         ))}
       </div>
-    </div>
+    </CursorCanvas>
   );
 }

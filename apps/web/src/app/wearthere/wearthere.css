@@ -77,7 +77,7 @@
   position: relative;
   overflow: hidden;
   display: grid;
-  align-items: end;
+  align-items: stretch;
 }
 
 .wt-atmosphere {
@@ -98,21 +98,27 @@
   background: linear-gradient(to top, var(--wt-paper), transparent 42%);
 }
 
-.wt-hero-inner {
+.wt-hero-inner,
+.wt-hero-grid {
   position: relative;
   z-index: 1;
   width: 100%;
-  padding: 7.5rem 1.4rem 2.2rem;
+  padding: 6.5rem 1.4rem 2.2rem;
   display: grid;
-  gap: 2rem;
+  gap: 1.4rem;
 }
 
 @media (min-width: 980px) {
-  .wt-hero-inner {
-    grid-template-columns: 1.2fr 0.8fr;
+  .wt-hero-grid {
+    grid-template-columns: 0.9fr 1.2fr;
+    grid-template-rows: auto auto;
     align-items: end;
-    padding: 8rem 2.4rem 3rem;
+    padding: 7rem 2.4rem 2.4rem;
+    min-height: 100svh;
   }
+  .wt-hero-type { grid-column: 1; grid-row: 1; z-index: 2; }
+  .wt-planner { grid-column: 1; grid-row: 2; }
+  .wt-hero-frame { grid-column: 2; grid-row: 1 / span 2; }
 }
 
 .wt-city {
@@ -158,18 +164,14 @@
 }
 
 .wt-ribbon {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 1.2rem 1.4rem 1.6rem;
   border-top: 1px solid color-mix(in srgb, var(--wt-ink) 18%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--wt-ink) 18%, transparent);
 }
 
-.wt-ribbon article {
-  padding: 1.3rem 1rem;
-  border-right: 1px solid color-mix(in srgb, var(--wt-ink) 18%, transparent);
-}
-
-.wt-ribbon article:last-child { border-right: 0; }
+.wt-band { width: 100%; height: auto; color: inherit; }
+.wt-band-label { fill: currentColor; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; }
+.wt-ribbon-note { margin-top: 0.6rem; font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
 
 .wt-board {
   display: grid;
@@ -180,12 +182,57 @@
   .wt-board { grid-template-columns: repeat(12, 1fr); }
 }
 
+.wt-lookbook { display: grid; gap: 1.5rem; }
+.wt-suitcase { max-width: 16rem; }
+.wt-drop {
+  border: 1px dashed color-mix(in srgb, var(--wt-ink) 35%, transparent);
+  padding: 1rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
 .wt-garment {
   min-height: 12rem;
   padding: 1.4rem;
-  border: 1px solid color-mix(in srgb, var(--wt-ink) 16%, transparent);
+  border: 0;
   position: relative;
 }
+
+.wt-garment.is-open { opacity: 0.38; }
+.wt-garment.is-packed { transform: scale(0.96); }
+.wt-garment-svg { width: min(46%, 140px); height: auto; margin-top: 1rem; }
+.wt-photo {
+  position: relative;
+  min-height: min(72vh, 640px);
+  width: min(100%, 58vw);
+  margin-left: auto;
+  clip-path: inset(8% 0 0 0);
+  animation: wt-mask 780ms ease both;
+}
+.wt-photo img { object-fit: cover; }
+.wt-photo-meta {
+  position: absolute;
+  left: 0;
+  bottom: 1rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.wt-weather-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+[data-climate="rain"] .wt-weather-veil {
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, #8aa 18%, transparent));
+  box-shadow: inset 0 0 80px color-mix(in srgb, #89a 22%, transparent);
+}
+[data-climate="sun"] .wt-weather-veil { background: linear-gradient(120deg, color-mix(in srgb, #ffb 16%, transparent), transparent 50%); }
+[data-climate="polar"] .wt-weather-veil { filter: saturate(0.85); background: color-mix(in srgb, #9ab 12%, transparent); }
+[data-climate="humid"] .wt-weather-veil { background: color-mix(in srgb, #8c8 14%, transparent); }
+@keyframes wt-mask { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(8% 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .wt-photo { animation: none; } }
 
 .wt-garment:nth-child(1) { grid-column: span 7; min-height: 18rem; }
 .wt-garment:nth-child(2) { grid-column: span 5; }
@@ -277,7 +324,7 @@
     background: var(--wt-paper);
     mix-blend-mode: normal;
   }
-  .wt-ribbon { grid-template-columns: 1fr 1fr; }
-  .wt-ribbon article { border-bottom: 1px solid color-mix(in srgb, var(--wt-ink) 18%, transparent); }
   .wt-garment:nth-child(n) { grid-column: span 12; min-height: 10rem; }
+  .wt-photo { width: 100%; min-height: 52vh; }
+  .wt-hero-type { order: 2; }
 }

@@ -37,18 +37,18 @@ export default async function CityHub({ params }: { params: Promise<{ city: stri
       <DestinationHero initialCity={dest.slug} />
       <ClimateRibbon weather={weather} />
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 02 · climate rhythm</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Typical climate</p>
         <p className="wt-serif mt-4 max-w-2xl text-5xl leading-none">{climateCopy(mood)}</p>
         <p className="mt-5 max-w-lg leading-7 opacity-80">
           {dest.country}. Climate model: {model.replaceAll("_", " ").toLowerCase()}. Compiled monthly normals — not a forecast.
         </p>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 04 · capsule</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Capsule</p>
         <WardrobeBoard pieces={cap.pieces} />
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 07 · periods</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">When to go</p>
         {surfaces.length === 0 ? (
           <p className="mt-6 max-w-xl text-2xl leading-snug">
             Equatorial / year-round climate. Twelve near-identical month pages are not generated. Pack for heat and rain, then use exact dates privately.

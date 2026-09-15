@@ -2,6 +2,11 @@
 
 import type { ProvenanceRecord } from "@penta/data-provenance";
 
+function humanType(value: string) {
+  if (value === "MANUFACTURER") return "Manufacturer";
+  return value.replaceAll("_", " ").toLowerCase();
+}
+
 export function SourceTrace({
   open,
   onClose,
@@ -17,7 +22,7 @@ export function SourceTrace({
         <button
           type="button"
           className="fixed inset-0 z-[55] bg-[#161513]/20"
-          aria-label="Close source trace"
+          aria-label="Close source drawer"
           onClick={onClose}
         />
       ) : null}
@@ -31,21 +36,33 @@ export function SourceTrace({
         {rows.length === 0 ? (
           <p className="mt-8 text-sm leading-7 text-[var(--fc-mute)]">No provenance rows on this surface.</p>
         ) : (
-          <ul className="mt-8 grid gap-6">
+          <ul className="mt-8 grid gap-8">
             {rows.map((row) => (
-              <li key={row.source_id} className="border-t border-[var(--fc-line)] pt-4">
-                <p className="text-lg">{row.source_name}</p>
-                <p className="fixcode-mono mt-2 text-[11px] uppercase tracking-[0.16em] text-[var(--fc-mute)]">
-                  {row.source_type} · {row.verification_method}
-                </p>
-                <p className="mt-3 text-sm">Retrieved {row.retrieved_at.slice(0, 10)}</p>
-                {row.locator?.section ? <p className="mt-1 text-sm">{row.locator.section}</p> : null}
-                <p className="mt-2 text-sm">
-                  {row.verified_at ? "Locator verified" : "General / unverified"}
-                </p>
+              <li key={row.source_id} className="fc-evidence">
+                <p className="text-xl">{row.source_name ?? "Documented source"}</p>
+                <dl className="mt-4 grid gap-2 text-[11px] uppercase tracking-[0.16em] text-[var(--fc-mute)]">
+                  <div>
+                    <dt>Source type</dt>
+                    <dd className="text-[var(--fc-ink)]">{humanType(row.source_type)}</dd>
+                  </div>
+                  <div>
+                    <dt>Locator</dt>
+                    <dd className="text-[var(--fc-ink)]">{row.verified_at ? "verified" : "general / unverified"}</dd>
+                  </div>
+                  <div>
+                    <dt>Retrieved</dt>
+                    <dd className="text-[var(--fc-ink)]">{row.retrieved_at.slice(0, 10)}</dd>
+                  </div>
+                  {row.locator?.section ? (
+                    <div>
+                      <dt>Section</dt>
+                      <dd className="text-[var(--fc-ink)]">{row.locator.section}</dd>
+                    </div>
+                  ) : null}
+                </dl>
                 {row.source_url ? (
-                  <a className="mt-3 inline-block text-sm underline" href={row.source_url}>
-                    Origin
+                  <a className="fc-run mt-5 inline-block text-center" href={row.source_url}>
+                    Open original source
                   </a>
                 ) : null}
               </li>

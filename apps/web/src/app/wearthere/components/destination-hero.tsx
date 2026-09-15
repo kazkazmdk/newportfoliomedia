@@ -1,9 +1,11 @@
 "use client";
 
 import { DESTINATIONS, typicalWeather, type StyleId } from "@penta/wearthere";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { NoiseTexture } from "@/components/creative";
+import { CursorCanvas } from "@/components/creative";
+import { destinationMedia } from "@/lib/media-catalog";
 import { useClimateMood } from "./climate-context";
 import { climateCopy, climateMood } from "./climate-theme";
 
@@ -21,6 +23,7 @@ export function DestinationHero({
   const month = Number(start.slice(5, 7)) || 11;
   const weather = useMemo(() => typicalWeather(dest, month), [dest, month]);
   const mood = climateMood(weather, dest.slug);
+  const media = destinationMedia(dest.slug);
   const { setMood } = useClimateMood();
   useEffect(() => {
     setMood(mood);
@@ -33,17 +36,31 @@ export function DestinationHero({
 
   return (
     <section className="wt-hero" data-climate={mood}>
-      <div className="wt-atmosphere" />
-      <NoiseTexture className="opacity-[0.18] mix-blend-soft-light" />
-      <div className="wt-hero-inner">
-        <div>
+      <div className="wt-hero-grid">
+        <div className="wt-hero-type">
           <p className="text-[11px] uppercase tracking-[0.28em]">
             {dest.city} · {start.slice(5)} — {end.slice(5)}
           </p>
-          <h1 className="wt-city mt-4">{dest.city}</h1>
+          <h1 className="wt-city">{dest.city}</h1>
           <p className="wt-serif mt-6 max-w-md text-4xl leading-none">What will it feel like?</p>
           <p className="mt-5 max-w-sm text-sm leading-7 opacity-80">{climateCopy(mood)}</p>
         </div>
+        <CursorCanvas label="Explore" color="#f4eadf" className="wt-hero-frame">
+          <div className="wt-photo" data-climate={mood} key={media.hero}>
+            <Image
+              src={media.hero}
+              alt={media.heroAlt}
+              fill
+              priority
+              sizes="(max-width: 800px) 100vw, 58vw"
+              className="object-cover"
+            />
+            <div className="wt-weather-veil" aria-hidden />
+          </div>
+          <p className="wt-photo-meta">
+            {weather.tmin_c}–{weather.tmax_c}° · {weather.rain_days} rain days · {weather.humidity}%
+          </p>
+        </CursorCanvas>
         <form id="plan" onSubmit={onSubmit} className="wt-planner">
           <label>
             Destination

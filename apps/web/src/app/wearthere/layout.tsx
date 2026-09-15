@@ -1,5 +1,4 @@
 import { Manrope, Playfair_Display } from "next/font/google";
-import { CursorFollower } from "@/components/creative";
 import { ClimateShell } from "./components/climate-shell";
 import { WearthereFooter } from "./components/footer";
 import { WearthereHeader } from "./components/header";
@@ -12,7 +11,6 @@ export default function WearthereLayout({ children }: { children: React.ReactNod
   return (
     <div className={`${serif.variable} ${sans.variable} ${sans.className}`}>
       <ClimateShell>
-        <CursorFollower label="Look" color="#f4eadf" />
         <WearthereHeader />
         {children}
         <WearthereFooter />

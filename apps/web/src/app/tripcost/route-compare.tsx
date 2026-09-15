@@ -3,6 +3,7 @@
 import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { BreakEvenChart } from "./components/break-even";
 import { CostRace } from "./components/cost-race";
 import { DoorToDoorTimeline } from "./components/door-timeline";
 import { RouteMap } from "./components/route-map";
@@ -37,10 +38,10 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
   return (
     <div>
       <section className="tc-hero">
-        <RouteMap from={route.from.slug} to={route.to.slug} />
+        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} />
         <div className="tc-form">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em]">Scene 01 · route</p>
+            <p className="text-[11px] uppercase tracking-[0.18em]">This corridor</p>
             <h1 className="mt-2 text-4xl">
               {route.from.name} → {route.to.name}
             </h1>
@@ -56,14 +57,14 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 02 · winner</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">Best option for this trip</p>
         <p className="mt-4 text-5xl">{LABELS[result.best]}</p>
         <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--tc-mute)]">
           Cash = fuel + tolls + parking. True cost adds wear. Train/bus/flight figures are typical estimates, not current tickets.
         </p>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 03 · door-to-door time</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">Door to door</p>
         <div className="mt-6">
           <DoorToDoorTimeline
             rows={result.modes.map((m) => ({
@@ -71,12 +72,39 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
               label: LABELS[m.mode],
               minutes: m.minutes_door,
               win: fastest?.mode === m.mode,
+              segments:
+                m.mode === "flight"
+                  ? [
+                      { id: "access", label: "Access", minutes: route.airport_access_minutes },
+                      { id: "sec", label: "Security", minutes: route.security_buffer_minutes },
+                      { id: "fly", label: "Flight", minutes: route.flight_minutes },
+                      { id: "city", label: "City", minutes: route.city_transfer_minutes },
+                    ]
+                  : m.mode === "train"
+                    ? [
+                        { id: "access", label: "Access", minutes: 20 },
+                        { id: "station", label: "Station", minutes: 10 },
+                        { id: "train", label: "Train", minutes: route.train_minutes },
+                        { id: "arr", label: "Arrival", minutes: 10 },
+                      ]
+                    : m.mode === "ev"
+                      ? [
+                          { id: "drive", label: "Drive", minutes: Math.max(m.minutes_door - route.ev_charge_minutes, 0) },
+                          { id: "charge", label: "Charge", minutes: route.ev_charge_minutes },
+                        ]
+                      : m.mode === "car" || m.mode === "rideshare"
+                        ? [{ id: "drive", label: "Drive", minutes: m.minutes_door }]
+                        : [
+                            { id: "access", label: "Access", minutes: 15 },
+                            { id: "bus", label: "Coach", minutes: route.bus_minutes },
+                            { id: "arr", label: "Arrival", minutes: 15 },
+                          ],
             }))}
           />
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 04 · cash cost</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">Cash cost</p>
         <div className="mt-6">
           <CostRace
             best={result.best}
@@ -91,7 +119,7 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 05 · true cost</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">Adjust the assumptions</p>
         <label className="mt-4 flex items-center gap-2 text-sm">
           <input type="checkbox" checked={trueCost} onChange={(e) => setTrueCost(e.target.checked)} />
           Show true cost (wear). Cash cost stays the default figure.
@@ -112,7 +140,13 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 06 · when does the car win?</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">When driving becomes cheaper</p>
+        <BreakEvenChart
+          rows={table.map((row) => {
+            const ev = compareRoute(adjusted, row.travellers, false).modes.find((m) => m.mode === "ev");
+            return { ...row, evCash: ev?.cash_eur };
+          })}
+        />
         <ul className="mt-6 max-w-xl text-lg leading-9">
           {table.map((row) => (
             <li key={row.travellers}>
@@ -131,7 +165,7 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
         ) : null}
       </section>
       <section className="tc-scene" id="assumptions">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Scene 07 · assumptions + evidence</p>
+        <p className="text-[11px] uppercase tracking-[0.18em]">Assumptions and evidence</p>
         <ul className="mt-4 grid gap-1 text-xs uppercase tracking-wide text-[var(--tc-mute)] md:grid-cols-2">
           <li>Fuel — {costs.fuel.evidence} · {costLabel(costs.fuel.evidence)}</li>
           <li>Tolls — {costs.tolls.evidence} · {costLabel(costs.tolls.evidence)}</li>

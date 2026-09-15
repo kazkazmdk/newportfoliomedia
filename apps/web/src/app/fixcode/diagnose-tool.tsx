@@ -4,7 +4,7 @@ import { applyAnswer, diagnose, getError, getSymptom, initialState, isBlocked, r
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Feedback } from "@/components/feedback";
-import { AnimatedNumber } from "@/components/creative";
+import { AnimatedNumber, CursorCanvas } from "@/components/creative";
 import { MachineVisual, zoneFromText } from "./components/machine-visual";
 import { SourceTrace } from "./components/source-trace";
 
@@ -39,6 +39,16 @@ export function DiagnoseTool() {
   const result: DiagnosisResult = diagnose(profile, current);
   const zone = zoneFromText(`${result.headline_cause?.name ?? ""} ${"code" in profile ? profile.code : profile.symptom} ${profile.meaning}`);
   const top = result.causes[0]?.probability ?? 0;
+  const live = result.causes.slice(0, 2).flatMap((c) => {
+    const t = `${c.name} ${c.summary}`.toLowerCase();
+    if (/water|hose|valve|inlet|tap/.test(t)) return ["water", "hose", "valve"];
+    if (/pump|drain/.test(t)) return ["drain", "pump"];
+    if (/motor|drum/.test(t)) return ["motor"];
+    if (/sensor|control/.test(t)) return ["sensor", "control"];
+    if (/heat/.test(t)) return ["heater"];
+    return [];
+  });
+  const dim = ["water", "hose", "valve", "drain", "motor", "sensor", "heater"].filter((id) => !live.includes(id));
 
   return (
     <div>
@@ -128,17 +138,18 @@ export function DiagnoseTool() {
             </div>
           )}
         </div>
-        <div className="fc-stage">
+        <CursorCanvas label="Trace" color="#161513" className="fc-stage">
           <div className="fc-scan ready" />
-          <MachineVisual zone={zone} ready appliance={appliance} />
+          <MachineVisual zone={zone} ready appliance={appliance} liveSystems={live} dimSystems={dim} />
           <p className="absolute bottom-5 left-5 fixcode-mono text-[10px] uppercase tracking-[0.2em]">
-            Diagnostic trace · top {Math.round(top * 100)}
+            {result.causes.length} possible causes
+            {state ? ` · narrowed` : ""}
           </p>
-        </div>
+        </CursorCanvas>
       </section>
 
       <section className="fc-scene">
-        <p className="fc-kicker">Hypothesis ranking</p>
+        <p className="fc-kicker">Diagnostic narrowing · {result.causes.length} possible causes</p>
         <ol className="mt-8">
           {result.causes.map((cause, index) => (
             <li key={cause.id} className={`fc-hypo ${index > 1 ? "is-dim" : ""}`}>

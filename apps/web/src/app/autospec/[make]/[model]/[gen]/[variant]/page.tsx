@@ -63,7 +63,7 @@ export default async function VehicleHub({
             Add to My Garage
           </Link>
         </div>
-        <VehicleStage />
+        <VehicleStage makeSlug={v.make_slug} generationSlug={v.generation_slug} identity={`${v.make} ${v.variant} ${v.generation}`} />
       </section>
       <IdentityStrip vehicle={v} />
       <section className="as-scene grid gap-10 lg:grid-cols-2">

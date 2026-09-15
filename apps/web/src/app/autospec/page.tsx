@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { VEHICLES, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
+import Image from "next/image";
+import { vehicleMediaOf } from "@/lib/media-catalog";
 import { GarageEntry } from "./garage-entry";
 import { VehicleStage } from "./components/vehicle-stage";
 
@@ -29,7 +31,7 @@ export default function AutospecHome() {
           ) : null}
           <GarageEntry />
         </div>
-        <VehicleStage />
+        <VehicleStage makeSlug={featured?.make_slug} generationSlug={featured?.generation_slug} identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined} />
       </section>
       <section className="as-scene">
         <p className="text-[11px] uppercase tracking-[0.2em]">Covered identities</p>
@@ -37,6 +39,16 @@ export default function AutospecHome() {
           {VEHICLES.slice(0, 8).map((v) => (
             <li key={v.id}>
               <Link href={vehicleUrl(v)} className="as-tile">
+                {vehicleMediaOf(v.make_slug, v.generation_slug) ? (
+                  <Image
+                    src={vehicleMediaOf(v.make_slug, v.generation_slug)!.src}
+                    alt={`${v.make} ${v.model} ${v.generation}`}
+                    width={640}
+                    height={320}
+                    sizes="(max-width: 800px) 100vw, 40vw"
+                    className="as-tile-img"
+                  />
+                ) : null}
                 <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation} {v.engine_code}</p>
                 <p className="as-display text-4xl">
                   {v.make}

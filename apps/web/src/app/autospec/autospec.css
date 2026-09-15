@@ -69,8 +69,8 @@
 
 @media (min-width: 980px) {
   .as-hero {
-    grid-template-columns: 0.9fr 1.2fr;
-    align-items: center;
+    grid-template-columns: 0.7fr 1.4fr;
+    align-items: end;
   }
 }
 
@@ -78,6 +78,30 @@
   position: relative;
   min-height: 22rem;
 }
+
+.as-depth { position: relative; }
+.as-plane {
+  position: absolute;
+  inset: 18% 4% 8%;
+  background: radial-gradient(60% 50% at 50% 70%, #cfc6b8, transparent 70%);
+}
+.as-car-photo { position: relative; width: min(70vw, 920px); margin-inline: auto; transition: filter 400ms ease, opacity 400ms ease; }
+.as-car-photo.is-inspect { filter: saturate(0.7) brightness(0.86); }
+.as-car-img { width: 100%; height: auto; display: block; }
+.as-shadow { height: 1.2rem; margin-top: -0.4rem; background: radial-gradient(50% 80% at 50% 50%, #10141855, transparent 70%); }
+.as-callout {
+  position: absolute;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  max-width: 12rem;
+}
+.as-callout span { width: 8px; height: 8px; border-radius: 50%; background: var(--as-metal); margin-top: 0.35rem; }
+.as-callout small { display: block; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: none; opacity: 0.7; }
+.as-credit { margin-top: 0.8rem; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--as-mute); }
+.as-tile-img { width: 100%; height: 8rem; object-fit: contain; margin-bottom: 1rem; }
+.as-tl.is-now { padding-block: 1.4rem; }
+.as-tl-km { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; }
 
 .as-car {
   width: min(100%, 640px);

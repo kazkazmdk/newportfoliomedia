@@ -23,15 +23,15 @@ export default function WearthereHome() {
       <DestinationHero initialCity={featured.slug} />
       <ClimateRibbon weather={weather} />
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 03 · November capsule · {featured.city}</p>
-        <h2 className="mt-4 max-w-xl text-5xl leading-none">An editorial board, not a packing list.</h2>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Your {featured.city} capsule</p>
+        <h2 className="mt-4 max-w-xl text-5xl leading-none">What to pack for typical November.</h2>
         <div className="mt-10">
           <WardrobeBoard pieces={capsule.pieces} />
         </div>
       </ViewportScene>
       <ClimateSlider dest={featured} />
       <ViewportScene id="destinations" className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Scene 06 · destinations</p>
+        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Destinations</p>
         <Marquee className="mt-6 text-5xl">
           {cities.map((d) => (
             <Link key={d.id} href={`/wearthere/${d.slug}`} className="wt-serif">
