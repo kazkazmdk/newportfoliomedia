@@ -1,7 +1,7 @@
 # PENTA Visual Product QA
 
 Baseline SHA: `55da9c0ae6cf306580574ddcd3a82d0aaa83e412`  
-Pass SHA: recorded at commit time in git (`main`)  
+Pass SHA: `f1488a8` on `main` (see `git rev-parse HEAD`)  
 Viewports: `1440×1000`, `1440×1600`, `390×844`  
 Rule: product first, art direction second. Identities unchanged.
 
