@@ -41,7 +41,7 @@ export function VehicleStage({
               alt={media.alt}
               width={1600}
               height={780}
-              sizes="(max-width: 800px) 94vw, 68vw"
+              sizes="(max-width: 800px) 100vw, 68vw"
               className="as-car-img"
               priority
             />

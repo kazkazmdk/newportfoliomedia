@@ -68,14 +68,51 @@ export default async function ErrorPage({
       ) : null}
       <ErrorHero profile={profile} brand={brand} appliance={appliance} />
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">What it means</p>
-        <p className="mt-5 max-w-2xl text-3xl leading-tight">{profile.meaning}</p>
-        <p className="mt-6 max-w-xl text-sm leading-7 text-[var(--fc-mute)]">
-          Run the safe checks first. This is a structured diagnostic tree — not a language-model guess.
-        </p>
+        <p className="fc-kicker">Start with #1</p>
+        {profile.questions[0] ? (
+          <div className="fc-check mt-6 max-w-3xl">
+            <CheckDiagram kind={checkKindFromText(`${profile.questions[0].text} ${profile.questions[0].why}`)} />
+            <div>
+              <p className="text-3xl leading-tight">{profile.questions[0].text}</p>
+              <p className="mt-3 text-sm leading-6 text-[var(--fc-mute)]">{profile.questions[0].why}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 max-w-xl text-2xl">No safe first check on file. Do not invent a step.</p>
+        )}
+        <Link
+          href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
+          className="fc-run mt-8 inline-block"
+        >
+          Next branch
+        </Link>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Possible causes</p>
+        <p className="fc-kicker">Check these next</p>
+        <ol className="mt-6 grid max-w-3xl gap-5">
+          {profile.questions.slice(1).map((q) => (
+            <li key={q.id} className="fc-check">
+              <CheckDiagram kind={checkKindFromText(`${q.text} ${q.why}`)} />
+              <div>
+                {q.text}
+                <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">When to stop</p>
+        {diyStop ? (
+          <p className="mt-5 max-w-xl text-2xl text-[var(--fc-signal)]">
+            {tree.boundaries.find((b) => b.blocksSelfService)?.text ?? "Stop self-service if the tree hits a professional or stop-use boundary."}
+          </p>
+        ) : (
+          <p className="mt-5 max-w-xl text-2xl">No stop-use boundary on this tree. Risk still sits on each cause.</p>
+        )}
+      </ViewportScene>
+      <ViewportScene className="fc-scene">
+        <p className="fc-kicker">Alternative causes</p>
         <ol className="mt-8">
           {profile.causes.map((cause, index) => (
             <li key={cause.id} className="fc-hypo">
@@ -92,29 +129,6 @@ export default async function ErrorPage({
             </li>
           ))}
         </ol>
-      </ViewportScene>
-      <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Safe checks first</p>
-        <ol className="mt-6 grid max-w-3xl gap-5">
-          {profile.questions.map((q) => (
-            <li key={q.id} className="fc-check">
-              <CheckDiagram kind={checkKindFromText(`${q.text} ${q.why}`)} />
-              <div>
-                {q.text}
-                <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </ViewportScene>
-      <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Narrow the diagnosis</p>
-        <Link
-          href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
-          className="fc-run mt-8 inline-block"
-        >
-          Start diagnosis
-        </Link>
       </ViewportScene>
       <ViewportScene className="fc-scene">
         <p className="fc-kicker">Manufacturer source</p>
@@ -139,14 +153,7 @@ export default async function ErrorPage({
         </ul>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">When to stop DIY</p>
-        {diyStop ? (
-          <p className="mt-5 max-w-xl text-2xl text-[var(--fc-signal)]">
-            Stop self-service if the tree hits a professional or stop-use boundary.
-          </p>
-        ) : (
-          <p className="mt-5 max-w-xl text-2xl">No stop-use boundary on this tree. Risk still sits on each cause.</p>
-        )}
+        <p className="fc-kicker">Related</p>
         {"related_symptoms" in profile && profile.related_symptoms.length ? (
           <ul className="mt-8 flex flex-wrap gap-3">
             {profile.related_symptoms.map((slug) => (

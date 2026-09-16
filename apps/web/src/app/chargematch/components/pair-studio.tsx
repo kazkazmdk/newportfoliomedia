@@ -17,47 +17,60 @@ export function PairStudio({
   charger: ChargerProfile;
 }) {
   const [port, setPort] = useState(charger.ports[0]?.id ?? "c1");
-  const extras = charger.ports.filter((p) => p.id !== port).slice(0, 2).map((p) => p.id);
+  const [plugged, setPlugged] = useState(1);
+  const used = useMemo(
+    () => charger.ports.slice(0, Math.min(plugged, charger.ports.length)).map((p) => p.id),
+    [charger.ports, plugged],
+  );
   const result = useMemo(() => compatibility(device, charger, CABLES[0]), [device, charger]);
   const chain = useMemo(
-    () => powerChain({ device, charger, cable: CABLES[0], selectedPort: port, usedPorts: [port] }),
-    [device, charger, port],
+    () => powerChain({ device, charger, cable: CABLES[0], selectedPort: port, usedPorts: used }),
+    [device, charger, port, used],
   );
   const multi = useMemo(
-    () => (extras.length ? allocate(charger, [port, ...extras]) : null),
-    [charger, extras, port],
+    () => (used.length ? allocate(charger, used) : null),
+    [charger, used],
   );
   const laptop = DEVICES.find((d) => d.slug.includes("macbook")) ?? DEVICES[0];
   const buds = DEVICES.find((d) => d.slug.includes("airpods")) ?? DEVICES[1];
   const labels: Record<string, string> = {
-    [port]: laptop.name,
-    ...(extras[0] ? { [extras[0]]: device.name === laptop.name ? "Second device" : device.name } : {}),
-    ...(extras[1] ? { [extras[1]]: buds.name } : {}),
+    [charger.ports[0]?.id ?? "c1"]: device.name,
+    ...(charger.ports[1] ? { [charger.ports[1].id]: laptop.name === device.name ? "Second device" : laptop.name } : {}),
+    ...(charger.ports[2] ? { [charger.ports[2].id]: buds.name } : {}),
+    ...(charger.ports[3] ? { [charger.ports[3].id]: "USB-A accessory" } : {}),
   };
 
   return (
     <div>
       <section className="cm-hero">
         <p className="cm-mono text-[11px] uppercase tracking-[0.2em]">{result.tag.replaceAll("_", " ")}</p>
-        <div className="mt-3 flex flex-wrap items-end gap-6">
-          <h1 className="text-5xl">{result.match.replaceAll("_", " ")}</h1>
-          <p className="cm-mono text-6xl">{chain.watts}W</p>
+        <div className="cm-result-bar">
+          <div>
+            <p className="cm-mono text-[10px] uppercase tracking-[0.18em]">Expected</p>
+            <p className="cm-mono text-6xl leading-none">{chain.watts}W</p>
+          </div>
+          <div>
+            <h1 className="text-3xl md:text-5xl">{result.match.replaceAll("_", " ")}</h1>
+            <p className="mt-2 text-sm uppercase tracking-[0.14em] text-[var(--cm-mute)]">
+              Limited by {chain.limitingComponent} · {chain.protocol.replaceAll("_", " ")}
+            </p>
+          </div>
+          <p className="max-w-sm text-sm leading-6 text-[var(--cm-mute)]">{result.safety_note}</p>
         </div>
-        <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--cm-mute)]">{result.safety_note}</p>
-        <div className="cm-connect mt-10">
+        <div className="cm-connect mt-8" style={{ display: "grid" }}>
           <div className="cm-node">
             <DeviceObject slug={device.slug} name={device.name} />
-            <p className="cm-mono mt-4">{device.max_watts}W cap</p>
+            <p className="cm-mono mt-3">{device.max_watts}W cap</p>
           </div>
           <div className="cm-cable" aria-hidden>
             <svg viewBox="0 0 220 88">
-              <path d="M110 8 V80" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+              <path d="M110 8 V80" stroke="currentColor" strokeWidth="3" />
               <text x="122" y="48" fontSize="10" fill="currentColor">USB-C</text>
             </svg>
           </div>
           <div className="cm-node">
             <ChargerObject watts={charger.total_watts} ports={charger.ports.length} />
-            <p className="cm-mono mt-4">{charger.total_watts}W</p>
+            <p className="cm-mono mt-3">{charger.total_watts}W brick</p>
           </div>
         </div>
       </section>
@@ -78,10 +91,36 @@ export function PairStudio({
       <section className="cm-scene">
         <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">One brick, several devices</p>
         <h2 className="mt-4 text-4xl">How power splits</h2>
-        {multi ? (
-          <div className="mt-8">
-            <MultiportTree total={charger.total_watts} branches={multi.ports.map((p) => ({ id: p, label: labels[p] ?? p, watts: multi.byPort?.[p] ?? 0 }))} />
-          </div>
+        {charger.ports.length > 1 ? (
+          <>
+            <div className="cm-plug">
+              {charger.ports.map((p, i) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`cm-port ${plugged > i ? "is-on" : ""}`}
+                  onClick={() => setPlugged(i + 1)}
+                >
+                  {p.label} {plugged > i ? "plugged" : "empty"}
+                </button>
+              ))}
+            </div>
+            {multi ? (
+              <div className="mt-8">
+                <MultiportTree
+                  total={charger.total_watts}
+                  branches={multi.ports.map((p) => ({
+                    id: p,
+                    label: `${labels[p] ?? p} · ${charger.ports.find((x) => x.id === p)?.label ?? p}`,
+                    watts: multi.byPort?.[p] ?? 0,
+                  }))}
+                />
+              </div>
+            ) : null}
+            <p className="mt-4 text-sm text-[var(--cm-mute)]">
+              Allocation from the published port map. Plug a second device to see watts move — not a measured wall draw.
+            </p>
+          </>
         ) : (
           <p className="mt-4 text-sm text-[var(--cm-mute)]">Single-port brick. No split allocation on file.</p>
         )}

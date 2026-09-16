@@ -25,7 +25,7 @@ export function TripcostHeader() {
       <p className="tc-live tc-mono uppercase">
         {live} <span aria-hidden>€</span>
       </p>
-      <button type="button" className="tc-menu border border-[var(--tc-ink)] px-2 py-1 text-[10px] uppercase tracking-[0.16em]" onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="tc-menu border border-[var(--tc-ink)] px-2 py-1 text-[10px] uppercase tracking-[0.16em]" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         Route
       </button>
     </header>

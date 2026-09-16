@@ -1,4 +1,5 @@
 .autospec {
+  overflow-x: clip;
   --as-paper: #ddd6cb;
   --as-ink: #101418;
   --as-mute: #5d615c;
@@ -85,7 +86,7 @@
   inset: 18% 4% 8%;
   background: radial-gradient(60% 50% at 50% 70%, #cfc6b8, transparent 70%);
 }
-.as-car-photo { position: relative; width: min(70vw, 920px); margin-inline: auto; transition: filter 400ms ease, opacity 400ms ease; }
+.as-car-photo { position: relative; width: min(92vw, 920px); margin-inline: auto; transition: filter 400ms ease, opacity 400ms ease; }
 .as-car-photo.is-inspect { filter: saturate(0.7) brightness(0.86); }
 .as-car-img { width: 100%; height: auto; display: block; }
 .as-shadow { height: 1.2rem; margin-top: -0.4rem; background: radial-gradient(50% 80% at 50% 50%, #10141855, transparent 70%); }
@@ -163,6 +164,68 @@
   text-transform: uppercase;
   font-size: 0.68rem;
   cursor: pointer;
+  min-height: 44px;
+}
+
+.as-cta:focus-visible,
+.as-field input:focus-visible,
+.as-add:focus-visible,
+.as-nav a:focus-visible,
+.as-menu:focus-visible,
+.as-vin summary:focus-visible {
+  outline: 2px solid var(--as-metal);
+  outline-offset: 3px;
+}
+
+.as-vin {
+  border-top: 1px solid var(--as-line);
+  padding-top: 0.8rem;
+}
+
+.as-vin summary {
+  cursor: pointer;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  list-style: none;
+}
+
+.as-vin summary span {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--as-mute);
+}
+
+.as-cockpit {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem 1rem;
+  margin-top: 1.4rem;
+}
+
+@media (min-width: 800px) {
+  .as-cockpit { grid-template-columns: repeat(5, 1fr); }
+}
+
+.as-cockpit-cell {
+  border-top: 2px solid var(--as-ink);
+  padding-top: 0.5rem;
+}
+
+.as-cockpit-cell p:first-child {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--as-mute);
+}
+
+.as-cockpit-cell strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-as-display), "Oswald", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-transform: uppercase;
 }
 
 .as-scene { padding: 4.8rem 1.6rem; }
@@ -219,7 +282,11 @@
 @media (max-width: 820px) {
   .as-header { grid-template-columns: 1fr auto; }
   .as-nav { display: none; }
-  .as-menu { display: inline-flex; }
+  .as-menu { display: inline-flex; min-height: 44px; align-items: center; }
+  .as-hero { padding-inline: 0; padding-bottom: 1.2rem; }
+  .as-hero > div:first-child { padding-inline: 1.2rem; }
+  .as-stage { overflow: hidden; min-height: 16rem; }
+  .as-car-photo { width: 100vw; max-width: none; }
   .as-nav.is-open {
     display: flex;
     flex-direction: column;

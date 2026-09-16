@@ -28,7 +28,7 @@ export function ChargematchHeader({
       <p className="cm-live cm-mono">
         Live model <span className="cm-dot" />
       </p>
-      <button type="button" className="cm-menu" onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="cm-menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         Panel
       </button>
       <div className="cm-strip" style={{ gridColumn: "1 / -1" }}>

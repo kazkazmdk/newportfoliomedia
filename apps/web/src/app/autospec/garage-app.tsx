@@ -53,7 +53,29 @@ export function GarageApp() {
           <p className="mt-3 text-lg text-[var(--as-mute)]">
             {km.toLocaleString()} km · {vehicle.engine_code} · {vehicle.years[0]}–{vehicle.years.at(-1)}
           </p>
-          <p className="as-display mt-8 text-6xl">{score.score}/100</p>
+          <div className="as-cockpit">
+            <div className="as-cockpit-cell">
+              <p>Service</p>
+              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km` : "No interval"}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Oil</p>
+              <strong>{vehicle.oil.capacity_liters ? `${vehicle.oil.spec} · ${vehicle.oil.capacity_liters} L` : "EV — none"}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Tyres</p>
+              <strong>{vehicle.tyres.front}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Battery</p>
+              <strong>12V {vehicle.battery.type}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Recalls</p>
+              <strong>{vehicle.recalls.length ? "VIN-specific · check source" : "No active data / check source"}</strong>
+            </div>
+          </div>
+          <p className="as-display mt-8 text-5xl">{score.score}/100</p>
           <ul className="mt-4 grid gap-1 text-sm">
             {score.factors.map((f) => (
               <li key={f}>{f}</li>
@@ -63,29 +85,6 @@ export function GarageApp() {
         <VehicleStage makeSlug={vehicle.make_slug} generationSlug={vehicle.generation_slug} identity={`${vehicle.make} ${vehicle.variant} ${vehicle.generation}`} />
       </section>
       <IdentityStrip vehicle={vehicle} />
-      <section className="as-scene">
-        <p className="text-[11px] uppercase tracking-[0.2em]">Fleet</p>
-        <ul className="mt-6 grid gap-3 md:grid-cols-3">
-          {VEHICLES.slice(0, 3).map((v) => (
-            <li key={v.id}>
-              <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-tile">
-                {vehicleMediaOf(v.make_slug, v.generation_slug) ? (
-                  <Image
-                    src={vehicleMediaOf(v.make_slug, v.generation_slug)!.src}
-                    alt={`${v.make} ${v.variant}`}
-                    width={480}
-                    height={240}
-                    sizes="30vw"
-                    className="as-tile-img"
-                  />
-                ) : null}
-                <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation}</p>
-                <p className="as-display text-3xl">{v.make} {v.variant}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
       <section className="as-scene">
         <OwnershipTimeline items={due} />
         {vehicle.issues.length ? (

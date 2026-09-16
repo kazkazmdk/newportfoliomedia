@@ -10,4 +10,7 @@ coverage
 .vercel
 apps/web/next-env.d.ts
 agent-tools
+test-results
+playwright-report
+blob-report
 

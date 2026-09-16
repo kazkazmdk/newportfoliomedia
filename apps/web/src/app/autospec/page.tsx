@@ -16,25 +16,42 @@ export default function AutospecHome() {
   const featured = VEHICLES[0];
   return (
     <main>
-      <section className="as-hero">
+      <section className="as-hero as-hero-onboard">
         <div>
           <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--as-mute)]">Digital garage</p>
-          <h1 className="mt-5 text-6xl leading-[0.9] md:text-7xl">
-            Your car,
+          <h1 className="mt-5 text-5xl leading-[0.9] md:text-7xl">
+            What do
             <br />
-            understood.
+            you drive?
           </h1>
-          {featured ? (
-            <p className="mt-6 text-[11px] uppercase tracking-[0.2em] text-[var(--as-mute)]">
-              {featured.make} {featured.variant} · {featured.generation} · {featured.engine_code}
-            </p>
-          ) : null}
+          <p className="mt-5 max-w-md text-sm leading-6 text-[var(--as-mute)]">
+            Search a make and generation we already cover. Oil, tyres, battery and service come from the vehicle graph — not a guessed VIN decode.
+          </p>
           <GarageEntry />
         </div>
-        <VehicleStage makeSlug={featured?.make_slug} generationSlug={featured?.generation_slug} identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined} />
+        <VehicleStage
+          makeSlug={featured?.make_slug}
+          generationSlug={featured?.generation_slug}
+          identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined}
+        />
       </section>
       <section className="as-scene">
+        <p className="text-[11px] uppercase tracking-[0.2em]">Once the car is identified</p>
+        <p className="as-display mt-4 max-w-xl text-4xl">My vehicle becomes an ownership state.</p>
+        <p className="mt-4 max-w-lg text-sm leading-6 text-[var(--as-mute)]">
+          Service interval, oil spec, tyre size, 12V battery, and recall portals. Nothing invented beyond the graph.
+        </p>
+        {featured ? (
+          <Link className="as-cta mt-8 inline-block" href={vehicleUrl(featured)}>
+            Open {featured.make} {featured.variant}
+          </Link>
+        ) : null}
+      </section>
+      <section className="as-scene" id="identities">
         <p className="text-[11px] uppercase tracking-[0.2em]">Covered identities</p>
+        <p className="mt-3 max-w-lg text-sm text-[var(--as-mute)]">
+          Discover after you know what AutoSpec does. These are generation/engine pages, not a catalogue home.
+        </p>
         <ul className="mt-8 grid gap-3 md:grid-cols-2">
           {VEHICLES.slice(0, 8).map((v) => (
             <li key={v.id}>

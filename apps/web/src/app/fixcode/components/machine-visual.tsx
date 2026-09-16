@@ -52,7 +52,7 @@ export function MachineVisual({
   return (
     <div className="fc-machine" role="img" aria-label={`${appliance} system schematic`}>
       <p className="fc-plate-mark" aria-hidden>
-        SYSTEM SCHEMATIC
+        Water path
       </p>
       <svg viewBox="0 0 420 480" fill="none">
         <g data-system="enclosure">

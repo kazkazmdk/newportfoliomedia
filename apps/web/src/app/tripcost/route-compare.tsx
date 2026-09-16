@@ -34,15 +34,22 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
   const be = train && car ? timeValueBreakEven(train, car) : null;
   const costs = routeCosts(route);
   const fastest = [...result.modes].sort((a, b) => a.minutes_door - b.minutes_door)[0];
+  const cheapest = [...result.modes].sort((a, b) => a.cash_eur - b.cash_eur)[0];
+  const trueBest = [...result.modes].sort((a, b) => a.true_eur - b.true_eur)[0];
+  const partyBest = result.best;
+  const fmtDoor = (minutes: number) => {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return h > 0 ? `${h}h${String(m).padStart(2, "0")}` : `${m} min`;
+  };
 
   return (
     <div>
-      <section className="tc-hero">
-        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} />
+      <section className="tc-hero is-result">
         <div className="tc-form">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em]">This corridor</p>
-            <h1 className="mt-2 text-4xl">
+            <h1 className="mt-1 text-3xl md:text-4xl">
               {route.from.name} → {route.to.name}
             </h1>
             <p className="mt-1 text-sm text-[var(--tc-mute)]">
@@ -50,12 +57,46 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
             </p>
           </div>
           <label>
-            Travellers · {travellers}
-            <input type="range" min={1} max={6} value={travellers} onChange={(e) => setTravellers(Number(e.target.value))} />
+            People · {travellers}
+            <input
+              type="range"
+              min={1}
+              max={6}
+              value={travellers}
+              aria-label="Number of travellers"
+              onChange={(e) => setTravellers(Number(e.target.value))}
+            />
           </label>
-          <p className="tc-mono text-2xl self-end">Best · {LABELS[result.best]}</p>
+          <p className="tc-mono text-xl self-end">Best for {travellers} · {LABELS[partyBest]}</p>
         </div>
+        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} compact />
       </section>
+      <div className="tc-verdicts" aria-label="Trip comparison">
+        {fastest ? (
+          <div className="tc-verdict">
+            <p>Fastest</p>
+            <strong>{LABELS[fastest.mode]} · {fmtDoor(fastest.minutes_door)}</strong>
+          </div>
+        ) : null}
+        {cheapest ? (
+          <div className="tc-verdict">
+            <p>Cheapest cash</p>
+            <strong>{LABELS[cheapest.mode]} · €{cheapest.cash_eur}</strong>
+          </div>
+        ) : null}
+        {trueBest ? (
+          <div className="tc-verdict">
+            <p>True cost</p>
+            <strong>{LABELS[trueBest.mode]} · €{trueBest.true_eur}</strong>
+          </div>
+        ) : null}
+        {partyBest ? (
+          <div className="tc-verdict">
+            <p>Best for {travellers} {travellers === 1 ? "person" : "people"}</p>
+            <strong>{LABELS[partyBest]}</strong>
+          </div>
+        ) : null}
+      </div>
       <section className="tc-scene">
         <p className="text-[11px] uppercase tracking-[0.18em]">Best option for this trip</p>
         <p className="mt-4 text-5xl">{LABELS[result.best]}</p>

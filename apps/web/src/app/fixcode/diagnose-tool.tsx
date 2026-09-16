@@ -91,8 +91,8 @@ export function DiagnoseTool() {
             </button>
           </div>
           {result.next_question && !result.self_service_blocked ? (
-            <div>
-              <p className="fc-kicker">Next safe check</p>
+            <div className="fc-do-first">
+              <p className="fc-kicker">Do this first</p>
               <p className="mt-2 text-sm leading-6 text-[var(--fc-mute)]">{result.why_this_question}</p>
               <h2 className="mt-4 text-2xl">{result.next_question.text}</h2>
               <div className="mt-4 flex flex-wrap gap-2">

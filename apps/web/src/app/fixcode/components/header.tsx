@@ -47,7 +47,7 @@ export function FixcodeHeader({
         ))}
       </nav>
       <div className="fc-status">
-        <span className="fixcode-mono">System status</span>
+        <span className="fixcode-mono">Ready</span>
         <span className={`fc-led ${status === "risk" ? "risk" : status === "warn" ? "warn" : ""}`} />
         {onOpenTrace ? (
           <button type="button" className="fixcode-mono" onClick={onOpenTrace}>

@@ -65,10 +65,18 @@ export function ErrorHero({
             <p className="mt-4 text-2xl leading-snug">{profile.meaning}</p>
             <p className="mt-3 text-sm text-[var(--fc-mute)]">
               {profile.brand} {profile.appliance}
+              {profile.causes[0] ? ` · most likely: ${profile.causes[0].name}` : ""}
             </p>
+            {profile.questions[0] ? (
+              <div className="fc-do-first mt-6">
+                <p className="fc-kicker">Do this first</p>
+                <p className="mt-2 text-xl leading-snug">{profile.questions[0].text}</p>
+                <p className="mt-2 text-sm text-[var(--fc-mute)]">{profile.questions[0].why}</p>
+              </div>
+            ) : null}
           </div>
           <button type="button" className="fc-kicker w-fit" onClick={() => setOpen(true)}>
-            Open source trace
+            Evidence / source
           </button>
         </div>
         <CursorCanvas label="Trace" color="#161513" className="fc-stage">

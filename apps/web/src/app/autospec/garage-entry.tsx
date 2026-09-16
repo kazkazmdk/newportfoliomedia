@@ -1,6 +1,6 @@
 "use client";
 
-import { decodeVin, findVehicles } from "@penta/autospec";
+import { VIN_SUPPORT, decodeVin, findVehicles } from "@penta/autospec";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 
@@ -23,13 +23,13 @@ export function GarageEntry() {
   }
 
   return (
-    <div className="mt-10 grid max-w-md gap-5">
+    <div className="mt-8 grid max-w-md gap-5">
       <label className="as-field">
         Make / model / generation
-        <input value={q} onChange={(e) => setQ(e.target.value)} />
+        <input aria-label="Search make and model" value={q} onChange={(e) => setQ(e.target.value)} />
       </label>
       <ul className="grid gap-2">
-        {hits.map((v) => (
+        {hits.slice(0, 4).map((v) => (
           <li key={v.id}>
             <button
               type="button"
@@ -45,16 +45,22 @@ export function GarageEntry() {
           </li>
         ))}
       </ul>
-      <form onSubmit={onVin} className="grid gap-2">
-        <label className="as-field">
-          VIN
-          <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
-        </label>
-        <button className="justify-self-start border border-[var(--as-ink)] px-4 py-2 text-[11px] uppercase tracking-[0.16em]" type="submit">
-          Decode VIN
-        </button>
-        {note ? <p className="text-sm text-[var(--as-mute)]">{note}</p> : null}
-      </form>
+      <details className="as-vin">
+        <summary>
+          VIN decode
+          <span>Unavailable · {VIN_SUPPORT === "NOT_IMPLEMENTED" ? "stub" : VIN_SUPPORT}</span>
+        </summary>
+        <form onSubmit={onVin} className="mt-3 grid gap-2">
+          <label className="as-field">
+            VIN
+            <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
+          </label>
+          <button className="justify-self-start border border-[var(--as-ink)] px-4 py-2 text-[11px] uppercase tracking-[0.16em]" type="submit">
+            Try decode (demo)
+          </button>
+          {note ? <p className="text-sm text-[var(--as-mute)]">{note}</p> : null}
+        </form>
+      </details>
     </div>
   );
 }

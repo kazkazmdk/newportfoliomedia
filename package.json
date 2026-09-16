@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "report": "tsx scripts/launch-report.ts",
     "qa": "vitest run && tsx scripts/seo-audit.ts",
+    "qa:visual": "playwright test",
     "deep-qa": "tsx scripts/deep-graph-qa.ts",
     "graph:audit": "tsx scripts/graph-audit.ts",
     "graph:health": "tsx scripts/graph-health.ts",
@@ -39,6 +40,7 @@
     "@types/node": "^20",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
+    "@playwright/test": "^1.55.0",
     "vitest": "^3.2.4"
   }
 }

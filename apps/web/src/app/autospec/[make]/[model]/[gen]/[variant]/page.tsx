@@ -56,9 +56,31 @@ export default async function VehicleHub({
             <br />
             {v.variant}
           </h1>
-          <p className="mt-5 max-w-md leading-7">
-            {v.years[0]}–{v.years.at(-1)} marketing years share this engine/generation. They are not split into thin year URLs. Market on file: {v.market.join(", ")}.
+          <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-[var(--as-mute)]">
+            {v.generation} · {v.engine_code} · {v.years[0]}–{v.years.at(-1)}
           </p>
+          <div className="as-cockpit">
+            <div className="as-cockpit-cell">
+              <p>Service</p>
+              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km` : "No interval"}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Oil</p>
+              <strong>{v.oil.capacity_liters ? `${v.oil.spec} · ${v.oil.capacity_liters} L` : "EV — none"}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Tyres</p>
+              <strong>{v.tyres.front}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Battery</p>
+              <strong>12V {v.battery.type}</strong>
+            </div>
+            <div className="as-cockpit-cell">
+              <p>Recalls</p>
+              <strong>{v.recalls.length ? "VIN-specific · check source" : "No active data / check source"}</strong>
+            </div>
+          </div>
           <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-cta mt-8 inline-block">
             Add to My Garage
           </Link>

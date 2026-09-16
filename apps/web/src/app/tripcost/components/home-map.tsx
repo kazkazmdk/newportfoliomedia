@@ -9,7 +9,7 @@ export function HomeMap() {
   const router = useRouter();
   const [from, setFrom] = useState("paris");
   const [to, setTo] = useState("lyon");
-  const [travellers, setTravellers] = useState(4);
+  const [travellers, setTravellers] = useState(2);
 
   const origins = useMemo(
     () => PLACES.filter((p) => ROUTES.some((r) => r.from.slug === p.slug)),
@@ -17,6 +17,7 @@ export function HomeMap() {
   );
   const destinations = useMemo(() => ROUTES.filter((r) => r.from.slug === from).map((r) => r.to), [from]);
   const dest = destinations.some((p) => p.slug === to) ? to : destinations[0]?.slug;
+  const corridor = ROUTES.find((r) => r.from.slug === from && r.to.slug === dest);
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -26,11 +27,11 @@ export function HomeMap() {
 
   return (
     <section className="tc-hero">
-      <RouteMap from={from} to={dest} />
       <form onSubmit={onSubmit} className="tc-form">
         <label>
           From
           <select
+            aria-label="Origin city"
             value={from}
             onChange={(e) => {
               setFrom(e.target.value);
@@ -47,7 +48,7 @@ export function HomeMap() {
         </label>
         <label>
           To
-          <select value={dest} onChange={(e) => setTo(e.target.value)}>
+          <select aria-label="Destination city" value={dest} onChange={(e) => setTo(e.target.value)}>
             {destinations.map((p) => (
               <option key={p.slug} value={p.slug}>
                 {p.name}
@@ -56,13 +57,26 @@ export function HomeMap() {
           </select>
         </label>
         <label>
-          Travellers · {travellers}
-          <input type="range" min={1} max={5} value={travellers} onChange={(e) => setTravellers(Number(e.target.value))} />
+          People · {travellers}
+          <input
+            type="range"
+            min={1}
+            max={5}
+            value={travellers}
+            aria-label="Number of travellers"
+            onChange={(e) => setTravellers(Number(e.target.value))}
+          />
         </label>
         <button className="tc-cta" type="submit">
-          Draw the cost
+          Compare trip
         </button>
       </form>
+      <RouteMap from={from} to={dest} compact />
+      {corridor ? (
+        <p className="px-4 pb-3 text-[11px] uppercase tracking-[0.16em] text-[var(--tc-mute)]">
+          {corridor.km} km corridor · heuristic cash / true cost — not a live ticket
+        </p>
+      ) : null}
     </section>
   );
 }

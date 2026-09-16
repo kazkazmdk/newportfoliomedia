@@ -28,7 +28,7 @@ export function WearthereHeader() {
       <Link href="/wearthere#plan" className={`wt-plan ${open ? "is-open" : ""}`}>
         Search / Plan trip
       </Link>
-      <button type="button" className="wt-menu wt-plan" onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="wt-menu wt-plan" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         Index
       </button>
     </header>

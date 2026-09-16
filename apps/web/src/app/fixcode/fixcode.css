@@ -1,4 +1,5 @@
 .fixcode-shell {
+  overflow-x: clip;
   --fc-paper: #e8e4dc;
   --fc-ink: #161513;
   --fc-mute: #6a655c;
@@ -197,6 +198,23 @@
   text-transform: uppercase;
   font-size: 0.72rem;
   cursor: pointer;
+  min-height: 44px;
+}
+
+.fc-run:focus-visible,
+.fc-answer:focus-visible,
+.fc-input:focus-visible,
+.fc-select:focus-visible,
+.fc-nav a:focus-visible,
+.fc-menu:focus-visible {
+  outline: 2px solid var(--fc-signal);
+  outline-offset: 3px;
+}
+
+.fc-do-first {
+  border-top: 2px solid var(--fc-ink);
+  padding-top: 0.8rem;
+  max-width: 22rem;
 }
 
 .fc-run:hover { background: #050504; }

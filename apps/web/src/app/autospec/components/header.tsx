@@ -19,7 +19,7 @@ export function AutospecHeader() {
       <div className="flex items-center gap-4">
         <span className="hidden text-[10px] uppercase tracking-[0.2em] md:inline">My garage / 01</span>
         <Link href="/autospec/garage" className="as-add">+ Add vehicle</Link>
-        <button type="button" className="as-menu as-add" onClick={() => setOpen((v) => !v)}>
+        <button type="button" className="as-menu as-add" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           Menu
         </button>
       </div>
