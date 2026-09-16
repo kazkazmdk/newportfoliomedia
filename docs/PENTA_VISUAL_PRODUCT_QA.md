@@ -1,283 +1,205 @@
 # PENTA Visual Product QA
 
-Baseline SHA: `55da9c0ae6cf306580574ddcd3a82d0aaa83e412`  
-Pass SHA: `344212bde4312b6d70e4ffbbec8586c7dbe580e9` on `main`  
-Viewports: `1440×1000`, `1440×1600`, `390×844`  
-Rule: product first, art direction second. Identities unchanged.
+This report is an integrity report, not a design review.
 
-Screenshots live in `docs/visual-product-qa/`.
+**Baseline SHA (visual-depth V2):** `55da9c0ae6cf306580574ddcd3a82d0aaa83e412`  
+**Product-first SHA:** `d2e2cd3509186897983d4987d819494b43b67b41`  
+**Integrity implementation start:** `b774b61` (first commit of this pass)  
+**Report generated from:** `git rev-parse HEAD` at the commit that last updated this file. Do not treat a hardcoded “final HEAD” as durable — the next commit would make it stale.
+
+Viewports asserted by Playwright: `390×844`, `1440×1000`, `1440×1600`.  
+Captures in `docs/visual-product-qa/` named `*-mobile-after.png`, `*-desktop-1440x1000-after.png`, `*-desktop-1440x1600-after.png` come from `pnpm qa:visual` against `next start`.
+
+**Status vocabulary**
+
+| Label | Meaning |
+| --- | --- |
+| **VERIFIED** | Automated test asserted the claim (URL, text, bounding box, or interaction). |
+| **MANUALLY REVIEWED** | Screenshot / human reading only. |
+| **NOT VERIFIED** | Not tested in this pass. |
+
+A fold claim is **VERIFIED** only when Playwright checks `box.y + box.height <= viewport.height + 2`.
 
 ---
 
 ## TripCost
 
-### Home — desktop 1440×1000 / 1440×1600
+### Home
 
-**First viewport**
-- CTA visible? **Yes.** `Compare trip` sits on the map as a command bar (`left/right/bottom: 1.2rem`).
-- Product understood? **Yes.** From / To / People control a geodesic corridor.
-- Result preview visible? **Partial.** Route line + city nodes update with the selects. No invented fare chips on the empty home.
-- Scroll required before interaction? **No.**
-
-**Hierarchy**
-- Primary: From, To, People, Compare trip
-- Secondary: selected Paris–Lyon geodesic
-- Decorative: Europe land polygon, muted unused corridors
-
-**Issues**
-- P0 (before): `.tc-map { min-height: 36rem }` + svg `min(78vh, 720px)` put ~700px of map above the form. CTA y > 844 on mobile; on 1440×1000 the form was a footer under the map.
-- P1 (before): form read as “the section after the poster”.
-
-**Fix made**
-- `apps/web/src/app/tripcost/tripcost.css` — mobile form `order: 1`, map `order: 2`, compact svg; desktop form absolutely docked on the map (solid paper, no glass).
-- `apps/web/src/app/tripcost/components/home-map.tsx` — CTA label `Compare trip`; people default 2.
-- `apps/web/src/app/tripcost/components/route-map.tsx` — selected route stroke 3.4–4px; unused corridors 0.16 opacity; city labels only for hubs + endpoints.
+| Claim | Status | Proof |
+| --- | --- | --- |
+| `Compare trip` fully in first 390×844 viewport | VERIFIED | Playwright bounding box |
+| From / To / People drive `/tripcost/{from}/to/{to}?travellers=` | VERIFIED | Interaction: travellers=2 on submit |
+| No invented live fare on empty home | MANUALLY REVIEWED | Screenshot |
+| Safari / iOS | NOT VERIFIED | Chromium only |
 
 **Before / after**
 - `tripcost-home-mobile-before.png` / `tripcost-home-mobile-after.png`
 - `tripcost-home-desktop-1440x1000-before.png` / `tripcost-home-desktop-1440x1000-after.png`
 - `tripcost-home-desktop-1440x1600-before.png` / `tripcost-home-desktop-1440x1600-after.png`
 
-Measured mobile after: From + To + People + Compare trip + a map slice all have `y < 844`.
-
 ### Result — Paris → Lyon
 
-**First viewport**
-- CTA / decision visible? **Yes.** Fastest / cheapest cash / true cost / best for N.
-- Labels used only from `compareRoute()`: Fastest = min `minutes_door`; Cheapest = min `cash_eur`; True cost = min `true_eur`; Best for N = `result.best`.
-- Scroll before the comparison? **No** on 390×844 (verdict grid immediately under the map).
+Previous bug: `useState(4)` ignored `?travellers=`. Fixed: `sanitizeTravellers()` reads the query (default 2, clamp 1–6) and `router.replace` keeps `?travellers=` in sync.
 
-**Hierarchy**
-- Primary: corridor title, people slider, four verdicts
-- Secondary: door-to-door / cash race / break-even
-- Decorative: map land fill
-
-**Fix made**
-- `apps/web/src/app/tripcost/route-compare.tsx` — `.tc-verdicts` from engine sorts only.
+| Claim | Status | Proof |
+| --- | --- | --- |
+| Home with 2 travellers → URL `travellers=2` → `Best for 2` | VERIFIED | Interaction test |
+| Slider to 5 → URL `travellers=5` → `Best for 5` | VERIFIED | Interaction test |
+| Fastest / Cheapest cash / True cost / Best for N fully in 390×844 | VERIFIED | `.tc-verdicts [data-verdict=*]` bounding boxes |
+| Verdicts come from `compareRoute()` sorts, not hardcoded labels | VERIFIED | Unit + UI uses engine sorts |
+| `.tc-hero.is-result` no longer uses 100svh | MANUALLY REVIEWED | CSS + screenshot |
+| Map is compact on result | MANUALLY REVIEWED | Screenshot |
 
 **Before / after**
 - `tripcost-result-mobile-before.png` / `tripcost-result-mobile-after.png`
-- `tripcost-result-desktop-before.png` / `tripcost-result-desktop-after.png`
-
-Show-don’t-tell: changing people recomputes `result.best` and the four chips.
+- `tripcost-result-desktop-1440x1000-after.png`
+- `tripcost-result-desktop-1440x1600-after.png`
+- Desktop 1440×1600 before: **No preserved before screenshot**
 
 ---
 
 ## ChargeMatch
 
-### Home — 1440×1000 / 390×844
+Frozen this pass except regression checks.
 
-**First viewport**
-- CTA visible? **Yes on 390×844.** `Check power` sits under Expected watts. Before: CTA y was below the 14rem nodes + objects.
-- Product understood? **Yes.** Device → charger → expected W.
-- Result preview visible? **Yes.** `powerChain()` watts + `limitingComponent` + protocol.
-- Scroll before interaction? **No** on mobile. Desktop keeps device → cable → charger to the right of the desk.
-
-**Hierarchy**
-- Primary: Device, Charger, Expected W, Check power
-- Secondary: industrial outline of device/brick (diagram, not fake photo)
-- Decorative: 48px technical grid
-
-**Issues**
-- P0 (before): `.cm-node { min-height: 14rem }` + CSS “photoreal” bodies buried the CTA.
-- P1: result weight < object weight.
-
-**Fix made**
-- `connect-hero.tsx` — live `powerChain()` expected block; hardware after the desk on desktop, hidden on mobile.
-- `chargematch.css` — nodes `min-height: 0`; hardware converted to stroke diagrams (Option A).
-- Multiport entry: `/chargematch/macbook-air-13-m3/with/anker-100w-2c` (published pair).
+| Claim | Status | Proof |
+| --- | --- | --- |
+| Device, Charger, Expected W, Check power fully in 390×844 | VERIFIED | Bounding boxes |
+| Changing charger updates expected watts | VERIFIED | Apple 20W → Anker 65W changes the W figure |
+| Multiport 1 plugged → 2 plugged changes allocation | VERIFIED | `.cm-branch` watt texts change |
+| Limiter text present | VERIFIED | `/limited by/i` |
+| Safari | NOT VERIFIED | |
 
 **Before / after**
 - `chargematch-home-mobile-before.png` / `chargematch-home-mobile-after.png`
 - `chargematch-home-desktop-1440x1000-before.png` / `chargematch-home-desktop-1440x1000-after.png`
-
-Measured mobile after: Expected `20W`, Limited by port, Check power all `y < 844`.
-
-### Result / multiport
-
-**First viewport**
-- Expected watts + match + limiter are the first block (`.cm-result-bar`).
-- Multiport: `allocate()` on `anker-100w-2c` is `100 → 65+30` when C2 is plugged. Port buttons change `plugged` and re-run `allocate()`.
-
-**Fix made**
-- `pair-studio.tsx` — result bar first; plug count drives `usedPorts`.
-
-**Before / after**
+- `chargematch-home-desktop-1440x1600-after.png` — **No preserved before screenshot**
 - `chargematch-result-mobile-before.png` / `chargematch-result-mobile-after.png`
-- `chargematch-result-desktop-before.png` / `chargematch-result-desktop-after.png`
 - `chargematch-multiport-mobile-after.png`
-
-Show-don’t-tell: changing the charger changes expected W and “limited by”.
 
 ---
 
 ## WearThere
 
-### Home — 390×844
+Previous bug: `worn` / `hero` were computed from all `visible` pieces. The UI said the look updates; unpacking did not change the stack. Fixed: `packedPieces = visible.filter(id ∈ packed)`; hero and stack come from packed pieces only. Empty: “Nothing packed yet.” Buttons: `Remove from case` / `Add to case`.
 
-**First viewport (measured after)**
-1. Destination + dates — `TOKYO` / `12 Nov–18 Nov`
-2. Climate — `9–17°C` · `Rain likely` · humidity
-3. Destination still
-4. Essential clothes — `Merino knit + Packable rain shell + Wool coat` from `capsuleFor()`
-5. Planner / Plan this trip (in-fold or one short scroll)
-
-**Before:** `.wt-hero-type { order: 2 }` put the photo/planner above Tokyo. First screen was a cropped still + form, no climate→clothes sentence.
-
-**CTA / result**
-- Compact result (`Wear this`) is in the first 844px.
-- Plan this trip is the explicit action; it may sit just under the style field.
-
-**Hierarchy**
-- Primary: city, climate numbers, clothing sentence
-- Secondary: planner
-- Decorative: rain veil on the still
-
-**Fix made**
-- `destination-hero.tsx` — climate read + `capsuleFor()` essential line.
-- `wearthere.css` — mobile flex order: type 1, frame 3, answer 4, planner 5. Photo `min-height: 28vh` (was 52vh).
+| Claim | Status | Proof |
+| --- | --- | --- |
+| `Wear this` fully in first 390×844 viewport | VERIFIED | Bounding box of the real “Wear this” label |
+| `Plan this trip` is the planner CTA | VERIFIED | Role=button exists |
+| `Plan this trip` is first-fold | **NOT claimed** | Not asserted in-fold. Honest: Wear this is the first-fold product answer; Plan may sit below 844px |
+| Remove from case changes look ids | VERIFIED | `data-look-ids` changes |
+| Packed count decreases | VERIFIED | `data-packed-count` changes |
+| Packing works without drag | VERIFIED | Button click only |
+| Mobile order destination → climate → visual → Wear this → planner | MANUALLY REVIEWED | CSS order + screenshot |
 
 **Before / after**
 - `wearthere-home-mobile-before.png` / `wearthere-home-mobile-after.png`
 - `wearthere-home-desktop-1440x1000-before.png` / `wearthere-home-desktop-1440x1000-after.png`
+- `wearthere-home-desktop-1440x1600-after.png` — **No preserved before screenshot**
 - `wearthere-tokyo-mobile-before.png` / `wearthere-tokyo-mobile-after.png`
-
-### Desktop
-
-Climate (°C, rain) sits in the same column as `Wear this`. The still remains the right-hand editorial field.
-
-### Capsule
-
-`wardrobe-board.tsx` — one dominant look (coat + knit + trousers + shoes stacked) plus secondary pieces and the existing pack/unpack board. No prices, no shop.
-
-Show-don’t-tell: Tokyo → Reykjavik changes mood tokens, °C, and the essential sentence.
 
 ---
 
 ## AutoSpec
 
-### Home — onboarding (no owned vehicle)
+Previous bug: garage and public vehicle used `87432` km, `last_oil_km: 76200`, `brake_pct: 72`, `battery: GOOD`, then showed remaining km and a `/100` score as if they were the user’s. Removed.
 
-**First viewport**
-- Job: **identify**. Headline `What do you drive?`
-- Input: make/model search. Hits are real `findVehicles()` rows.
-- VIN is `<details>` with `Unavailable · stub` (`VIN_SUPPORT === NOT_IMPLEMENTED`). Not a peer CTA.
-- Car photo `100vw` on 390×844 (was `min(70vw, 920px)`).
-
-**Covered identities** starts after an ownership explanation block — not immediately under the hero.
-
-**Issues**
-- P1 (before): home mixed “Your car, understood” + featured G20 identity + VIN decode as a real control.
-- P1 (before): car ~70vw, too small.
-
-**Fix made**
-- `page.tsx` — onboarding copy; identities moved down.
-- `garage-entry.tsx` — VIN demoted; default query `320d` so a real hit appears.
-- `autospec.css` — `.as-car-photo { width: 100vw }` under 820px.
-- `vehicle-stage.tsx` — `sizes` 100vw on small screens.
+| Claim | Status | Proof |
+| --- | --- | --- |
+| Home search field in first viewport | VERIFIED | Bounding box |
+| Search `320d` shows a real vehicle hit | VERIFIED | Button matching /320d/ |
+| VIN is not a working primary CTA | VERIFIED | `Try decode` count 0 until details; summary says unavailable/stub |
+| Public page shows interval (`Every N km / M months`), not remaining km | VERIFIED | Text + `87432` count 0 |
+| Public page has Add to My Garage | VERIFIED | Link visible |
+| Garage asks for mileage before remaining km | MANUALLY REVIEWED | Code + screenshot of public vs garage |
+| Score hidden until all five checks entered | MANUALLY REVIEWED | `ownershipCoverage().ready` gate; no default GOOD/72 |
+| Safari | NOT VERIFIED | |
 
 **Before / after**
 - `autospec-home-mobile-before.png` / `autospec-home-mobile-after.png`
 - `autospec-home-desktop-1440x1000-before.png` / `autospec-home-desktop-1440x1000-after.png`
-
-### Vehicle / garage — ownership
-
-Cockpit cells from the graph only:
-- Service = `nextService()[0].km_left`
-- Oil = `oil.spec` + `capacity_liters`
-- Tyres = `tyres.front`
-- Battery = `12V` + `battery.type`
-- Recalls = VIN-specific check source (no invented clean bill)
-
-**Before / after**
+- `autospec-home-desktop-1440x1600-after.png` — **No preserved before screenshot**
 - `autospec-vehicle-mobile-before.png` / `autospec-vehicle-mobile-after.png`
 
-Show-don’t-tell: inspect zones (engine / tyres / battery / service) change the callout on the still.
+Catalog unit test still uses `87432` as an **internal fixture** for `ownershipScore()`. That is not a user-facing value.
 
 ---
 
 ## FixCode
 
-### Home
+Previous bug: recommended action sat in the hero, but the next action CTA (`Next branch`) was after a long water scrollytelling + a duplicated “Start with #1” question.
 
-Unchanged composition (P2: do not restage). Brand / appliance / error / observed / Run diagnostic + schematic still share the first desktop viewport.
+| Claim | Status | Proof |
+| --- | --- | --- |
+| `Do this first` in first 390×844 viewport | VERIFIED | Bounding box |
+| Associated `Start check` CTA in the same first viewport | VERIFIED | Link bounding box |
+| Start check lands on `/fixcode/diagnose` with the same first question | VERIFIED | Interaction |
+| First question is not repeated as “Start with #1” | MANUALLY REVIEWED | Section retitled “Why this check first” (why only) |
+| Machine visualization still present after the hero | MANUALLY REVIEWED | `fc-pin-wrap` kept |
+| Safari | NOT VERIFIED | |
 
 **Before / after**
 - `fixcode-home-mobile-before.png` / `fixcode-home-mobile-after.png`
-
-### Error / diagnose
-
-**Hierarchy after**
-1. Code (`4C`) + plain-English meaning
-2. `Do this first` = `questions[0]`
-3. Illustrated check + `Next branch`
-4. Remaining checks
-5. Stop boundary from `tree.boundaries`
-6. Alternative causes
-7. Manufacturer source (secondary)
-
-**Fix made**
-- `error-hero.tsx` / `[code]/page.tsx` / `diagnose-tool.tsx`
-- Schematic plate mark: `Water path` instead of `SYSTEM SCHEMATIC`
-- Header status: `Ready` instead of `System status`
-
-**Before / after**
 - `fixcode-error-mobile-before.png` / `fixcode-error-mobile-after.png`
-
-Show-don’t-tell: answering a diagnose branch dims eliminated systems on the plate.
+- `fixcode-error-desktop-1440x1000-after.png` / `fixcode-error-desktop-1440x1600-after.png` — **No preserved before screenshot** for 1440×1600
 
 ---
 
-## Accessibility / performance (P2)
+## Viewport matrix
 
-- Focus rings on primary controls (product colour tokens, 2px / 3px offset).
-- Selects/inputs/CTAs `min-height: 44px` where they are the action.
-- `aria-expanded` on the five mobile nav toggles.
-- `overflow-x: clip` on each product root.
-- Existing `prefers-reduced-motion` blocks kept (paths, scan, photo mask, flow dots).
-- `next/image` `sizes` updated only where crop width changed (AutoSpec 100vw, WearThere hero unchanged 100vw/58vw). Priority remains on heroes.
+Playwright writes after-shots for every QA route at all three sizes. Genuine before shots from the visual-depth / product-first passes were kept. Missing befores are listed as **No preserved before screenshot** — none were invented.
+
+Stale `*-qa.png` files from the previous, more lenient run were left on disk as historical extras. They are **not** evidence for this pass.
 
 ---
 
 ## Automated QA
 
-`tests/visual-qa/product-first.spec.ts` + `playwright.config.ts`
+`tests/visual-qa/product-first.spec.ts`
 
-- Routes return OK
-- `390×844` and `1440×1000` screenshots (non-blocking, not pixel-diff)
-- No horizontal overflow (`scrollWidth <= clientWidth + 1`)
-- Primary CTA / result copy visible and `y < 844` on mobile
-- Main product landmark exists
-- Mobile nav opens
-- No `pageerror`
+- 11 routes load without `pageerror`
+- Full matrix 390×844 / 1440×1000 / 1440×1600, no horizontal overflow
+- Fold: `y + height <= viewport + 2` on the **named** element (not a substitute string)
+- Interactions: TripCost 2→5, WearThere pack, ChargeMatch charger + multiport, AutoSpec 320d + VIN stub, FixCode Start check
+- Mobile nav `aria-expanded`
 
-Command: `pnpm qa:visual` (CI starts `next start` after `pnpm build`).
+Command: `pnpm qa:visual` (starts `next start` after `pnpm build`).
+
+Last local run: **23 passed**.
 
 ---
 
 ## Remaining defects
 
 ### P0
-None observed after the pass on the required viewports.
+
+None remaining after this pass. The three P0s that existed at `d2e2cd3` (TripCost travellers ignored, AutoSpec fake odometer/score, WearThere look not bound to packed) are **VERIFIED** fixed.
+
+This line is allowed only because: all Playwright tests passed, the critical interactions ran, and the state-continuity bugs were asserted — not inferred from code review.
 
 ### P1
-- WearThere `Plan this trip` can sit just under the 844px fold when the still + essential line are both present. The clothing answer is in-fold; this is accepted.
-- ChargeMatch home desktop still has unused grid field around the outlines. Identity kept; not filled with cards.
+
+- WearThere `Plan this trip` is not asserted first-fold. Forcing it into 844px would crush the still or `Wear this`. Documented, not faked.
+- AutoSpec garage ownership extras (oil km, brakes, battery) are optional this-session fields. Nothing is persisted server-side. That is honest, but a refresh without `?km=` forgets mileage unless the query is kept.
 
 ### P2
-- Chrome headless letter-spacing screenshots collapse small uppercase tracking (`FROM` reads as `FROMFROM`). Live CSS tracking is unchanged.
-- FixCode home remains a tall diagnostic hero by design.
-- TripCost SVG land is still a coarse polygon (no MapLibre added).
-- AutoSpec `findVehicles("BMW 320d")` fails because the concatenated identity is `bmw 3 series … 320d`, not `bmw 320d`. Default query is now `320d`. Token search would be a later engine change.
+
+- Safari / WebKit / iOS: **NOT VERIFIED**
+- Chrome headless letter-spacing can collapse small uppercase tracking in screenshots. Live CSS is unchanged.
+- `findVehicles("BMW 320d")` still fails (identity string is `bmw 3 series … 320d`). Query `320d` works and is the tested path.
+- TripCost land polygon remains a geodesic sketch, not a road map.
+- ChargeMatch desktop still has unused grid around the outlines (identity kept).
 
 ---
 
 ## Gate questions
 
-| Product | Without the logo, does the UI show the engine? | Tool or Behance? |
+| Product | UI claim backed by state/engine? | Tool or poster? |
 | --- | --- | --- |
-| FixCode | Code → meaning → do this first → schematic zone | Tool |
-| WearThere | °C / rain → named garments | Tool |
-| ChargeMatch | Device + charger → expected W + limiter | Tool |
-| AutoSpec | Search vs cockpit (service/oil/tyres/battery) | Tool |
-| TripCost | From/To/People → compare → fastest/cheapest/true | Tool |
+| FixCode | Yes — first question + Start check → diagnose | Tool |
+| WearThere | Yes — packed set drives look + count | Tool |
+| ChargeMatch | Yes — `powerChain()` / `allocate()` | Tool |
+| AutoSpec | Yes — public interval; remaining only after mileage | Tool |
+| TripCost | Yes — `?travellers=` = `compareRoute()` party size | Tool |

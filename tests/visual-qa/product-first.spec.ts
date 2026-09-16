@@ -95,7 +95,7 @@ test.describe("product-first visual QA", () => {
 
     await page.goto("/tripcost/paris/to/lyon?travellers=2", { waitUntil: "domcontentloaded" });
     await expect(page.getByRole("heading", { name: /paris → lyon/i })).toBeVisible();
-    await expect(page.getByText("465 km", { exact: false })).toBeVisible();
+    await expect(page.locator(".tc-hero.is-result").getByText(/465 km/)).toBeVisible();
     await expect(page.getByLabel("Number of travellers")).toHaveValue("2");
     const verdicts = page.locator(".tc-verdicts");
     await expect(verdicts).toBeVisible();
@@ -179,7 +179,7 @@ test.describe("product integrity interactions", () => {
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     const expected = page.locator(".cm-expected .cm-mono.text-5xl");
     const before = (await expected.innerText()).trim();
-    await page.getByLabel("Charger").selectOption({ label: /anker/i });
+    await page.getByLabel("Charger").selectOption({ label: "Anker 65W USB-C (Nano II class)" });
     await expect(expected).not.toHaveText(before);
     await expect(page.locator(".cm-expected")).toContainText(/limited by/i);
   });
