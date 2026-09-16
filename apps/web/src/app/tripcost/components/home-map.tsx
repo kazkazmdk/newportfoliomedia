@@ -73,7 +73,7 @@ export function HomeMap() {
       </form>
       <RouteMap from={from} to={dest} compact />
       {corridor ? (
-        <p className="px-4 pb-3 text-[11px] uppercase tracking-[0.16em] text-[var(--tc-mute)]">
+        <p className="tc-corridor-note">
           {corridor.km} km corridor · heuristic cash / true cost — not a live ticket
         </p>
       ) : null}

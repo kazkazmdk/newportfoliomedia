@@ -1,14 +1,12 @@
 "use client";
 
-import { VEHICLES, assistantAnswer, getVehicle, nextService, ownershipScore, vehicleUrl } from "@penta/autospec";
+import { assistantAnswer, getVehicle, nextService, ownershipScore, vehicleUrl } from "@penta/autospec";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 import { IdentityStrip } from "./components/identity-strip";
 import { OwnershipTimeline } from "./components/ownership-timeline";
-import Image from "next/image";
-import { vehicleMediaOf } from "@/lib/media-catalog";
 import { VehicleStage } from "./components/vehicle-stage";
 
 export function GarageApp() {

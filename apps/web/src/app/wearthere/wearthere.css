@@ -124,7 +124,8 @@
   .wt-hero-type { grid-column: 1; grid-row: 1; z-index: 2; }
   .wt-answer { grid-column: 1; grid-row: 2; }
   .wt-planner { grid-column: 1; grid-row: 3; }
-  .wt-hero-frame { grid-column: 2; grid-row: 1 / span 3; }
+  .wt-hero-frame { grid-column: 2; grid-row: 1 / span 3; min-height: 72vh; }
+  .wt-photo { min-height: min(72vh, 720px); }
 }
 
 .wt-city {

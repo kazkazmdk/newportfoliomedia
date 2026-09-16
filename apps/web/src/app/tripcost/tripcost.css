@@ -60,17 +60,28 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: calc(100svh - 3.6rem);
+}
+
+.tc-corridor-note {
+  order: 3;
+  padding: 0.45rem 1rem 0.7rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
 }
 
 .tc-map {
   position: relative;
   min-height: 0;
+  flex: 1;
   background: #c5d0da;
   overflow: hidden;
   order: 2;
 }
 
-.tc-map svg { width: 100%; height: min(38vh, 280px); display: block; }
+.tc-map svg { width: 100%; height: min(42vh, 320px); display: block; }
 .tc-map-note {
   position: absolute;
   left: 0.8rem;
@@ -115,6 +126,7 @@
 
 @media (min-width: 800px) {
   .tc-hero { min-height: calc(100svh - 3.6rem); display: block; }
+  .tc-corridor-note { display: none; }
   .tc-map { min-height: calc(100svh - 3.6rem); }
   .tc-map svg { height: calc(100svh - 3.6rem); }
   .tc-form {

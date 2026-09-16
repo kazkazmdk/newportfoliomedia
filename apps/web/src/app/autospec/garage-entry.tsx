@@ -6,7 +6,7 @@ import { FormEvent, useMemo, useState } from "react";
 
 export function GarageEntry() {
   const router = useRouter();
-  const [q, setQ] = useState("BMW 320d");
+  const [q, setQ] = useState("320d");
   const [vin, setVin] = useState("");
   const [note, setNote] = useState("");
   const hits = useMemo(() => findVehicles(q), [q]);
@@ -26,7 +26,7 @@ export function GarageEntry() {
     <div className="mt-8 grid max-w-md gap-5">
       <label className="as-field">
         Make / model / generation
-        <input aria-label="Search make and model" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input aria-label="Search make and model" value={q} onChange={(e) => setQ(e.target.value)} placeholder="BMW 320d G20" />
       </label>
       <ul className="grid gap-2">
         {hits.slice(0, 4).map((v) => (
