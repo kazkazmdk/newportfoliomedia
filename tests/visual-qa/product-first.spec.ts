@@ -212,7 +212,40 @@ test.describe("product integrity interactions", () => {
     await expect(page.getByText(/typical service interval/i)).toBeVisible();
     await expect(page.getByText(/every \d/i).first()).toBeVisible();
     await expect(page.getByText(/87432/)).toHaveCount(0);
+    await expect(page.getByText(/km remaining/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: /add to my garage/i })).toBeVisible();
+  });
+
+  test("AutoSpec garage without mileage asks for it and keeps recalls unknown", async ({ page }) => {
+    await page.goto("/autospec/garage?make=bmw&model=3-series&gen=g20&var=320d-b47", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/enter mileage/i).first()).toBeVisible();
+    await expect(page.getByLabel("Current mileage in kilometres")).toBeVisible();
+    await expect(page.locator("[data-ownership-score]")).toHaveCount(0);
+    await expect(page.getByText(/vin required/i).first()).toBeVisible();
+    await expect(page.getByText(/no open recall/i)).toHaveCount(0);
+    await expect(page.getByText(/87432/)).toHaveCount(0);
+  });
+
+  test("AutoSpec garage at 30000 km shows scheduled interval due now, not 15000 remaining", async ({ page }) => {
+    await page.goto("/autospec/garage?make=bmw&model=3-series&gen=g20&var=320d-b47&km=30000", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/scheduled interval due now/i).first()).toBeVisible();
+    await expect(page.getByText(/15,000 km remaining/i)).toHaveCount(0);
+    await expect(page.getByText(/based on the standard/i).first()).toBeVisible();
+    await expect(page.getByText(/vin required/i).first()).toBeVisible();
+  });
+
+  test("AutoSpec garage score excludes unknown recalls", async ({ page }) => {
+    await page.goto("/autospec/garage?make=bmw&model=3-series&gen=g20&var=320d-b47&km=40000", { waitUntil: "domcontentloaded" });
+    await page.getByText(/optional ownership checks/i).click();
+    await page.getByLabel("Odometer at last oil change").fill("35000");
+    await page.getByLabel("Brake pad remaining percent").fill("80");
+    await page.getByLabel("12V battery condition").selectOption("GOOD");
+    await page.getByText("Tyres inspected", { exact: true }).click();
+    await page.getByRole("radio", { name: /^ok$/i }).check();
+    const score = page.locator("[data-ownership-score]");
+    await expect(score).toBeVisible();
+    await expect(score).toContainText(/recall status not included/i);
+    await expect(page.getByText(/no open recall/i)).toHaveCount(0);
   });
 
   test("FixCode Start check lands on diagnose with the first question", async ({ page }) => {

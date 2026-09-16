@@ -104,17 +104,22 @@ Previous bug: `worn` / `hero` were computed from all `visible` pieces. The UI sa
 
 ## AutoSpec
 
-Previous bug: garage and public vehicle used `87432` km, `last_oil_km: 76200`, `brake_pct: 72`, `battery: GOOD`, then showed remaining km and a `/100` score as if they were the user’s. Removed.
+Close-out pass on product truth only. No identity change.
 
 | Claim | Status | Proof |
 | --- | --- | --- |
 | Home search field in first viewport | VERIFIED | Bounding box |
 | Search `320d` shows a real vehicle hit | VERIFIED | Button matching /320d/ |
 | VIN is not a working primary CTA | VERIFIED | `Try decode` count 0 until details; summary says unavailable/stub |
-| Public page shows interval (`Every N km / M months`), not remaining km | VERIFIED | Text + `87432` count 0 |
-| Public page has Add to My Garage | VERIFIED | Link visible |
-| Garage asks for mileage before remaining km | MANUALLY REVIEWED | Code + screenshot of public vs garage |
-| Score hidden until all five checks entered | MANUALLY REVIEWED | `ownershipCoverage().ready` gate; no default GOOD/72 |
+| Public page: Typical service interval / Every N km | VERIFIED | Playwright |
+| No hardcoded odometer `87432` on public or garage | VERIFIED | Playwright count 0 |
+| No default battery / brake / clean-recall state in UI | VERIFIED | Garage without mileage: score absent, Recalls = VIN required |
+| Garage without mileage: Enter mileage, no score | VERIFIED | Playwright |
+| Exact interval boundary (`?km=30000`) → due now, not 15,000 remaining | VERIFIED | Playwright + `kmUntilNextInterval` unit tests |
+| Public interval vs garage scheduled interval separated | VERIFIED | Public “Typical…”, garage “Next scheduled interval” / “due now” |
+| Tyre check incomplete if `tyre_ok` missing | VERIFIED | Unit: checked+undefined = incomplete |
+| Score uses entered checks only; unknown recall excluded | VERIFIED | Unit + Playwright `Recall status not included`; no `No open recall` |
+| `lastOilKm` only affects oil remaining copy | MANUALLY REVIEWED | Oil block appears only when last oil is entered |
 | Safari | NOT VERIFIED | |
 
 **Before / after**
@@ -123,7 +128,10 @@ Previous bug: garage and public vehicle used `87432` km, `last_oil_km: 76200`, `
 - `autospec-home-desktop-1440x1600-after.png` — **No preserved before screenshot**
 - `autospec-vehicle-mobile-before.png` / `autospec-vehicle-mobile-after.png`
 
-Catalog unit test still uses `87432` as an **internal fixture** for `ownershipScore()`. That is not a user-facing value.
+Classified leftovers:
+- `87432` / `open_recalls: 0` in `catalog.test.ts` = **internal fixture** only.
+- `GOOD` / `WEAK` in garage `<select>` = user-entered options, no default.
+- `72` in AutoSpec engine page demand seed = SEO demand integer, not brake wear.
 
 ---
 
@@ -175,14 +183,12 @@ Last local run: **23 passed**.
 
 ### P0
 
-None remaining after this pass. The three P0s that existed at `d2e2cd3` (TripCost travellers ignored, AutoSpec fake odometer/score, WearThere look not bound to packed) are **VERIFIED** fixed.
-
-This line is allowed only because: all Playwright tests passed, the critical interactions ran, and the state-continuity bugs were asserted — not inferred from code review.
+None remaining if the AutoSpec close-out tests in this commit pass. The previous AutoSpec P0s (fake odometer, invented remaining km, `open_recalls: 0` treated as clean) are asserted fixed.
 
 ### P1
 
 - WearThere `Plan this trip` is not asserted first-fold. Forcing it into 844px would crush the still or `Wear this`. Documented, not faked.
-- AutoSpec garage ownership extras (oil km, brakes, battery) are optional this-session fields. Nothing is persisted server-side. That is honest, but a refresh without `?km=` forgets mileage unless the query is kept.
+- AutoSpec garage extras stay this-session. Mileage survives only via `?km=`. VIN decode remains unimplemented, so recall status cannot become VERIFIED.
 
 ### P2
 

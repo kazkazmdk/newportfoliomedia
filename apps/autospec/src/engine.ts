@@ -24,11 +24,29 @@ export function findVehicles(query: string): VehicleIdentity[] {
   );
 }
 
+export function kmUntilNextInterval(km: number, interval: number): number {
+  if (interval <= 0) return 0;
+  const rem = km % interval;
+  if (km > 0 && rem === 0) return 0;
+  return interval - rem;
+}
+
+export function kmUntilNextFromLast(currentKm: number, lastKm: number, interval: number): number | null {
+  if (!Number.isFinite(currentKm) || !Number.isFinite(lastKm) || lastKm > currentKm) return null;
+  return kmUntilNextInterval(currentKm - lastKm, interval);
+}
+
+export function scheduledIntervalCopy(kmLeft: number) {
+  if (kmLeft === 0) return "Scheduled interval due now";
+  return `Next scheduled interval in ${kmLeft.toLocaleString()} km`;
+}
+
 export function nextService(vehicle: VehicleIdentity, km: number, ageMonths?: number) {
   return vehicle.services
     .map((item) => {
-      const kmLeft = item.interval_km - (km % item.interval_km);
-      const monthsLeft = ageMonths == null ? null : item.interval_months - (ageMonths % item.interval_months);
+      const kmLeft = kmUntilNextInterval(km, item.interval_km);
+      const monthsLeft =
+        ageMonths == null ? null : kmUntilNextInterval(ageMonths, item.interval_months);
       return { ...item, km_left: kmLeft, months_left: monthsLeft };
     })
     .sort((a, b) => a.km_left - b.km_left);
@@ -49,14 +67,18 @@ export type OwnershipCheckInput = {
   tyre_ok?: boolean;
   brake_pct?: number;
   battery?: "GOOD" | "WEAK" | "UNKNOWN";
-  open_recalls?: number;
+  open_recalls?: number | null;
 };
 
 export function ownershipCoverage(input: OwnershipCheckInput) {
   const checks = [
     { id: "mileage", label: "Current mileage", done: input.km != null && Number.isFinite(input.km) },
     { id: "oil", label: "Last oil change", done: input.last_oil_km != null },
-    { id: "tyres", label: "Tyre condition", done: input.tyre_checked === true },
+    {
+      id: "tyres",
+      label: "Tyre condition",
+      done: input.tyre_checked === true && input.tyre_ok != null,
+    },
     { id: "brakes", label: "Brake wear", done: input.brake_pct != null },
     { id: "battery", label: "12V battery", done: input.battery != null && input.battery !== "UNKNOWN" },
   ] as const;
@@ -70,8 +92,8 @@ export function ownershipScore(input: {
   tyre_ok: boolean;
   brake_pct: number;
   battery: "GOOD" | "WEAK" | "UNKNOWN";
-  open_recalls: number;
-}): { score: number; factors: string[] } {
+  open_recalls?: number | null;
+}): { score: number; factors: string[]; recall_included: boolean } {
   const factors: string[] = [];
   let score = 100;
   const oilAge = input.km - input.last_oil_km;
@@ -96,11 +118,19 @@ export function ownershipScore(input: {
     score -= 5;
     factors.push("Battery unknown");
   } else factors.push("Battery good");
-  if (input.open_recalls > 0) {
+  const open = input.open_recalls;
+  let recall_included = false;
+  if (open == null) {
+    factors.push("Recall status not included — VIN verification required.");
+  } else if (open > 0) {
     score -= 12;
-    factors.push("Recall check outstanding");
-  } else factors.push("No open recall recorded in this profile");
-  return { score: Math.max(0, score), factors };
+    factors.push("Open recall recorded in verified check");
+    recall_included = true;
+  } else {
+    factors.push("No open recall found in verified check");
+    recall_included = true;
+  }
+  return { score: Math.max(0, score), factors, recall_included };
 }
 
 export const RULE_VERSION = "maintenance-v1";

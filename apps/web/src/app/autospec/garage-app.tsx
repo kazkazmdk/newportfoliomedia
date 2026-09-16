@@ -1,6 +1,15 @@
 "use client";
 
-import { assistantAnswer, getVehicle, nextService, ownershipCoverage, ownershipScore, vehicleUrl } from "@penta/autospec";
+import {
+  assistantAnswer,
+  getVehicle,
+  kmUntilNextFromLast,
+  nextService,
+  ownershipCoverage,
+  ownershipScore,
+  scheduledIntervalCopy,
+  vehicleUrl,
+} from "@penta/autospec";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
@@ -14,6 +23,12 @@ function sanitizeKm(raw: string | null): number | null {
   const n = Number.parseInt(raw, 10);
   if (!Number.isFinite(n) || n < 1) return null;
   return Math.min(2_000_000, n);
+}
+
+function tyreLabel(tyreChecked: boolean, tyreOk: boolean | undefined) {
+  if (!tyreChecked) return "Not checked";
+  if (tyreOk == null) return "Tyre result missing";
+  return tyreOk ? "Inspected OK" : "Needs attention";
 }
 
 export function GarageApp() {
@@ -58,7 +73,7 @@ export function GarageApp() {
       tyre_ok: tyreOk,
       brake_pct: brakePct,
       battery,
-      open_recalls: 0,
+      open_recalls: null,
     });
   }, [coverage.ready, km, lastOilKm, tyreOk, brakePct, battery]);
 
@@ -67,6 +82,12 @@ export function GarageApp() {
   }
 
   const due = km != null ? nextService(vehicle, km) : [];
+  const nextScheduled = due[0];
+  const oilRow = vehicle.services.find((s) => s.id === "oil");
+  const oilUntil =
+    km != null && lastOilKm != null && oilRow
+      ? kmUntilNextFromLast(km, lastOilKm, oilRow.interval_km)
+      : null;
 
   function saveMileage(event: FormEvent) {
     event.preventDefault();
@@ -112,8 +133,10 @@ export function GarageApp() {
           ) : null}
           <div className="as-cockpit">
             <div className="as-cockpit-cell">
-              <p>Service</p>
-              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km remaining` : "Enter mileage"}</strong>
+              <p>Next scheduled interval</p>
+              <strong>
+                {nextScheduled ? scheduledIntervalCopy(nextScheduled.km_left) : "Enter mileage"}
+              </strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Oil</p>
@@ -121,7 +144,7 @@ export function GarageApp() {
             </div>
             <div className="as-cockpit-cell">
               <p>Tyres</p>
-              <strong>{tyreChecked ? (tyreOk ? "Inspected OK" : "Needs inspection") : "Not checked"}</strong>
+              <strong>{tyreLabel(tyreChecked, tyreOk)}</strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Battery</p>
@@ -132,26 +155,41 @@ export function GarageApp() {
               <strong>VIN required</strong>
             </div>
           </div>
+          {km != null ? (
+            <p className="mt-3 text-sm text-[var(--as-mute)]">Based on the standard maintenance interval. Assumes the maintenance schedule has been followed.</p>
+          ) : null}
+          {oilUntil != null && lastOilKm != null && oilRow ? (
+            <div className="mt-6" data-oil-known>
+              <p className="text-[11px] uppercase tracking-[0.18em]">Oil service</p>
+              <p className="as-display mt-2 text-3xl">
+                {oilUntil === 0 ? "Oil service due now" : `${oilUntil.toLocaleString()} km until next oil change`}
+              </p>
+              <p className="mt-2 text-sm text-[var(--as-mute)]">
+                Last oil change entered at {lastOilKm.toLocaleString()} km.
+              </p>
+            </div>
+          ) : null}
           <p className="as-display mt-8 text-5xl">{coverage.completed} / {coverage.total} checks completed</p>
           <ul className="mt-4 grid gap-1 text-sm">
             {coverage.checks.map((c) => (
               <li key={c.id}>
-                {c.label}: {c.done ? "entered" : "not entered"}
+                {c.label}: {c.done ? "entered" : c.id === "tyres" && tyreChecked && tyreOk == null ? "Tyre result missing" : "not entered"}
               </li>
             ))}
           </ul>
           {score ? (
-            <>
+            <div data-ownership-score>
               <p className="as-display mt-6 text-5xl">{score.score}/100</p>
+              <p className="mt-2 text-sm">Based on {coverage.completed} entered checks.</p>
               <ul className="mt-4 grid gap-1 text-sm">
                 {score.factors.map((f) => (
                   <li key={f}>{f}</li>
                 ))}
               </ul>
-            </>
+            </div>
           ) : (
             <p className="mt-4 text-sm text-[var(--as-mute)]">
-              Ownership score stays hidden until mileage, last oil, tyres, brakes and battery are all entered. No default health values.
+              Ownership score stays hidden until mileage, last oil, tyres, brakes and battery are all entered. No default health values. Recall status is not included.
             </p>
           )}
         </div>
@@ -160,7 +198,7 @@ export function GarageApp() {
       <IdentityStrip vehicle={vehicle} />
       <section className="as-scene">
         {km != null ? (
-          <OwnershipTimeline items={due} mode="remaining" />
+          <OwnershipTimeline items={due} mode="scheduled" />
         ) : (
           <OwnershipTimeline items={vehicle.services} mode="interval" />
         )}
@@ -217,10 +255,27 @@ export function GarageApp() {
               Tyres inspected
             </label>
             {tyreChecked ? (
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={tyreOk === true} onChange={(e) => setTyreOk(e.target.checked)} />
-                Tyres OK
-              </label>
+              <fieldset className="grid gap-2">
+                <legend className="text-[11px] uppercase tracking-[0.16em]">Tyre condition</legend>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="tyre-condition"
+                    checked={tyreOk === true}
+                    onChange={() => setTyreOk(true)}
+                  />
+                  OK
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="tyre-condition"
+                    checked={tyreOk === false}
+                    onChange={() => setTyreOk(false)}
+                  />
+                  Needs attention
+                </label>
+              </fieldset>
             ) : null}
           </div>
         </details>

@@ -5,7 +5,7 @@ import { applyAnswer, diagnose, getError, getSymptom, initialState, likelihoodLa
 import { allocate, compatibility, compatibilityEvidence, getCharger, getDevice } from "@penta/chargematch";
 import { compareRoute, getRoute, sanitizeTravellers, timeValueBreakEven } from "@penta/tripcost";
 import { capsuleFor, DESTINATIONS, isForecastCurrent, weatherSourceLabel } from "@penta/wearthere";
-import { checkFitment, ownershipCoverage, ownershipScore, VEHICLES } from "@penta/autospec";
+import { checkFitment, getVehicle, kmUntilNextFromLast, kmUntilNextInterval, nextService, ownershipCoverage, ownershipScore, scheduledIntervalCopy, VEHICLES } from "@penta/autospec";
 import { buildCatalog, coverageReport, launchReport, programmaticSeoIssues } from "@penta/catalog";
 import { globalNoindex } from "@penta/publishing-core";
 import { routeAiTask } from "@penta/ai-core";
@@ -274,6 +274,54 @@ describe("AutoSpec", () => {
     const mileageOnly = ownershipCoverage({ km: 40000 });
     expect(mileageOnly.completed).toBe(1);
     expect(mileageOnly.ready).toBe(false);
+  });
+
+  it("returns 0 km left on exact service interval boundaries", () => {
+    const v = getVehicle("bmw", "3-series", "g20", "320d-b47")!;
+    const interval = 15000;
+    expect(kmUntilNextInterval(0, interval)).toBe(15000);
+    expect(kmUntilNextInterval(14999, interval)).toBe(1);
+    expect(kmUntilNextInterval(15000, interval)).toBe(0);
+    expect(kmUntilNextInterval(15001, interval)).toBe(14999);
+    expect(kmUntilNextInterval(29999, interval)).toBe(1);
+    expect(kmUntilNextInterval(30000, interval)).toBe(0);
+    const atZero = nextService(v, 0);
+    expect(atZero.find((s) => s.interval_km === 15000)?.km_left).toBe(15000);
+    const at15000 = nextService(v, 15000);
+    expect(at15000.find((s) => s.interval_km === 15000)?.km_left).toBe(0);
+    const at30000 = nextService(v, 30000);
+    expect(at30000.find((s) => s.interval_km === 15000)?.km_left).toBe(0);
+    expect(at30000.find((s) => s.interval_km === 30000)?.km_left).toBe(0);
+    expect(scheduledIntervalCopy(0)).toMatch(/due now/i);
+    expect(kmUntilNextFromLast(52000, 45000, 15000)).toBe(8000);
+  });
+
+  it("does not complete tyre coverage without a condition", () => {
+    expect(ownershipCoverage({ tyre_checked: false, tyre_ok: undefined }).checks.find((c) => c.id === "tyres")?.done).toBe(false);
+    expect(ownershipCoverage({ tyre_checked: true, tyre_ok: undefined }).checks.find((c) => c.id === "tyres")?.done).toBe(false);
+    expect(ownershipCoverage({ tyre_checked: true, tyre_ok: true }).checks.find((c) => c.id === "tyres")?.done).toBe(true);
+    expect(ownershipCoverage({ tyre_checked: true, tyre_ok: false }).checks.find((c) => c.id === "tyres")?.done).toBe(true);
+  });
+
+  it("excludes unknown recalls from ownership score", () => {
+    const known = {
+      km: 40000,
+      last_oil_km: 35000,
+      tyre_ok: true,
+      brake_pct: 80,
+      battery: "GOOD" as const,
+    };
+    const unknown = ownershipScore({ ...known, open_recalls: null });
+    const omitted = ownershipScore(known);
+    expect(unknown.recall_included).toBe(false);
+    expect(omitted.recall_included).toBe(false);
+    expect(unknown.score).toBe(omitted.score);
+    expect(unknown.factors.join(" ")).toMatch(/recall status not included/i);
+    expect(unknown.factors.join(" ")).not.toMatch(/no open recall/i);
+    const verifiedZero = ownershipScore({ ...known, open_recalls: 0 });
+    expect(verifiedZero.recall_included).toBe(true);
+    expect(verifiedZero.score).toBe(unknown.score);
+    expect(verifiedZero.factors.join(" ")).toMatch(/no open recall found in verified check/i);
   });
 });
 
