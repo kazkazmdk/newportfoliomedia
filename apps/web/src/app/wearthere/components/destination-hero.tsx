@@ -88,17 +88,27 @@ export function DestinationHero({
           </p>
         </CursorCanvas>
         <form id="plan" onSubmit={onSubmit} className="wt-planner">
-          <label>
-            Destination
-            <select aria-label="Destination city" value={city} onChange={(e) => setCity(e.target.value)}>
-              {DESTINATIONS.map((d) => (
-                <option key={d.slug} value={d.slug}>
-                  {d.city}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="wt-planner-row">
+            <label>
+              Destination
+              <select aria-label="Destination city" value={city} onChange={(e) => setCity(e.target.value)}>
+                {DESTINATIONS.map((d) => (
+                  <option key={d.slug} value={d.slug}>
+                    {d.city}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Style
+              <select aria-label="Packing style" value={style} onChange={(e) => setStyle(e.target.value as StyleId)}>
+                {["minimal", "streetwear", "classic", "business", "outdoor", "luxury", "casual"].map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="wt-dates">
             <label>
               From
               <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
@@ -108,14 +118,6 @@ export function DestinationHero({
               <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
             </label>
           </div>
-          <label>
-            Style
-            <select aria-label="Packing style" value={style} onChange={(e) => setStyle(e.target.value as StyleId)}>
-              {["minimal", "streetwear", "classic", "business", "outdoor", "luxury", "casual"].map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
-          </label>
           <button className="wt-cta w-fit" type="submit">
             Plan this trip
           </button>

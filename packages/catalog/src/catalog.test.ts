@@ -3,9 +3,9 @@ import { evaluatePageQuality, searchDemandScore, seoRecommendation, classifyDema
 import { assertInferenceCannotBecomeOfficial, isFresh, provenance } from "@penta/data-provenance";
 import { applyAnswer, diagnose, getError, getSymptom, initialState, likelihoodLabel, BRANDS } from "@penta/fixcode";
 import { allocate, compatibility, compatibilityEvidence, getCharger, getDevice } from "@penta/chargematch";
-import { compareRoute, getRoute, timeValueBreakEven } from "@penta/tripcost";
+import { compareRoute, getRoute, sanitizeTravellers, timeValueBreakEven } from "@penta/tripcost";
 import { capsuleFor, DESTINATIONS, isForecastCurrent, weatherSourceLabel } from "@penta/wearthere";
-import { checkFitment, ownershipScore, VEHICLES } from "@penta/autospec";
+import { checkFitment, ownershipCoverage, ownershipScore, VEHICLES } from "@penta/autospec";
 import { buildCatalog, coverageReport, launchReport, programmaticSeoIssues } from "@penta/catalog";
 import { globalNoindex } from "@penta/publishing-core";
 import { routeAiTask } from "@penta/ai-core";
@@ -201,6 +201,16 @@ describe("TripCost", () => {
     const expired = compareRoute(route, 4, false, new Date("2026-11-01T00:00:00.000Z"));
     expect(expired.modes.find((m) => m.mode === "train")!.stale).toBe(true);
   });
+
+  it("sanitizes travellers query values to 1–6", () => {
+    expect(sanitizeTravellers(undefined)).toBe(2);
+    expect(sanitizeTravellers("")).toBe(2);
+    expect(sanitizeTravellers("abc")).toBe(2);
+    expect(sanitizeTravellers("0")).toBe(1);
+    expect(sanitizeTravellers(-3)).toBe(1);
+    expect(sanitizeTravellers("9")).toBe(6);
+    expect(sanitizeTravellers("3")).toBe(3);
+  });
 });
 
 describe("WearThere", () => {
@@ -258,6 +268,12 @@ describe("AutoSpec", () => {
     });
     expect(score.score).toBeGreaterThan(50);
     expect(score.factors.length).toBeGreaterThan(3);
+    const empty = ownershipCoverage({});
+    expect(empty.completed).toBe(0);
+    expect(empty.ready).toBe(false);
+    const mileageOnly = ownershipCoverage({ km: 40000 });
+    expect(mileageOnly.completed).toBe(1);
+    expect(mileageOnly.ready).toBe(false);
   });
 });
 

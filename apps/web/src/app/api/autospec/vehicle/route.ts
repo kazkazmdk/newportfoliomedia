@@ -31,6 +31,9 @@ export async function POST(request: Request) {
     vehicle: vehicle.id,
     engine: vehicle.engine_code,
     market: vehicle.market,
-    schedule: nextService(vehicle, parsed.value.km ?? 0, 12),
+    schedule:
+      parsed.value.km != null
+        ? nextService(vehicle, parsed.value.km)
+        : vehicle.services.map((item) => ({ ...item, km_left: null, months_left: null })),
   });
 }

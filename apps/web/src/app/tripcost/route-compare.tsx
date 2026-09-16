@@ -1,6 +1,7 @@
 "use client";
 
-import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
+import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, sanitizeTravellers, timeValueBreakEven, type RouteRecord } from "@penta/tripcost";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 import { BreakEvenChart } from "./components/break-even";
@@ -17,12 +18,23 @@ const LABELS: Record<string, string> = {
   rideshare: "Rideshare",
 };
 
-export function RouteCompare({ route }: { route: RouteRecord }) {
-  const [travellers, setTravellers] = useState(4);
+export function RouteCompare({ route, initialTravellers }: { route: RouteRecord; initialTravellers?: number }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const travellers = sanitizeTravellers(searchParams.get("travellers") ?? initialTravellers);
   const [trueCost, setTrueCost] = useState(false);
   const [fuel, setFuel] = useState(route.fuel_eur_per_l);
   const [parking, setParking] = useState(route.parking_eur);
   const [tolls, setTolls] = useState(route.tolls_eur);
+
+  function setTravellers(next: number) {
+    const value = sanitizeTravellers(next);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("travellers", String(value));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
   const adjusted = useMemo(
     () => ({ ...route, fuel_eur_per_l: fuel, parking_eur: parking, tolls_eur: tolls }),
     [route, fuel, parking, tolls],
@@ -70,33 +82,33 @@ export function RouteCompare({ route }: { route: RouteRecord }) {
           <p className="tc-mono text-xl self-end">Best for {travellers} · {LABELS[partyBest]}</p>
         </div>
         <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} compact />
+        <div className="tc-verdicts" aria-label="Trip comparison">
+          {fastest ? (
+            <div className="tc-verdict" data-verdict="fastest">
+              <p>Fastest</p>
+              <strong>{LABELS[fastest.mode]} · {fmtDoor(fastest.minutes_door)}</strong>
+            </div>
+          ) : null}
+          {cheapest ? (
+            <div className="tc-verdict" data-verdict="cheapest">
+              <p>Cheapest cash</p>
+              <strong>{LABELS[cheapest.mode]} · €{cheapest.cash_eur}</strong>
+            </div>
+          ) : null}
+          {trueBest ? (
+            <div className="tc-verdict" data-verdict="true-cost">
+              <p>True cost</p>
+              <strong>{LABELS[trueBest.mode]} · €{trueBest.true_eur}</strong>
+            </div>
+          ) : null}
+          {partyBest ? (
+            <div className="tc-verdict" data-verdict="best">
+              <p>Best for {travellers} {travellers === 1 ? "person" : "people"}</p>
+              <strong>{LABELS[partyBest]}</strong>
+            </div>
+          ) : null}
+        </div>
       </section>
-      <div className="tc-verdicts" aria-label="Trip comparison">
-        {fastest ? (
-          <div className="tc-verdict">
-            <p>Fastest</p>
-            <strong>{LABELS[fastest.mode]} · {fmtDoor(fastest.minutes_door)}</strong>
-          </div>
-        ) : null}
-        {cheapest ? (
-          <div className="tc-verdict">
-            <p>Cheapest cash</p>
-            <strong>{LABELS[cheapest.mode]} · €{cheapest.cash_eur}</strong>
-          </div>
-        ) : null}
-        {trueBest ? (
-          <div className="tc-verdict">
-            <p>True cost</p>
-            <strong>{LABELS[trueBest.mode]} · €{trueBest.true_eur}</strong>
-          </div>
-        ) : null}
-        {partyBest ? (
-          <div className="tc-verdict">
-            <p>Best for {travellers} {travellers === 1 ? "person" : "people"}</p>
-            <strong>{LABELS[partyBest]}</strong>
-          </div>
-        ) : null}
-      </div>
       <section className="tc-scene">
         <p className="text-[11px] uppercase tracking-[0.18em]">Best option for this trip</p>
         <p className="mt-4 text-5xl">{LABELS[result.best]}</p>

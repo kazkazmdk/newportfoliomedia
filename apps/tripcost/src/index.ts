@@ -377,6 +377,12 @@ function round(n: number) {
   return Math.round(n);
 }
 
+export function sanitizeTravellers(raw: unknown, fallback = 2): number {
+  const n = typeof raw === "number" ? raw : Number.parseInt(String(Array.isArray(raw) ? raw[0] : raw ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(6, Math.max(1, Math.round(n)));
+}
+
 export function compareRoute(
   route: RouteRecord,
   travellers: number,

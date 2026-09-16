@@ -1,15 +1,23 @@
 "use client";
 
-import { assistantAnswer, getVehicle, nextService, ownershipScore, vehicleUrl } from "@penta/autospec";
+import { assistantAnswer, getVehicle, nextService, ownershipCoverage, ownershipScore, vehicleUrl } from "@penta/autospec";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 import { IdentityStrip } from "./components/identity-strip";
 import { OwnershipTimeline } from "./components/ownership-timeline";
 import { VehicleStage } from "./components/vehicle-stage";
 
+function sanitizeKm(raw: string | null): number | null {
+  if (raw == null || raw === "") return null;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 1) return null;
+  return Math.min(2_000_000, n);
+}
+
 export function GarageApp() {
+  const router = useRouter();
   const params = useSearchParams();
   const vehicle = getVehicle(
     params.get("make") ?? "bmw",
@@ -17,44 +25,95 @@ export function GarageApp() {
     params.get("gen") ?? "g20",
     params.get("var") ?? "320d-b47",
   );
-  const [km] = useState(87432);
+  const km = sanitizeKm(params.get("km"));
+  const [kmDraft, setKmDraft] = useState(km != null ? String(km) : "");
+  const [lastOilKm, setLastOilKm] = useState<number | undefined>();
+  const [tyreChecked, setTyreChecked] = useState(false);
+  const [tyreOk, setTyreOk] = useState<boolean | undefined>();
+  const [brakePct, setBrakePct] = useState<number | undefined>();
+  const [battery, setBattery] = useState<"GOOD" | "WEAK" | "UNKNOWN" | undefined>();
   const [question, setQuestion] = useState("What oil should I buy?");
   const [answer, setAnswer] = useState("");
 
-  const score = useMemo(
+  const coverage = useMemo(
     () =>
-      ownershipScore({
-        km,
-        last_oil_km: 76200,
-        tyre_ok: true,
-        brake_pct: 72,
-        battery: "GOOD",
-        open_recalls: 0,
+      ownershipCoverage({
+        km: km ?? undefined,
+        last_oil_km: lastOilKm,
+        tyre_checked: tyreChecked,
+        tyre_ok: tyreOk,
+        brake_pct: brakePct,
+        battery,
       }),
-    [km],
+    [km, lastOilKm, tyreChecked, tyreOk, brakePct, battery],
   );
+
+  const score = useMemo(() => {
+    if (!coverage.ready || km == null || lastOilKm == null || tyreOk == null || brakePct == null || !battery || battery === "UNKNOWN") {
+      return null;
+    }
+    return ownershipScore({
+      km,
+      last_oil_km: lastOilKm,
+      tyre_ok: tyreOk,
+      brake_pct: brakePct,
+      battery,
+      open_recalls: 0,
+    });
+  }, [coverage.ready, km, lastOilKm, tyreOk, brakePct, battery]);
 
   if (!vehicle) {
     return <p className="as-scene">We don&apos;t have verified data for that vehicle yet.</p>;
   }
 
-  const due = nextService(vehicle, km, 48);
+  const due = km != null ? nextService(vehicle, km) : [];
+
+  function saveMileage(event: FormEvent) {
+    event.preventDefault();
+    const next = sanitizeKm(kmDraft);
+    if (next == null) return;
+    const q = new URLSearchParams(params.toString());
+    q.set("km", String(next));
+    router.replace(`/autospec/garage?${q.toString()}`, { scroll: false });
+  }
 
   return (
     <div>
       <section className="as-hero">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em]">My Garage · private · noindex</p>
+          <p className="text-[11px] uppercase tracking-[0.18em]">My Garage · this session · noindex</p>
           <h1 className="mt-4 text-5xl leading-[0.9] md:text-7xl">
             {vehicle.make} {vehicle.variant}
           </h1>
           <p className="mt-3 text-lg text-[var(--as-mute)]">
-            {km.toLocaleString()} km · {vehicle.engine_code} · {vehicle.years[0]}–{vehicle.years.at(-1)}
+            {vehicle.engine_code} · {vehicle.years[0]}–{vehicle.years.at(-1)}
+            {km != null ? ` · ${km.toLocaleString()} km entered` : ""}
           </p>
+          {km == null ? (
+            <form className="mt-6 grid max-w-sm gap-3" onSubmit={saveMileage}>
+              <label className="as-field">
+                Current mileage
+                <input
+                  type="number"
+                  min={1}
+                  max={2000000}
+                  inputMode="numeric"
+                  aria-label="Current mileage in kilometres"
+                  placeholder="e.g. 42000"
+                  value={kmDraft}
+                  onChange={(e) => setKmDraft(e.target.value)}
+                  required
+                />
+              </label>
+              <button className="as-cta w-fit" type="submit">
+                Use this mileage
+              </button>
+            </form>
+          ) : null}
           <div className="as-cockpit">
             <div className="as-cockpit-cell">
               <p>Service</p>
-              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km` : "No interval"}</strong>
+              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km remaining` : "Enter mileage"}</strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Oil</p>
@@ -62,29 +121,109 @@ export function GarageApp() {
             </div>
             <div className="as-cockpit-cell">
               <p>Tyres</p>
-              <strong>{vehicle.tyres.front}</strong>
+              <strong>{tyreChecked ? (tyreOk ? "Inspected OK" : "Needs inspection") : "Not checked"}</strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Battery</p>
-              <strong>12V {vehicle.battery.type}</strong>
+              <strong>{battery && battery !== "UNKNOWN" ? battery : "Not checked"}</strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Recalls</p>
-              <strong>{vehicle.recalls.length ? "VIN-specific · check source" : "No active data / check source"}</strong>
+              <strong>VIN required</strong>
             </div>
           </div>
-          <p className="as-display mt-8 text-5xl">{score.score}/100</p>
+          <p className="as-display mt-8 text-5xl">{coverage.completed} / {coverage.total} checks completed</p>
           <ul className="mt-4 grid gap-1 text-sm">
-            {score.factors.map((f) => (
-              <li key={f}>{f}</li>
+            {coverage.checks.map((c) => (
+              <li key={c.id}>
+                {c.label}: {c.done ? "entered" : "not entered"}
+              </li>
             ))}
           </ul>
+          {score ? (
+            <>
+              <p className="as-display mt-6 text-5xl">{score.score}/100</p>
+              <ul className="mt-4 grid gap-1 text-sm">
+                {score.factors.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="mt-4 text-sm text-[var(--as-mute)]">
+              Ownership score stays hidden until mileage, last oil, tyres, brakes and battery are all entered. No default health values.
+            </p>
+          )}
         </div>
         <VehicleStage makeSlug={vehicle.make_slug} generationSlug={vehicle.generation_slug} identity={`${vehicle.make} ${vehicle.variant} ${vehicle.generation}`} />
       </section>
       <IdentityStrip vehicle={vehicle} />
       <section className="as-scene">
-        <OwnershipTimeline items={due} />
+        {km != null ? (
+          <OwnershipTimeline items={due} mode="remaining" />
+        ) : (
+          <OwnershipTimeline items={vehicle.services} mode="interval" />
+        )}
+        <details className="as-vin mt-10">
+          <summary>
+            Optional ownership checks
+            <span>Only values you enter are used. Nothing is pre-filled.</span>
+          </summary>
+          <div className="mt-4 grid max-w-lg gap-3">
+            <label className="as-field">
+              Last oil change (km)
+              <input
+                type="number"
+                min={0}
+                aria-label="Odometer at last oil change"
+                value={lastOilKm ?? ""}
+                onChange={(e) => setLastOilKm(e.target.value === "" ? undefined : Number(e.target.value))}
+              />
+            </label>
+            <label className="as-field">
+              Brake pad estimate (%)
+              <input
+                type="number"
+                min={0}
+                max={100}
+                aria-label="Brake pad remaining percent"
+                value={brakePct ?? ""}
+                onChange={(e) => setBrakePct(e.target.value === "" ? undefined : Number(e.target.value))}
+              />
+            </label>
+            <label className="as-field">
+              12V battery
+              <select
+                className="border-b border-[var(--as-ink)] bg-transparent py-2"
+                aria-label="12V battery condition"
+                value={battery ?? ""}
+                onChange={(e) => setBattery((e.target.value || undefined) as "GOOD" | "WEAK" | "UNKNOWN" | undefined)}
+              >
+                <option value="">Not checked</option>
+                <option value="GOOD">Good</option>
+                <option value="WEAK">Weak</option>
+                <option value="UNKNOWN">Unknown</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={tyreChecked}
+                onChange={(e) => {
+                  setTyreChecked(e.target.checked);
+                  if (!e.target.checked) setTyreOk(undefined);
+                }}
+              />
+              Tyres inspected
+            </label>
+            {tyreChecked ? (
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={tyreOk === true} onChange={(e) => setTyreOk(e.target.checked)} />
+                Tyres OK
+              </label>
+            ) : null}
+          </div>
+        </details>
         {vehicle.issues.length ? (
           <ul className="mt-10 grid gap-3">
             {vehicle.issues.map((issue) => (
@@ -114,7 +253,10 @@ export function GarageApp() {
             setAnswer(assistantAnswer(vehicle, question));
           }}
         >
-          <input className="border-b border-[var(--as-ink)] bg-transparent py-2" value={question} onChange={(e) => setQuestion(e.target.value)} />
+          <label className="as-field">
+            Ask from the vehicle graph
+            <input className="border-b border-[var(--as-ink)] bg-transparent py-2" value={question} onChange={(e) => setQuestion(e.target.value)} />
+          </label>
           <button className="as-cta w-fit" type="submit">
             Answer from the vehicle graph
           </button>

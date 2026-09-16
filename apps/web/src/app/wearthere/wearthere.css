@@ -144,6 +144,16 @@
   gap: 0.9rem;
   padding-bottom: 0.4rem;
 }
+.wt-planner-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+.wt-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
 
 .wt-planner label {
   display: grid;
@@ -223,14 +233,25 @@
   display: grid;
   align-content: end;
 }
+.wt-look-hero.is-empty {
+  min-height: 12rem;
+  align-content: start;
+}
+.wt-look-empty { min-height: 8rem; }
 .wt-look-stack {
   display: flex;
   gap: 0.6rem;
   align-items: flex-end;
   min-height: 12rem;
 }
-.wt-look-stack .wt-garment-svg { width: min(38%, 160px); }
+.wt-look-stack .wt-garment-svg {
+  width: min(38%, 160px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
 .wt-look-stack .wt-garment-svg:first-child { width: min(52%, 210px); }
+@media (prefers-reduced-motion: reduce) {
+  .wt-look-stack .wt-garment-svg { transition: none; }
+}
 .wt-suitcase { max-width: 16rem; }
 .wt-drop {
   border: 1px dashed color-mix(in srgb, var(--wt-ink) 35%, transparent);
@@ -377,7 +398,8 @@
   .wt-climate-read { order: 2; }
   .wt-hero-frame { order: 3; }
   .wt-answer { order: 4; max-width: none; }
-  .wt-planner { order: 5; }
+  .wt-planner { order: 5; gap: 0.45rem; }
+  .wt-planner-row, .wt-dates { gap: 0.55rem; }
   .wt-garment:nth-child(n) { grid-column: span 12; min-height: 10rem; }
   .wt-photo { width: 100%; min-height: 28vh; clip-path: none; }
   .wt-menu { min-height: 44px; align-items: center; }

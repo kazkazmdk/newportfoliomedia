@@ -66,29 +66,22 @@ export default async function ErrorPage({
       {schema ? (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ) : null}
-      <ErrorHero profile={profile} brand={brand} appliance={appliance} />
+      <ErrorHero
+        profile={profile}
+        brand={brand}
+        appliance={appliance}
+        diagnoseHref={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
+      />
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Start with #1</p>
+        <p className="fc-kicker">Why this check first</p>
         {profile.questions[0] ? (
-          <div className="fc-check mt-6 max-w-3xl">
-            <CheckDiagram kind={checkKindFromText(`${profile.questions[0].text} ${profile.questions[0].why}`)} />
-            <div>
-              <p className="text-3xl leading-tight">{profile.questions[0].text}</p>
-              <p className="mt-3 text-sm leading-6 text-[var(--fc-mute)]">{profile.questions[0].why}</p>
-            </div>
-          </div>
+          <p className="mt-5 max-w-xl text-2xl leading-tight">{profile.questions[0].why}</p>
         ) : (
           <p className="mt-5 max-w-xl text-2xl">No safe first check on file. Do not invent a step.</p>
         )}
-        <Link
-          href={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
-          className="fc-run mt-8 inline-block"
-        >
-          Next branch
-        </Link>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Check these next</p>
+        <p className="fc-kicker">Other checks</p>
         <ol className="mt-6 grid max-w-3xl gap-5">
           {profile.questions.slice(1).map((q) => (
             <li key={q.id} className="fc-check">

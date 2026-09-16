@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { VEHICLES, allAutospecPages, getVehicle, nextService, vehicleUrl } from "@penta/autospec";
+import { VEHICLES, allAutospecPages, getVehicle, serviceIntervalLabel, typicalServiceInterval, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
 import { IdentityStrip } from "../../../../components/identity-strip";
@@ -43,7 +43,7 @@ export default async function VehicleHub({
   const topics = ["oil", "tyres", "battery", "maintenance", "problems"].filter(
     (t) => !(t === "oil" && v.oil.capacity_liters === 0),
   );
-  const due = nextService(v, 87432, 48);
+  const typical = typicalServiceInterval(v);
   return (
     <main>
       <section className="as-hero">
@@ -61,8 +61,8 @@ export default async function VehicleHub({
           </p>
           <div className="as-cockpit">
             <div className="as-cockpit-cell">
-              <p>Service</p>
-              <strong>{due[0] ? `${due[0].km_left.toLocaleString()} km` : "No interval"}</strong>
+              <p>Typical service interval</p>
+              <strong>{typical ? serviceIntervalLabel(typical) : "No interval on file"}</strong>
             </div>
             <div className="as-cockpit-cell">
               <p>Oil</p>
@@ -104,9 +104,9 @@ export default async function VehicleHub({
           <p className="as-display mt-3 text-5xl">{v.battery.type}</p>
         </div>
         <div>
-          <p className="text-[11px] uppercase tracking-[0.2em]">Service</p>
+          <p className="text-[11px] uppercase tracking-[0.2em]">Service interval</p>
           <div className="mt-4">
-            <OwnershipTimeline items={due} />
+            <OwnershipTimeline items={v.services} mode="interval" />
           </div>
         </div>
       </section>

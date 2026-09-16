@@ -14,7 +14,10 @@ export {
   findVehicles,
   getVehicle,
   nextService,
+  ownershipCoverage,
   ownershipScore,
+  serviceIntervalLabel,
+  typicalServiceInterval,
   vehicleUrl,
   RULE_VERSION,
 } from "./engine";

@@ -8,7 +8,7 @@ export function CompareForm() {
   const router = useRouter();
   const [from, setFrom] = useState("paris");
   const [to, setTo] = useState("lyon");
-  const [travellers, setTravellers] = useState(4);
+  const [travellers, setTravellers] = useState(2);
 
   const origins = useMemo(
     () => PLACES.filter((p) => ROUTES.some((r) => r.from.slug === p.slug)),

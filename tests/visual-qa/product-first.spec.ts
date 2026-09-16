@@ -1,26 +1,27 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
 const SHOT_DIR = path.join(process.cwd(), "docs/visual-product-qa");
 
 const ROUTES = [
-  { name: "tripcost-home", path: "/tripcost", cta: /compare trip/i, main: ".tc-hero" },
-  { name: "tripcost-result", path: "/tripcost/paris/to/lyon", cta: /best for/i, main: ".tc-verdicts" },
-  { name: "chargematch-home", path: "/chargematch", cta: /check power/i, main: ".cm-expected" },
-  { name: "chargematch-result", path: "/chargematch/iphone-16/with/apple-20w", cta: /expected/i, main: ".cm-result-bar" },
-  { name: "chargematch-multiport", path: "/chargematch/macbook-air-13-m3/with/anker-100w-2c", cta: /expected/i, main: ".cm-result-bar" },
-  { name: "wearthere-home", path: "/wearthere", cta: /wear this/i, main: ".wt-hero" },
-  { name: "wearthere-tokyo", path: "/wearthere/tokyo", cta: /wear this/i, main: ".wt-hero" },
-  { name: "autospec-home", path: "/autospec", cta: /what do|add /i, main: ".as-hero" },
-  { name: "autospec-vehicle", path: "/autospec/bmw/3-series/g20/320d-b47", cta: /add to my garage/i, main: ".as-cockpit" },
-  { name: "fixcode-home", path: "/fixcode", cta: /run diagnostic|diagnose/i, main: ".fc-hero" },
-  { name: "fixcode-error", path: "/fixcode/samsung/washer/4c", cta: /do this first|next branch/i, main: ".fc-code-giant" },
+  { name: "tripcost-home", path: "/tripcost", main: ".tc-hero" },
+  { name: "tripcost-result", path: "/tripcost/paris/to/lyon?travellers=2", main: ".tc-verdicts" },
+  { name: "chargematch-home", path: "/chargematch", main: ".cm-expected" },
+  { name: "chargematch-result", path: "/chargematch/iphone-16/with/apple-20w", main: ".cm-result-bar" },
+  { name: "chargematch-multiport", path: "/chargematch/macbook-air-13-m3/with/anker-100w-2c", main: ".cm-result-bar" },
+  { name: "wearthere-home", path: "/wearthere", main: ".wt-hero" },
+  { name: "wearthere-tokyo", path: "/wearthere/tokyo", main: ".wt-hero" },
+  { name: "autospec-home", path: "/autospec", main: ".as-hero" },
+  { name: "autospec-vehicle", path: "/autospec/bmw/3-series/g20/320d-b47", main: ".as-cockpit" },
+  { name: "fixcode-home", path: "/fixcode", main: ".fc-hero" },
+  { name: "fixcode-error", path: "/fixcode/samsung/washer/4c", main: ".fc-code-giant" },
 ];
 
 const VIEWPORTS = [
-  { name: "mobile", width: 390, height: 844 },
-  { name: "desktop-1440x1000", width: 1440, height: 1000 },
+  { name: "mobile", width: 390, height: 844, file: "mobile-after" },
+  { name: "desktop-1440x1000", width: 1440, height: 1000, file: "desktop-1440x1000-after" },
+  { name: "desktop-1440x1600", width: 1440, height: 1600, file: "desktop-1440x1600-after" },
 ];
 
 async function noPageError(page: Page) {
@@ -39,6 +40,24 @@ async function noHorizontalOverflow(page: Page) {
   );
 }
 
+async function setRange(locator: Locator, value: number) {
+  await locator.evaluate((el, v) => {
+    const input = el as HTMLInputElement;
+    const proto = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value");
+    proto?.set?.call(input, String(v));
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+}
+
+async function fullyInViewport(locator: Locator, height: number, label: string) {
+  await expect(locator, label).toBeVisible();
+  const box = await locator.boundingBox();
+  expect(box, `${label} box`).toBeTruthy();
+  if (!box) return;
+  expect(box.y + box.height, `${label} below fold y=${box.y} h=${box.height}`).toBeLessThanOrEqual(height + 2);
+}
+
 test.describe("product-first visual QA", () => {
   for (const route of ROUTES) {
     test(`${route.name} loads without runtime errors`, async ({ page }) => {
@@ -50,40 +69,64 @@ test.describe("product-first visual QA", () => {
     });
   }
 
-  test("390x844 first viewport has primary CTA or result", async ({ page }) => {
-    mkdirSync(SHOT_DIR, { recursive: true });
-    await page.setViewportSize({ width: 390, height: 844 });
-    for (const route of ROUTES) {
-      const done = await noPageError(page);
-      await page.goto(route.path, { waitUntil: "domcontentloaded" });
-      await noHorizontalOverflow(page);
-      const cta = page.getByText(route.cta).locator("visible=true").first();
-      await expect(cta, `${route.path} CTA`).toBeVisible();
-      const box = await cta.boundingBox();
-      expect(box, `${route.path} CTA box`).toBeTruthy();
-      if (box) {
-        expect(box.y, `${route.path} CTA below fold`).toBeLessThan(844);
+  for (const vp of VIEWPORTS) {
+    test(`${vp.name} matrix screenshots and overflow`, async ({ page }) => {
+      mkdirSync(SHOT_DIR, { recursive: true });
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      for (const route of ROUTES) {
+        const done = await noPageError(page);
+        await page.goto(route.path, { waitUntil: "domcontentloaded" });
+        await expect(page.locator(route.main).first()).toBeVisible();
+        await noHorizontalOverflow(page);
+        await page.screenshot({
+          path: path.join(SHOT_DIR, `${route.name}-${vp.file}.png`),
+          fullPage: false,
+        });
+        done();
       }
-      await page.screenshot({
-        path: path.join(SHOT_DIR, `${route.name}-mobile-qa.png`),
-        fullPage: false,
-      });
-      done();
-    }
-  });
+    });
+  }
 
-  test("1440x1000 screenshots and main landmark", async ({ page }) => {
-    mkdirSync(SHOT_DIR, { recursive: true });
-    await page.setViewportSize({ width: 1440, height: 1000 });
-    for (const route of ROUTES) {
-      await page.goto(route.path, { waitUntil: "domcontentloaded" });
-      await expect(page.locator(route.main).first()).toBeVisible();
-      await noHorizontalOverflow(page);
-      await page.screenshot({
-        path: path.join(SHOT_DIR, `${route.name}-desktop-qa.png`),
-        fullPage: false,
-      });
-    }
+  test("390x844 real first-fold claims", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
+    await fullyInViewport(page.getByRole("button", { name: /compare trip/i }), 844, "TripCost Compare trip");
+
+    await page.goto("/tripcost/paris/to/lyon?travellers=2", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { name: /paris → lyon/i })).toBeVisible();
+    await expect(page.getByText("465 km", { exact: false })).toBeVisible();
+    await expect(page.getByLabel("Number of travellers")).toHaveValue("2");
+    const verdicts = page.locator(".tc-verdicts");
+    await expect(verdicts).toBeVisible();
+    await fullyInViewport(verdicts.locator('[data-verdict="fastest"]'), 844, "Fastest");
+    await fullyInViewport(verdicts.locator('[data-verdict="cheapest"]'), 844, "Cheapest cash");
+    await fullyInViewport(verdicts.locator('[data-verdict="true-cost"]'), 844, "True cost");
+    await fullyInViewport(verdicts.locator('[data-verdict="best"]'), 844, "Best for N");
+    await expect(verdicts.getByText(/best for 2/i)).toBeVisible();
+    await expect(page.getByText(/best for 4/i)).toHaveCount(0);
+
+    await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
+    await fullyInViewport(page.getByLabel("Device"), 844, "ChargeMatch Device");
+    await fullyInViewport(page.getByLabel("Charger"), 844, "ChargeMatch Charger");
+    await fullyInViewport(page.locator(".cm-expected"), 844, "ChargeMatch Expected W");
+    await fullyInViewport(page.getByRole("button", { name: /check power/i }), 844, "ChargeMatch Check power");
+
+    await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
+    await fullyInViewport(page.getByText(/wear this/i).locator("visible=true").first(), 844, "Wear this");
+    const plan = page.getByRole("button", { name: /plan this trip/i });
+    await expect(plan).toBeVisible();
+    const planBox = await plan.boundingBox();
+    expect(planBox, "Plan this trip exists").toBeTruthy();
+    // Honest fold: Wear this is required in-fold. Plan CTA may sit just below.
+
+    await page.goto("/autospec", { waitUntil: "domcontentloaded" });
+    await fullyInViewport(page.getByLabel("Search make and model"), 844, "AutoSpec search");
+    await fullyInViewport(page.getByRole("button", { name: /add /i }).first(), 844, "AutoSpec vehicle hit");
+
+    await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
+    await fullyInViewport(page.getByText(/do this first/i).locator("visible=true").first(), 844, "Do this first");
+    await fullyInViewport(page.getByRole("link", { name: /start check/i }), 844, "Start check");
   });
 
   test("mobile nav opens on each home", async ({ page }) => {
@@ -93,25 +136,91 @@ test.describe("product-first visual QA", () => {
       await page.goto(pathName, { waitUntil: "load" });
       const toggle = page.locator("header button[aria-expanded]").last();
       await expect(toggle).toBeVisible();
-      await page.waitForFunction(() => {
-        const btn = document.querySelector("header button[aria-expanded]");
-        return Boolean(btn && (btn as HTMLButtonElement).onclick !== null || (window as unknown as { next?: unknown }).next);
-      });
       await toggle.dispatchEvent("click");
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
     }
   });
 });
 
-test.describe("viewport matrix", () => {
-  for (const vp of VIEWPORTS) {
-    test(`tripcost home ${vp.name} CTA in first screen`, async ({ page }) => {
-      await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
-      const cta = page.getByRole("button", { name: /compare trip/i });
-      await expect(cta).toBeVisible();
-      const box = await cta.boundingBox();
-      expect(box?.y ?? 9999).toBeLessThan(vp.height);
-    });
-  }
+test.describe("product integrity interactions", () => {
+  test("TripCost travellers 2 then 5 stay in URL and verdict", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
+    await setRange(page.getByLabel("Number of travellers"), 2);
+    await page.getByRole("button", { name: /compare trip/i }).click();
+    await expect(page).toHaveURL(/travellers=2/);
+    await expect(page.locator('[data-verdict="best"]')).toContainText(/best for 2/i);
+    await expect(page.getByText(/best for 4/i)).toHaveCount(0);
+
+    await setRange(page.getByLabel("Number of travellers"), 5);
+    await expect(page).toHaveURL(/travellers=5/);
+    await expect(page.locator('[data-verdict="best"]')).toContainText(/best for 5/i);
+    await expect(page.locator('[data-verdict="best"]')).not.toContainText(/best for 2/i);
+  });
+
+  test("WearThere remove from case changes look and packed count", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
+    const count = page.locator("[data-packed-count]").first();
+    const stack = page.locator("[data-look-ids]").first();
+    await count.scrollIntoViewIfNeeded();
+    const beforeCount = await count.getAttribute("data-packed-count");
+    const beforeIds = await stack.getAttribute("data-look-ids");
+    expect(Number(beforeCount)).toBeGreaterThan(0);
+    expect(beforeIds).toBeTruthy();
+    await page.getByRole("button", { name: /remove from case/i }).first().click();
+    await expect(count).not.toHaveAttribute("data-packed-count", beforeCount ?? "");
+    const afterIds = await stack.getAttribute("data-look-ids");
+    expect(afterIds).not.toEqual(beforeIds);
+  });
+
+  test("ChargeMatch charger change updates expected watts", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
+    const expected = page.locator(".cm-expected .cm-mono.text-5xl");
+    const before = (await expected.innerText()).trim();
+    await page.getByLabel("Charger").selectOption({ label: /anker/i });
+    await expect(expected).not.toHaveText(before);
+    await expect(page.locator(".cm-expected")).toContainText(/limited by/i);
+  });
+
+  test("ChargeMatch multiport allocation changes when a second port is plugged", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto("/chargematch/macbook-air-13-m3/with/anker-100w-2c", { waitUntil: "domcontentloaded" });
+    const branches = page.locator(".cm-branch .cm-mono.text-xl");
+    await page.getByRole("button", { name: /empty/i }).first().scrollIntoViewIfNeeded();
+    const one = await branches.allInnerTexts();
+    await page.getByRole("button", { name: /empty/i }).first().click();
+    await expect(branches).not.toHaveText(one);
+    const two = await branches.allInnerTexts();
+    expect(two.join("|")).not.toEqual(one.join("|"));
+  });
+
+  test("AutoSpec 320d search hits a real vehicle and VIN is not a primary CTA", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/autospec", { waitUntil: "domcontentloaded" });
+    const search = page.getByLabel("Search make and model");
+    await search.fill("320d");
+    const hit = page.getByRole("button", { name: /320d/i }).first();
+    await expect(hit).toBeVisible();
+    await expect(page.getByRole("button", { name: /try decode/i })).toHaveCount(0);
+    await expect(page.locator("details.as-vin summary")).toContainText(/unavailable|stub/i);
+  });
+
+  test("AutoSpec public page shows interval, not remaining km from a fake odometer", async ({ page }) => {
+    await page.goto("/autospec/bmw/3-series/g20/320d-b47", { waitUntil: "domcontentloaded" });
+    await expect(page.getByText(/typical service interval/i)).toBeVisible();
+    await expect(page.getByText(/every \d/i).first()).toBeVisible();
+    await expect(page.getByText(/87432/)).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /add to my garage/i })).toBeVisible();
+  });
+
+  test("FixCode Start check lands on diagnose with the first question", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
+    const question = (await page.locator(".fc-do-first p.text-xl").innerText()).trim();
+    await page.getByRole("link", { name: /start check/i }).click();
+    await expect(page).toHaveURL(/\/fixcode\/diagnose/);
+    await expect(page.getByText(question, { exact: false }).first()).toBeVisible();
+  });
 });

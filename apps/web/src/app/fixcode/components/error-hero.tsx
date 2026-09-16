@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ErrorProfile, SymptomProfile } from "@penta/fixcode";
 import { CursorCanvas } from "@/components/creative";
+import { CheckDiagram, checkKindFromText } from "./machine-diagrams";
 import { MachineVisual, type WaterStep, zoneFromText } from "./machine-visual";
 import { SourceTrace } from "./source-trace";
 
@@ -18,10 +19,12 @@ export function ErrorHero({
   profile,
   brand,
   appliance,
+  diagnoseHref,
 }: {
   profile: ErrorProfile | SymptomProfile;
   brand: string;
   appliance: string;
+  diagnoseHref: string;
 }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
@@ -29,6 +32,7 @@ export function ErrorHero({
   const code = isError ? profile.code : profile.symptom;
   const water = /4c|4e|water supply/i.test(`${code} ${profile.meaning}`);
   const zone = zoneFromText(`${code} ${profile.meaning} ${profile.causes[0]?.name ?? ""}`);
+  const first = profile.questions[0];
 
   useEffect(() => {
     if (!water) return;
@@ -67,11 +71,17 @@ export function ErrorHero({
               {profile.brand} {profile.appliance}
               {profile.causes[0] ? ` · most likely: ${profile.causes[0].name}` : ""}
             </p>
-            {profile.questions[0] ? (
+            {first ? (
               <div className="fc-do-first mt-6">
                 <p className="fc-kicker">Do this first</p>
-                <p className="mt-2 text-xl leading-snug">{profile.questions[0].text}</p>
-                <p className="mt-2 text-sm text-[var(--fc-mute)]">{profile.questions[0].why}</p>
+                <p className="mt-2 text-xl leading-snug">{first.text}</p>
+                <p className="mt-2 text-sm text-[var(--fc-mute)]">{first.why}</p>
+                <div className="mt-4">
+                  <CheckDiagram kind={checkKindFromText(`${first.text} ${first.why}`)} />
+                </div>
+                <Link href={diagnoseHref} className="fc-run mt-4 inline-block">
+                  Start check
+                </Link>
               </div>
             ) : null}
           </div>

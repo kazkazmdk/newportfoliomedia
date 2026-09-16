@@ -24,14 +24,44 @@ export function findVehicles(query: string): VehicleIdentity[] {
   );
 }
 
-export function nextService(vehicle: VehicleIdentity, km: number, ageMonths: number) {
+export function nextService(vehicle: VehicleIdentity, km: number, ageMonths?: number) {
   return vehicle.services
     .map((item) => {
       const kmLeft = item.interval_km - (km % item.interval_km);
-      const monthsLeft = item.interval_months - (ageMonths % item.interval_months);
+      const monthsLeft = ageMonths == null ? null : item.interval_months - (ageMonths % item.interval_months);
       return { ...item, km_left: kmLeft, months_left: monthsLeft };
     })
     .sort((a, b) => a.km_left - b.km_left);
+}
+
+export function serviceIntervalLabel(item: { interval_km: number; interval_months: number }) {
+  return `Every ${item.interval_km.toLocaleString()} km / ${item.interval_months} months`;
+}
+
+export function typicalServiceInterval(vehicle: VehicleIdentity) {
+  return [...vehicle.services].sort((a, b) => a.interval_km - b.interval_km || a.interval_months - b.interval_months)[0];
+}
+
+export type OwnershipCheckInput = {
+  km?: number;
+  last_oil_km?: number;
+  tyre_checked?: boolean;
+  tyre_ok?: boolean;
+  brake_pct?: number;
+  battery?: "GOOD" | "WEAK" | "UNKNOWN";
+  open_recalls?: number;
+};
+
+export function ownershipCoverage(input: OwnershipCheckInput) {
+  const checks = [
+    { id: "mileage", label: "Current mileage", done: input.km != null && Number.isFinite(input.km) },
+    { id: "oil", label: "Last oil change", done: input.last_oil_km != null },
+    { id: "tyres", label: "Tyre condition", done: input.tyre_checked === true },
+    { id: "brakes", label: "Brake wear", done: input.brake_pct != null },
+    { id: "battery", label: "12V battery", done: input.battery != null && input.battery !== "UNKNOWN" },
+  ] as const;
+  const completed = checks.filter((c) => c.done).length;
+  return { completed, total: checks.length, ready: completed === checks.length, checks };
 }
 
 export function ownershipScore(input: {

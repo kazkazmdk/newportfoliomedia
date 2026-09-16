@@ -144,7 +144,8 @@
   text-transform: uppercase;
 }
 
-.as-field input {
+.as-field input,
+.as-field select {
   border: 0;
   border-bottom: 1px solid var(--as-ink);
   background: transparent;
@@ -169,6 +170,7 @@
 
 .as-cta:focus-visible,
 .as-field input:focus-visible,
+.as-field select:focus-visible,
 .as-add:focus-visible,
 .as-nav a:focus-visible,
 .as-menu:focus-visible,

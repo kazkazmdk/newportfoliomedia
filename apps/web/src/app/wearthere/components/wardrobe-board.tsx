@@ -4,12 +4,24 @@ import { useMemo, useState } from "react";
 import type { ClothingPiece } from "@penta/wearthere";
 import { GarmentSvg, garmentKind } from "./garment-svg";
 
+const LOOK_KINDS = ["coat", "knit", "trousers", "boots"] as const;
+
+function packLabel(on: boolean) {
+  return on ? "Remove from case" : "Add to case";
+}
+
 export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
   const [packed, setPacked] = useState<string[]>(() => pieces.map((p) => p.id));
   const visible = useMemo(() => pieces, [pieces]);
-  const count = packed.length;
-  const hero = visible.find((p) => garmentKind(p) === "coat") ?? visible[0];
-  const worn = visible.filter((p) => ["coat", "knit", "trousers", "boots"].includes(garmentKind(p))).slice(0, 4);
+  const packedPieces = visible.filter((piece) => packed.includes(piece.id));
+  const count = packedPieces.length;
+  const hero =
+    packedPieces.find((p) => garmentKind(p) === "coat") ??
+    packedPieces.find((p) => garmentKind(p) === "knit") ??
+    packedPieces[0];
+  const worn = LOOK_KINDS.map((kind) => packedPieces.find((p) => garmentKind(p) === kind)).filter(
+    (p): p is ClothingPiece => Boolean(p),
+  );
   const secondary = visible.filter((p) => !worn.some((w) => w.id === p.id));
 
   function toggle(id: string) {
@@ -20,28 +32,42 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
     <div className="wt-lookbook">
       <div className="wt-suitcase" aria-live="polite">
         <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Packed</p>
-        <p className="wt-serif mt-2 text-4xl">
+        <p className="wt-serif mt-2 text-4xl" data-packed-count={count}>
           {String(count).padStart(2, "0")} / {String(visible.length).padStart(2, "0")}
         </p>
         <p className="mt-2 text-sm opacity-70">Pack or unpack a piece. The look updates.</p>
       </div>
       <div className="wt-look">
-        <article className="wt-look-hero">
+        <article className={`wt-look-hero${count === 0 ? " is-empty" : ""}`}>
           <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">The look</p>
-          <div className="wt-look-stack" aria-hidden>
-            {worn.map((piece) => (
-              <GarmentSvg key={piece.id} kind={garmentKind(piece)} />
-            ))}
-          </div>
-          <h3 className="wt-serif mt-4 text-4xl">{hero?.name ?? "Capsule"}</h3>
-          <p className="mt-2 text-sm opacity-70">
-            {worn.map((p) => p.name).join(" · ")}
-          </p>
-          {hero ? (
-            <button type="button" className="wt-pack mt-5" onClick={() => toggle(hero.id)}>
-              {packed.includes(hero.id) ? "Packed" : "Add to case"}
-            </button>
-          ) : null}
+          {count === 0 ? (
+            <div className="wt-look-empty">
+              <h3 className="wt-serif mt-6 text-4xl">Nothing packed yet.</h3>
+              <p className="mt-2 text-sm opacity-70">Add pieces to rebuild the look.</p>
+            </div>
+          ) : (
+            <>
+              <div
+                className="wt-look-stack"
+                data-look-ids={worn.map((p) => p.id).join(",")}
+                aria-live="polite"
+                aria-label={worn.map((p) => p.name).join(", ") || "Packed look"}
+              >
+                {worn.map((piece) => (
+                  <GarmentSvg key={piece.id} kind={garmentKind(piece)} />
+                ))}
+              </div>
+              <h3 className="wt-serif mt-4 text-4xl">{hero?.name ?? "Capsule"}</h3>
+              <p className="mt-2 text-sm opacity-70">
+                {worn.map((p) => p.name).join(" · ") || hero?.name}
+              </p>
+              {hero ? (
+                <button type="button" className="wt-pack mt-5" onClick={() => toggle(hero.id)}>
+                  {packLabel(packed.includes(hero.id))}
+                </button>
+              ) : null}
+            </>
+          )}
         </article>
         <div className="grid gap-3">
           {secondary.slice(0, 4).map((piece) => {
@@ -54,7 +80,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
                   {piece.layer} · warmth {piece.warmth}
                 </p>
                 <button type="button" className="wt-pack mt-3" onClick={() => toggle(piece.id)}>
-                  {on ? "Packed" : "Unpack / add"}
+                  {packLabel(on)}
                 </button>
               </article>
             );
@@ -78,7 +104,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
                 {piece.layer} · warmth {piece.warmth} · rain {piece.water_resistance}
               </p>
               <button type="button" className="wt-pack mt-5" onClick={() => toggle(piece.id)}>
-                {on ? "Packed" : "Add to case"}
+                {packLabel(on)}
               </button>
             </article>
           );
@@ -93,7 +119,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
           if (id) setPacked((prev) => (prev.includes(id) ? prev : [...prev, id]));
         }}
       >
-        Suitcase zone
+        Suitcase zone — buttons also pack and unpack
       </div>
     </div>
   );

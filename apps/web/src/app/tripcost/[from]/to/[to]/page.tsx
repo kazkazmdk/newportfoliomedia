@@ -1,5 +1,6 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ROUTES, allTripcostPages, getRoute } from "@penta/tripcost";
+import { ROUTES, allTripcostPages, getRoute, sanitizeTravellers } from "@penta/tripcost";
 import { pageMeta } from "@/lib/seo";
 import { RouteCompare } from "../../../route-compare";
 
@@ -19,9 +20,20 @@ export async function generateMetadata({ params }: { params: Promise<{ from: str
   });
 }
 
-export default async function RoutePage({ params }: { params: Promise<{ from: string; to: string }> }) {
+export default async function RoutePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ from: string; to: string }>;
+  searchParams: Promise<{ travellers?: string | string[] }>;
+}) {
   const { from, to } = await params;
+  const query = await searchParams;
   const route = getRoute(from, to);
   if (!route) notFound();
-  return <RouteCompare route={route} />;
+  return (
+    <Suspense fallback={<p className="tc-scene">Loading corridor…</p>}>
+      <RouteCompare route={route} initialTravellers={sanitizeTravellers(query.travellers)} />
+    </Suspense>
+  );
 }

@@ -61,7 +61,7 @@ export function HomeMap() {
           <input
             type="range"
             min={1}
-            max={5}
+            max={6}
             value={travellers}
             aria-label="Number of travellers"
             onChange={(e) => setTravellers(Number(e.target.value))}

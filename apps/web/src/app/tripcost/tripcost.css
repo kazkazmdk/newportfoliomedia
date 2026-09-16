@@ -63,6 +63,10 @@
   min-height: calc(100svh - 3.6rem);
 }
 
+.tc-hero.is-result {
+  min-height: 0;
+}
+
 .tc-corridor-note {
   order: 3;
   padding: 0.45rem 1rem 0.7rem;
@@ -124,11 +128,33 @@
 
 .tc-form .tc-cta { grid-column: 1 / -1; min-height: 44px; }
 
+.tc-map.is-compact {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+.tc-map.is-compact svg,
+.tc-hero.is-result .tc-map svg {
+  height: min(22vh, 168px);
+}
+
 @media (min-width: 800px) {
   .tc-hero { min-height: calc(100svh - 3.6rem); display: block; }
+  .tc-hero.is-result {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
   .tc-corridor-note { display: none; }
   .tc-map { min-height: calc(100svh - 3.6rem); }
   .tc-map svg { height: calc(100svh - 3.6rem); }
+  .tc-hero.is-result .tc-map,
+  .tc-map.is-compact {
+    min-height: 0;
+  }
+  .tc-hero.is-result .tc-map svg,
+  .tc-map.is-compact svg {
+    height: min(36vh, 280px);
+  }
   .tc-form {
     position: absolute;
     left: 1.2rem;
@@ -189,6 +215,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.7rem 1rem;
   padding: 1rem 1.2rem 0.4rem;
+  order: 3;
+}
+
+.tc-hero.is-result .tc-map {
+  flex: 0 0 auto;
 }
 
 @media (min-width: 800px) {
@@ -215,6 +246,16 @@
 }
 
 .tc-hero.is-result .tc-form { align-items: start; }
+
+@media (min-width: 800px) {
+  .tc-hero.is-result .tc-form {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    grid-template-columns: 1fr auto auto;
+  }
+}
 
 .tc-scene { padding: 4.2rem 1.2rem; }
 @media (min-width: 900px) { .tc-scene { padding: 5.4rem 1.8rem; } }
