@@ -2,9 +2,9 @@
 
 > Generated report. Do not edit by hand.
 >
-> git SHA: `e3506c0a347a0f32d598de5b7412157fbfce4d19`
-> generated: `2026-09-17T10:35:28.706Z`
-> metrics snapshot hash: `25792b96ef6b0937`
+> git SHA: `67a3d579882eda99d42e9b4d87cc84ba3f5c4a01`
+> generated: `2026-09-17T10:37:21.997Z`
+> metrics snapshot hash: `57130e0cc008f611`
 
 This is the **only** current source of truth for live metrics. Older reports in `docs/` are historical unless they carry this same SHA + hash.
 
