@@ -107,6 +107,19 @@ export function ConnectHero({
             </span>
           </label>
 
+          <div className="cm-quick-actions">
+            <SpringButton className="cm-cta" type="submit">
+              Check this path
+            </SpringButton>
+            <button
+              type="button"
+              className="cm-ghost"
+              onClick={() => router.push("/chargematch/macbook-air-13-m3/with/anker-100w-2c")}
+            >
+              Explore a multiport split
+            </button>
+          </div>
+
           <div className="cm-builder-step">
             <span className="cm-step-index cm-mono">03</span>
             <div className="cm-field-pair">
@@ -142,19 +155,6 @@ export function ConnectHero({
               </label>
               <span className="cm-field-meta cm-mono">{selectedCable.max_watts}W cable ceiling · selected {selectedPort.toUpperCase()}</span>
             </div>
-          </div>
-
-          <div className="cm-quick-actions">
-            <SpringButton className="cm-cta" type="submit">
-              Check this path
-            </SpringButton>
-            <button
-              type="button"
-              className="cm-ghost"
-              onClick={() => router.push("/chargematch/macbook-air-13-m3/with/anker-100w-2c")}
-            >
-              Explore a multiport split
-            </button>
           </div>
         </div>
 
