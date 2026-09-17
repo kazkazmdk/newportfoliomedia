@@ -968,6 +968,13 @@
   backdrop-filter: blur(16px);
 }
 
+.cm-builder-verdict {
+  grid-column: 1 / -1;
+  align-self: auto;
+  color: var(--cm-ink);
+  border-color: var(--cm-line);
+}
+
 .cm-verdict-power {
   display: grid;
   align-content: space-between;

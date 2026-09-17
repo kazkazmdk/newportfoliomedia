@@ -48,6 +48,19 @@ export function ConnectHero({
       </div>
 
       <form onSubmit={onSubmit} className="cm-builder">
+        <aside className="cm-verdict cm-builder-verdict" aria-live="polite" aria-label="Current power path verdict">
+          <div className="cm-verdict-power">
+            <span className="cm-field-label cm-mono">Expected ceiling</span>
+            <strong className="cm-mono">{chain.watts}<small>W</small></strong>
+          </div>
+          <dl className="cm-verdict-facts">
+            <div><dt className="cm-mono">Protocol</dt><dd>{chain.protocol.replaceAll("_", " ")}</dd></div>
+            <div><dt className="cm-mono">Bottleneck</dt><dd>{chain.limitingComponent}</dd></div>
+            <div><dt className="cm-mono">Evidence</dt><dd>Published specs</dd></div>
+          </dl>
+          <p className="cm-verdict-note">Calculated from the rated device, charger, cable, and selected port. Not a measured wall draw.</p>
+        </aside>
+
         <div className="cm-builder-panel">
           <div className="cm-builder-heading">
             <p className="cm-mono">Configuration</p>
@@ -172,18 +185,6 @@ export function ConnectHero({
             </div>
           </div>
 
-          <aside className="cm-verdict" aria-live="polite" aria-label="Current power path verdict">
-            <div className="cm-verdict-power">
-              <span className="cm-field-label cm-mono">Expected ceiling</span>
-              <strong className="cm-mono">{chain.watts}<small>W</small></strong>
-            </div>
-            <dl className="cm-verdict-facts">
-              <div><dt className="cm-mono">Protocol</dt><dd>{chain.protocol.replaceAll("_", " ")}</dd></div>
-              <div><dt className="cm-mono">Bottleneck</dt><dd>{chain.limitingComponent}</dd></div>
-              <div><dt className="cm-mono">Evidence</dt><dd>Published specs</dd></div>
-            </dl>
-            <p className="cm-verdict-note">Calculated from the rated device, charger, cable, and selected port. Not a measured wall draw.</p>
-          </aside>
         </div>
       </form>
     </section>
