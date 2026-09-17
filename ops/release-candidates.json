@@ -1,0 +1,4973 @@
+{
+  "generated_at": "graph-derived",
+  "public_site_live": false,
+  "global_noindex": true,
+  "note": "PUBLISHABLE is a quality-layer release candidate. INDEXABLE still requires a demand path. Sitemap stays empty while PUBLIC_SITE_LIVE=false.",
+  "scale": {
+    "generated": 984,
+    "publishable": 241,
+    "limited": 403,
+    "noindex": 340,
+    "blocked": 0,
+    "duplicateClustersRemoved": 16,
+    "qualityBands": {
+      "<60": 243,
+      "60-69": 716,
+      "70-79": 18,
+      "80-89": 7,
+      "90+": 0
+    },
+    "byProduct": {
+      "fixcode": {
+        "product": "fixcode",
+        "entities": 1961,
+        "relations": 5894,
+        "generated": 249,
+        "candidateUrls": 79,
+        "publishable": 79,
+        "limited": 150,
+        "noindex": 20,
+        "blocked": 0,
+        "tierA": 18,
+        "tierB": 31,
+        "tierC": 30,
+        "duplicateClustersRemoved": 0,
+        "qualityBands": {
+          "<60": 118,
+          "60-69": 106,
+          "70-79": 18,
+          "80-89": 7,
+          "90+": 0
+        }
+      },
+      "autospec": {
+        "product": "autospec",
+        "entities": 435,
+        "relations": 506,
+        "generated": 123,
+        "candidateUrls": 0,
+        "publishable": 0,
+        "limited": 60,
+        "noindex": 63,
+        "blocked": 0,
+        "tierA": 0,
+        "tierB": 0,
+        "tierC": 0,
+        "duplicateClustersRemoved": 0,
+        "qualityBands": {
+          "<60": 63,
+          "60-69": 60,
+          "70-79": 0,
+          "80-89": 0,
+          "90+": 0
+        }
+      },
+      "wearthere": {
+        "product": "wearthere",
+        "entities": 2383,
+        "relations": 6425,
+        "generated": 332,
+        "candidateUrls": 170,
+        "publishable": 156,
+        "limited": 3,
+        "noindex": 173,
+        "blocked": 0,
+        "tierA": 35,
+        "tierB": 60,
+        "tierC": 61,
+        "duplicateClustersRemoved": 12,
+        "qualityBands": {
+          "<60": 32,
+          "60-69": 300,
+          "70-79": 0,
+          "80-89": 0,
+          "90+": 0
+        }
+      },
+      "chargematch": {
+        "product": "chargematch",
+        "entities": 175,
+        "relations": 533,
+        "generated": 242,
+        "candidateUrls": 16,
+        "publishable": 6,
+        "limited": 152,
+        "noindex": 84,
+        "blocked": 0,
+        "tierA": 2,
+        "tierB": 3,
+        "tierC": 1,
+        "duplicateClustersRemoved": 4,
+        "qualityBands": {
+          "<60": 30,
+          "60-69": 212,
+          "70-79": 0,
+          "80-89": 0,
+          "90+": 0
+        }
+      },
+      "tripcost": {
+        "product": "tripcost",
+        "entities": 558,
+        "relations": 689,
+        "generated": 38,
+        "candidateUrls": 0,
+        "publishable": 0,
+        "limited": 38,
+        "noindex": 0,
+        "blocked": 0,
+        "tierA": 0,
+        "tierB": 0,
+        "tierC": 0,
+        "duplicateClustersRemoved": 0,
+        "qualityBands": {
+          "<60": 0,
+          "60-69": 38,
+          "70-79": 0,
+          "80-89": 0,
+          "90+": 0
+        }
+      }
+    }
+  },
+  "candidates": [
+    {
+      "url": "/fixcode/bosch/dishwasher/e15-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 81,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:57a40bfd:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.9,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e15",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/ie-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:01102561:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:ie",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/oe-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:28a9ada1:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:oe",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/ue-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:7b4b414b:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:ue",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/4c-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:17452d2b:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:4c",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/5c-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:2d14b191:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:5c",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/ue-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 80,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:5940b72d:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.89,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "80-89",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:ue",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/de-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:2df79773:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:de",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/fe-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:9b17b4e0:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:fe",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/le-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:802df276:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:le",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/pe-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:b0f67765:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:pe",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/1c-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:7acfec3c:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:1c",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/4e-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:f3d8f74c:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:4e",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/5e-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:5c0112b6:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:5e",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/sud-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:1447f6d3:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:sud",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/ub-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 79,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:59c323f5:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:ub",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/washer/te-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:e297ac41:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:washer:te",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/1e-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:71432f45:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:1e",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/3c-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:7373011f:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:3c",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/3e-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:3b1ad261:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:3e",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/dc1-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:b7e8008a:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:dc1",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/he-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 78,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:7514c0a3:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.88,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:he",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/4c2-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 77,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:e0e182ef:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.87,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:4c2",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/8c-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 77,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:a9e321f0:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.87,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:8c",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/hc-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 77,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:11121b31:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.87,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "70-79",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:hc",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-15/with/anker-65w",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:fc56a8c0:eyJldmlkZW5jZUlkcyI6WyJNQU5V",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-15-anker-65w",
+        "unique compatibility result: EXCELLENT MATCH",
+        "limiting component: device input limit",
+        "expected wattage 20",
+        "evidence SPEC_VERIFIED"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-15/with/apple-20w",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:a7189d5a:eyJldmlkZW5jZUlkcyI6WyJNQU5V",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-15-apple-20w",
+        "unique compatibility result: EXCELLENT MATCH",
+        "limiting component: charger port allocation",
+        "expected wattage 20",
+        "evidence SPEC_VERIFIED"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-15/with/gan-100w-3c1a",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:cf6564c8:eyJldmlkZW5jZUlkcyI6WyJJTkZF",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-15-gan-100w-3c1a",
+        "unique compatibility result: EXCELLENT MATCH",
+        "limiting component: device input limit",
+        "expected wattage 20",
+        "evidence INFERRED"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-16/with/anker-65w",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:586b7a37:eyJldmlkZW5jZUlkcyI6WyJNQU5V",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-16-anker-65w",
+        "unique compatibility result: EXCELLENT MATCH",
+        "limiting component: device input limit",
+        "expected wattage 25",
+        "evidence SPEC_VERIFIED"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-16/with/apple-20w",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:44231ac0:eyJldmlkZW5jZUlkcyI6WyJNQU5V",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-16-apple-20w",
+        "unique compatibility result: WORKS",
+        "limiting component: charger port allocation",
+        "expected wattage 20",
+        "evidence SPEC_VERIFIED"
+      ]
+    },
+    {
+      "url": "/chargematch/iphone-16/with/gan-100w-3c1a",
+      "product": "chargematch",
+      "intent": "compatibility",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:be68bd53:eyJldmlkZW5jZUlkcyI6WyJJTkZF",
+      "sourceCoverage": 0.6,
+      "indexState": "SEO_CANDIDATE",
+      "family": "can-charger-charge",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-15T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: iphone-16-gan-100w-3c1a",
+        "unique compatibility result: EXCELLENT MATCH",
+        "limiting component: device input limit",
+        "expected wattage 25",
+        "evidence INFERRED"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e01-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:537a233b:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e01",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e02-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:80b7433a:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e02",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e04-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:85246601:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e04",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e06-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c3507eaa:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e06",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e07-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c20f55ff:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e07",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e08-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c528aa8c:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e08",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e09-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:b2ad3bc4:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e09",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e10-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:190f3edc:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e10",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e11-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:a8ac9821:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e11",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e12-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:a2f739d1:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e12",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e13-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3ac854e1:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e13",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e14-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:a7281cd8:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e14",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e16-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:fa4d0062:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e16",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e17-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e3a99fa5:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e17",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e20-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:05b9f945:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e20",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e21-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:a2f25bd1:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e21",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e22-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:de0908d3:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e22",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e23-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:0bf8c675:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e23",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e24-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:c41a5e51:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e24",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e25-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:040829f5:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e25",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e26-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:0a648445:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e26",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dishwasher/e27-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:434c6e70:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dishwasher:e27",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dryer/e01-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e5e07784:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dryer:e01",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dryer/e02-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:11c89198:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dryer:e02",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/dryer/e03-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:eb4824be:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:dryer:e03",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/oven/e005-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:34610d70:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:oven:e005",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/oven/e305-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:31035f8e:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:oven:e305",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/e02-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9541b5d3:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:e02",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/e18-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:38ade5f5:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:e18",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f17-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:31cc25fe:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f17",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f18-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:332b141b:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f18",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f19-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:4cd00fd2:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f19",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f21-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:31af58f6:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f21",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f23-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:fa7d9136:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f23",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f43-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:4b99d471:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f43",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/bosch/washer/f44-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:03d53d90:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:bosch:washer:f44",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/lg/dryer/d80-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:8497068a:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:lg:dryer:d80",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f11-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:be7c3b05:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f11",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f12-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:f99ea2e4:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f12",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f13-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:1b887c48:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f13",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f24-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:36053aa2:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f24",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f78-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:bac9ecc0:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f78",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dishwasher/f87-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:ccf74a99:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dishwasher:f87",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dryer/f1-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3db1ad09:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dryer:f1",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/dryer/f2-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:d0daa72c:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:dryer:f2",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/washer/f10-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:9652e26c:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:washer:f10",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/washer/f11-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:de7393b7:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:washer:f11",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/washer/f13-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:7511335b:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:washer:f13",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/washer/f20-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:12eeb9b7:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:washer:f20",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/miele/washer/f70-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9eb71d91:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:miele:washer:f70",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/dc-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:fc1845a1:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:dc",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/le-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:5e36bc5e:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:le",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/oe-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:0f270490:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:oe",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/fixcode/samsung/washer/te-error",
+      "product": "fixcode",
+      "intent": "error-code",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:dbae9c23:eyJldmlkZW5jZUlkcyI6WyJmaXg6",
+      "sourceCoverage": 0.82,
+      "indexState": "SEO_CANDIDATE",
+      "family": "error-code",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: fix:samsung:washer:te",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/amsterdam/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:74c060bf:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: amsterdam-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/amsterdam/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:779f3bbb:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: amsterdam-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/amsterdam/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:bffdce44:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: amsterdam-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/amsterdam/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:2583e0e3:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: amsterdam-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/amsterdam/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:c06938f3:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: amsterdam-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/bangkok/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:d5a10515:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: bangkok-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/bangkok/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:93fa6d07:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: bangkok-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/barcelona/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:aa52b2f1:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: barcelona-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/barcelona/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:c4dc255f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: barcelona-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/barcelona/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:34c04e92:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: barcelona-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/barcelona/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:6310fa8f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: barcelona-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/barcelona/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:869e3584:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: barcelona-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:f49e892f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:cafc6c73:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:6b26bf9b:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:bdb023df:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:30abf7a3:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:7ffa941a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:628edb33:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/berlin/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:4b208237:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: berlin-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/chicago/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:8a2cdb63:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: chicago-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/chicago/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:fb234e2e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: chicago-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/chicago/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9d29aad5:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: chicago-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/chicago/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:1b159822:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: chicago-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/chicago/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:2e05519c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: chicago-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/copenhagen/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:86cd5db1:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: copenhagen-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/copenhagen/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:f795cf89:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: copenhagen-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/copenhagen/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:5eca0aa6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: copenhagen-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/copenhagen/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:42ec929d:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: copenhagen-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/copenhagen/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3fc78f5a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: copenhagen-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:386d1e09:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:cb1f7d0b:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:9283098a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:21f4629c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:72a12328:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dubai/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:5a2c35c8:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dubai-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dublin/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e5e29de6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dublin-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/dublin/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c0f8903c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: dublin-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/edinburgh/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:8cd63022:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: edinburgh-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/edinburgh/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:ee51d382:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: edinburgh-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/edinburgh/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:aa1c3132:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: edinburgh-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/florence/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c9ae6cbc:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: florence-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/florence/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:51e82a10:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: florence-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/florence/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:61b1d656:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: florence-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/florence/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3d20e917:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: florence-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/florence/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:d55d9384:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: florence-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:2fc0ed62:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:2148f7dc:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:b818dd38:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:28f0e716:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:725a4129:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/hong-kong/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:deec9dce:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: hong-kong-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:d887c7d2:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:6e95cd70:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:0cafeb38:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:7f4ede9e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:5b6efb3e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/istanbul/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:9571bdb5:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: istanbul-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/lisbon/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:fca66142:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: lisbon-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/lisbon/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:45a72b76:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: lisbon-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/lisbon/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:de622640:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: lisbon-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/lisbon/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:743756b2:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: lisbon-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/lisbon/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:1bd8275a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: lisbon-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/london/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:4e212d93:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: london-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/london/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:5b0a7771:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: london-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:6876c132:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:ce6c93c6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:b3636351:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:f2ff133e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:779d54d5:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/madrid/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:4e3e006d:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: madrid-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:981ff2ae:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:5e378ef5:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:2de23a51:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9cdda047:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:6a393b77:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/marrakech/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:8dc0088e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: marrakech-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/miami/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:2ff2801f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: miami-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/miami/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:b28e619c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: miami-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:8be2d9bb:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:99377231:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:1dd942f0:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:29e3f4de:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:fbc705a5:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:935bf175:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/new-york/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:962697fa:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: new-york-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:374e6e10:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:81d4aed1:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:4c1eb46e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:8b8211e6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9876f38c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:93718e2a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/osaka/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3b7a35f6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: osaka-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:2ec8a6d6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:f26fd3fc:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:5af43133:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:665e42a6:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:1ed60c1c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:f74da9f0:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/paris/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:d79d4898:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: paris-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/prague/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e20e1ee1:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: prague-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/prague/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:b6ed9ad0:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: prague-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/prague/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e19ac04e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: prague-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/prague/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:62ab2d13:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: prague-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/prague/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:9c4abc54:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: prague-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:f99ffa02:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:fc2a9f17:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c630ec35:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:1ffffc1e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:27babf0c:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/reykjavik/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:d34b7139:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: reykjavik-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:275d61e7:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:6eeee734:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:f4703e1e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:529b23ef:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:bfe08c27:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/rome/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:cc9883e4:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: rome-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:e9d45c71:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:3bc78cff:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/february/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:db2b8ccf:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-february",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/january/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:bcd463ac:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-january",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:d6e419bb:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:1f0ef743:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:5f291c21:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:54894657:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:79cf1d89:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/seoul/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:21ef909f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: seoul-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/sydney/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:3694b1b8:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: sydney-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/sydney/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "B",
+      "decisionFingerprint": "df1:115834d0:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: sydney-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/april/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:a17c0e28:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-april",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:ed1d8b2f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:9916a7d1:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:fb63d67a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:fb43149b:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:394ebb75:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:ac5a9fb7:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/tokyo/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "A",
+      "decisionFingerprint": "df1:540a8f47:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: tokyo-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/december/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:48dd58be:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-december",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/june/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:aac34311:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-june",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:49386590:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:1f787603:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:f86ad620:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:53fcc734:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/toronto/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:c597b83f:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: toronto-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:78f4c86e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:3af2dede:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:739ffecf:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:f3f2061e:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/summer/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e02d98d8:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-summer",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vancouver/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e9540998:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vancouver-winter",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/march/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:a223ea98:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-march",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/may/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:67ca5447:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-may",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/november/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:0c931ca7:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-november",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/october/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:e64ec64a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-october",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/september/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:586143e0:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-september",
+        "no failed hard gate"
+      ]
+    },
+    {
+      "url": "/wearthere/vienna/winter/what-to-wear",
+      "product": "wearthere",
+      "intent": "wear-period",
+      "quality": 68,
+      "publishState": "PUBLISHABLE",
+      "catalogTier": "C",
+      "decisionFingerprint": "df1:299cab7a:eyJldmlkZW5jZUlkcyI6WyJjZjE6",
+      "sourceCoverage": 0.49,
+      "indexState": "SEO_CANDIDATE",
+      "family": "wear-month",
+      "qualityBand": "60-69",
+      "lifecycle": "new",
+      "lastmod": "2026-09-12T00:00:00.000Z",
+      "reasons": [
+        "hard gates / unique decision passed; demand evidence is still editorial so INDEXABLE stays closed",
+        "distinct graph key: vienna-winter",
+        "no failed hard gate"
+      ]
+    }
+  ]
+}

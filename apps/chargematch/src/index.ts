@@ -667,13 +667,20 @@ export function allChargematchPages(): PageRecord[] {
       publish_state: q.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
     });
   }
-  for (const [d, c] of POPULAR_PAIRS) {
+  const seenPairs = new Set<string>();
+  const pairList: Array<[string, string]> = [
+    ...POPULAR_PAIRS,
+    ...DEVICES.flatMap((device) => CHARGERS.map((charger) => [device.slug, charger.slug] as [string, string])),
+  ];
+  for (const [d, c] of pairList) {
+    const key = `${d}:${c}`;
+    if (seenPairs.has(key)) continue;
+    seenPairs.add(key);
     const device = getDevice(d);
     const charger = getCharger(c);
     if (!device || !charger) continue;
     const result = compatibility(device, charger);
     const demand = Math.min(device.demand, charger.demand);
-    if (demand < 50) continue;
     const q = evaluatePageQuality({
       site: "chargematch",
       family: "can-charger-charge",
@@ -713,6 +720,11 @@ export function allChargematchPages(): PageRecord[] {
         max_power: result.max_power,
         device: d,
         charger: c,
+        protocol: result.protocol,
+        ports: charger.ports.length,
+        connector: device.connector,
+        device_max: device.max_watts,
+        charger_watts: charger.total_watts,
         distinct_reason: `${d}-${c}`,
         theoretical: result.theoretical,
         tag: result.tag,

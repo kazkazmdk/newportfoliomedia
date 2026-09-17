@@ -47,6 +47,17 @@ export type SerpOpportunity = (typeof SERP_OPPORTUNITIES)[number];
 export const POSTLAUNCH_STATUSES = ["WINNER", "PROVEN", "DISCOVERY", "WEAK", "DECAYING"] as const;
 export type PostLaunchStatus = (typeof POSTLAUNCH_STATUSES)[number];
 
+export const LIFECYCLE_STATES = [
+  "new",
+  "discovered",
+  "crawled",
+  "indexed",
+  "underperforming",
+  "candidate-refresh",
+  "candidate-consolidation",
+] as const;
+export type LifecycleState = (typeof LIFECYCLE_STATES)[number];
+
 export type DemandEvidence = {
   id: string;
   source: DemandEvidenceSource;

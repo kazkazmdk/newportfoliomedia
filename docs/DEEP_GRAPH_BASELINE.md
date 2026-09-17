@@ -1,6 +1,6 @@
 # Deep graph baseline
 
-Generated: 2026-09-14T12:46:21.756Z
+Generated: 2026-09-17T09:33:56.347Z
 
 Recalculated from in-memory GraphStore after populateDecisionGraph + page builders. Stored README/JSON reports were not read. quality_score comes from evaluatePageQuality at page-build/recompute time, not from a previous markdown.
 
@@ -10,33 +10,34 @@ Recalculated from in-memory GraphStore after populateDecisionGraph + page builde
 
 ## Recalculated now
 
-- Entities: **5470**
-- Relations: **15021** (unique 14137, duplicate 884)
-- Relations/entity avg **2.75** · median **1** · P25 1 · P75 5 · P90 16
-- Decision-relevant relations: **13610** (2.49/entity, median degree 1)
-- Pages INDEXABLE **629** · NOINDEX_PRODUCT **114** · GRAPH_ONLY **36** · REVIEW_REQUIRED **111** · CONFLICTED **0** · STALE **0**
+- Entities: **5512**
+- Relations: **14047** (unique 13603, duplicate 444)
+- Relations/entity avg **2.55** · median **1** · P25 1 · P75 5 · P90 16
+- Decision-relevant relations: **12636** (2.29/entity, median degree 1)
+- Pages INDEXABLE **0** · SEO_CANDIDATE **265** · NOINDEX_PRODUCT **305** · GRAPH_ONLY **316** · REVIEW_REQUIRED **98** · CONFLICTED **0** · STALE **0**
+- Edge kinds SOURCE_TRUTH **3087** · DERIVED_RULE **6777** · PERSONALIZED_DECISION **0** · UNKNOWN **4183**
 
 ### Entity degree
 
-isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥20: 121
+isolated 11 · exactly 1: 2921 · 2–4: 1177 · ≥5: 1403 · ≥10: 740 · ≥20: 100
 
 ### Relation classes
 
-- DECISION_RELEVANT: 13610
+- DECISION_RELEVANT: 12636
 - DESCRIPTIVE: 1226
 - NAVIGATION_ONLY: 185
 - UNKNOWN: 0
 
 ### Truth status (entities + relations)
 
-- VERIFIED_PRIMARY: 9004
-- VERIFIED_SECONDARY: 8806
+- VERIFIED_PRIMARY: 0
+- VERIFIED_SECONDARY: 5897
 - TESTED: 0
 - REPORTED: 0
-- INFERRED: 41
-- ESTIMATED: 1081
+- INFERRED: 145
+- ESTIMATED: 3120
 - STALE: 0
-- UNKNOWN: 1559
+- UNKNOWN: 10397
 - CONFLICTING: 0
 
 ### Entities by type
@@ -59,6 +60,7 @@ isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥
 - mode: 103
 - symptom: 98
 - component: 63
+- power_scenario: 42
 - power_profile: 38
 - model_family: 36
 - destination: 32
@@ -109,7 +111,6 @@ isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥
 
 - PACKS: 2909
 - PACKS_FOR_ACTIVITY: 828
-- EXPECTED_POWER: 660
 - TESTED_BY: 570
 - REQUIRES_TOOL: 469
 - MAY_BE_CAUSED_BY: 458
@@ -130,8 +131,6 @@ isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥
 - RETURNS: 312
 - SAFETY_HAZARD: 262
 - CAN_CHARGE: 220
-- DEVICE_NEGOTIATES_WITH: 220
-- COMPATIBLE_IF: 220
 - INDICATES: 201
 - MAY_INDICATE: 192
 - HAS_TIME_COMPONENT: 180
@@ -139,6 +138,7 @@ isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥
 - ON_APPLIANCE: 131
 - HAS_ERROR_CODE: 131
 - IN_FAMILY: 131
+- HAS_SCENARIO: 126
 - HAS_SERVICE_INTERVAL: 104
 - HAS_MODE: 103
 - ROUTE_ALTERNATIVE: 96
@@ -196,27 +196,27 @@ isolated 11 · exactly 1: 2921 · 2–4: 1135 · ≥5: 1403 · ≥10: 739 · ≥
 
 | Product | Entities | Relations | Avg | Median | Decision rel/entity | Isolated | ≥5 | ≥10 | INDEX | NOINDEX | GRAPH_ONLY |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixcode | 1961 | 5894 | 3.01 | 3 | 2.4 | 0 | 835 | 236 | 46 | 109 | 4 |
-| autospec | 435 | 506 | 1.16 | 1 | 0.77 | 0 | 25 | 22 | 102 | 0 | 0 |
-| wearthere | 2383 | 6425 | 2.7 | 1 | 2.7 | 4 | 427 | 427 | 379 | 5 | 32 |
-| chargematch | 133 | 1507 | 11.33 | 2 | 11.3 | 4 | 36 | 33 | 64 | 0 | 0 |
-| tripcost | 558 | 689 | 1.23 | 1 | 1.17 | 3 | 80 | 21 | 38 | 0 | 0 |
+| fixcode | 1961 | 5894 | 3.01 | 3 | 2.4 | 0 | 835 | 236 | 0 | 52 | 20 |
+| autospec | 435 | 506 | 1.16 | 1 | 0.77 | 0 | 25 | 22 | 0 | 60 | 63 |
+| wearthere | 2383 | 6425 | 2.7 | 1 | 2.7 | 4 | 427 | 427 | 0 | 3 | 159 |
+| chargematch | 175 | 533 | 3.05 | 2 | 3.02 | 4 | 36 | 34 | 0 | 152 | 74 |
+| tripcost | 558 | 689 | 1.23 | 1 | 1.17 | 3 | 80 | 21 | 0 | 38 | 0 |
 
 ## Quality distribution (recomputed scores, not a previous report)
 
-mean 80.3 · median 84 · p10 62 · p25 82 · p75 84 · p90 84 · min 59 · max 84
+mean 63.4 · median 68 · p10 48 · p25 61 · p75 68 · p90 68 · min 38 · max 81
 
-INDEXABLE mean 83.7 · min 80
+INDEXABLE mean 0 · min 0
 
 Share of pages ≥90: **0%** — gate suspect: **false**
 
 | Bucket | Count | % | INDEXABLE |
 | --- | ---: | ---: | ---: |
-| 0-49 | 0 | 0% | 0 |
-| 50-59 | 4 | 0.4% | 0 |
-| 60-69 | 130 | 14.6% | 0 |
-| 70-79 | 1 | 0.1% | 0 |
-| 80-84 | 755 | 84.8% | 629 |
+| 0-49 | 123 | 12.5% | 0 |
+| 50-59 | 120 | 12.2% | 0 |
+| 60-69 | 716 | 72.8% | 0 |
+| 70-79 | 18 | 1.8% | 0 |
+| 80-84 | 7 | 0.7% | 0 |
 | 85-89 | 0 | 0% | 0 |
 | 90-94 | 0 | 0% | 0 |
 | 95-100 | 0 | 0% | 0 |

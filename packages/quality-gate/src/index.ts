@@ -903,3 +903,16 @@ export function densityRequired(entityType: string): number | null {
 }
 
 export { confidenceLevelFromScore, DIMENSION_MAX };
+export {
+  climateFingerprint,
+  decisionFingerprint,
+  fingerprintFromPage,
+  rainBand,
+  scaleQualityBand,
+  scaleQualityDistribution,
+  SCALE_QUALITY_BANDS,
+  stableHash,
+  stableSerialize,
+  tempBand,
+} from "./fingerprint";
+export type { ClimateFingerprintInput, DecisionFingerprintInput, ScaleQualityBand } from "./fingerprint";

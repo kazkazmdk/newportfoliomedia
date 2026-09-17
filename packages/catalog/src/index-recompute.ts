@@ -2,6 +2,7 @@ import type { GraphStore, IndexState, PageRecord } from "@penta/graph-core";
 import { classifyRelation, classifyEntityDepth } from "@penta/graph-core";
 import {
   evaluatePageQuality,
+  fingerprintFromPage,
   intentFamilyId,
   outputSimilarity,
   structuredSimilarity,
@@ -12,6 +13,8 @@ import {
   type PageQualityInput,
   type SearchDemandEvidence,
 } from "@penta/quality-gate";
+import { lastmodFromGraph } from "@penta/publishing-core";
+import { assignDistribution } from "./distribution";
 import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data-provenance";
 import {
   assessDemand,
@@ -328,7 +331,11 @@ export function applyIndexGates(store: GraphStore): void {
     page.noindex = state !== "INDEXABLE";
     page.publish_state = publishState(state);
     page.seo_validation = seoValidation;
+    page.decision_fingerprint = fingerprintFromPage(page);
+    page.freshness = lastmodFromGraph(store, page);
+    page.lifecycle_state = page.lifecycle_state ?? "new";
     const cluster = queryClusterFor(page);
+    const parent = parentPage(store, page);
     page.structured_payload = {
       ...page.structured_payload,
       quality_why: result.why,
@@ -343,8 +350,12 @@ export function applyIndexGates(store: GraphStore): void {
       demand_class: result.demand_assessment?.class ?? "UNKNOWN",
       demand_phase: result.demand_assessment?.phase ?? "PRE_LAUNCH",
       seo_eligibility: result.demand_assessment?.seoEligibility ?? "NONE",
+      decision_fingerprint: page.decision_fingerprint,
+      lastmod: page.freshness,
+      has_internal_link: Boolean(parent) || page.family.includes("hub") || page.entity_ids.length > 1,
     };
   }
+  assignDistribution(store);
 }
 
 export function similarityReport(store: GraphStore) {

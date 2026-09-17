@@ -71,6 +71,13 @@ A positive boolean is not proof. Each gate returns `{ gate, status, evidence, re
 States: `INDEXABLE` | `SEO_CANDIDATE` | `NOINDEX_PRODUCT` | `GRAPH_ONLY` | `REVIEW_REQUIRED` + `seo_validation` `NONE|PRELAUNCH|POSTLAUNCH`.
 
 - `INDEXABLE` ≠ `LIVE`. `PUBLIC_SITE_LIVE=false` → global noindex, empty sitemap.
+- Le volume SEO n’est pas un quota 50–100. C’est l’output des quality gates sur le graphe. `PUBLISHABLE` = décision unique + hard gates. `INDEXABLE` exige encore une preuve de demande. Tiers A/B/C segmentent sitemaps / QA / monitoring, ils ne cachent pas C.
+- lastmod = dernière mise à jour source / entité / relation / décision. Jamais `new Date()` à chaque build.
+- Sitemaps segmentés : `/sitemaps/{produit}-{a|b|c}.xml` (vides tant que le kill switch est on). Uniquement des URLs `PUBLISHABLE` + indexables.
+
+```bash
+pnpm release:manifest   # ops/release-candidates.json + docs/PUBLISHABLE_SURFACE.md + QA sample
+```
 
 ```bash
 pnpm demand:import     # validate data/demand/** CSV/JSON

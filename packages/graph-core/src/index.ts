@@ -133,6 +133,20 @@ export type PageRecord = {
   batch: string;
   publish_state: "DRAFT" | "READY" | "INDEXABLE" | "PUBLISHED";
   seo_validation?: "NONE" | "PRELAUNCH" | "POSTLAUNCH";
+  /** Quality-layer uniqueness key. Not the URL. */
+  decision_fingerprint?: string;
+  /** Sitemap / QA / monitoring slice. Never hides a PUBLISHABLE page. */
+  catalog_tier?: "A" | "B" | "C" | null;
+  /** Release-candidate state. Distinct from robots INDEXABLE. */
+  catalog_publish_state?: "PUBLISHABLE" | "LIMITED" | "NOINDEX" | "BLOCKED";
+  lifecycle_state?:
+    | "new"
+    | "discovered"
+    | "crawled"
+    | "indexed"
+    | "underperforming"
+    | "candidate-refresh"
+    | "candidate-consolidation";
 };
 
 export class GraphStore {

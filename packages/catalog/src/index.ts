@@ -12,6 +12,7 @@ import { populateDecisionGraph } from "./graph-depth";
 import { deepenDecisionGraph } from "./graph-deepen";
 import { applyIndexGates, resetDemandCache } from "./index-recompute";
 import { evaluateScaleStops, scaleMustStop, scaleCandidates, type ScaleSnapshot } from "./scale-stop";
+import { releaseCandidates, scaleReport } from "./distribution";
 import { cellAction, truthDemandCell, type DemandAssessmentV2, type DemandEvidenceSource } from "@penta/demand";
 
 let cached: GraphStore | null = null;
@@ -153,6 +154,7 @@ export function launchReport() {
     scale_must_stop: scaleMustStop(catalogScaleStops()),
     scale_candidates: scaleCandidates(),
     demand_data_priority: demandDataPriority().slice(0, 40),
+    distribution: scaleReport(store),
   };
 }
 
@@ -623,6 +625,8 @@ export function fullOpsPayload() {
     providers: PROVIDER_HEALTH,
     tools_declared: SITE_AI_TOOLS,
     sitemap: sitemapConsistencyIssues(),
+    distribution: scaleReport(buildCatalog()),
+    release_candidates: releaseCandidates(buildCatalog()).length,
   };
 }
 
@@ -636,3 +640,18 @@ export {
   SCALE_STOP_THRESHOLDS,
 } from "./scale-stop";
 export type { ScaleCandidate, ScaleSnapshot, ScaleStopResult } from "./scale-stop";
+export {
+  allCatalogRows,
+  assignDistribution,
+  catalogPublishState,
+  CATALOG_SITES,
+  CATALOG_TIERS,
+  joinReleaseManifestToGsc,
+  monitorCohorts,
+  qaSample,
+  releaseCandidates,
+  scaleReport,
+  sourceCoverageOf,
+  toReleaseCandidate,
+} from "./distribution";
+export type { CatalogPublishState, CatalogTier, MonitorCohort, ProductScaleRow, ReleaseCandidate, ScaleReport } from "./distribution";
