@@ -1383,6 +1383,15 @@
     padding-top: 1rem;
   }
 
+  .as-hero-onboard .as-lede,
+  .as-hero-onboard .as-onboard-intro > p:last-child {
+    display: none;
+  }
+
+  .as-hero-onboard .as-hero-copy h1 {
+    font-size: clamp(3rem, 15vw, 4.5rem);
+  }
+
   .as-hero-onboard .as-onboard-panel {
     order: 2;
   }

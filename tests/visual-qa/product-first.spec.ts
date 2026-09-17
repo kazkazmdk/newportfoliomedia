@@ -179,6 +179,7 @@ test.describe("product integrity interactions", () => {
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     await page.getByLabel("Device").selectOption({ label: "MacBook Air 13-inch (M3)" });
     const expected = page.locator(".cm-verdict-power strong");
+    await expect(page.locator(".cm-field-meta").first()).toContainText(/accepts up to 70W/i);
     const before = (await expected.innerText()).trim();
     await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Anker 65W USB-C (Nano II class)" });
     await expect(expected).not.toHaveText(before);
