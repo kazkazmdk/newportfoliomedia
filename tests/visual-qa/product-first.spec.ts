@@ -122,7 +122,7 @@ test.describe("product-first visual QA", () => {
 
     await page.goto("/autospec", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByLabel("Search make and model"), 844, "AutoSpec search");
-    await fullyInViewport(page.getByRole("button", { name: /add /i }).first(), 844, "AutoSpec vehicle hit");
+    await fullyInViewport(page.getByRole("button", { name: /320d/i }).first(), 844, "AutoSpec vehicle hit");
 
     await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByText(/do this first/i).locator("visible=true").first(), 844, "Do this first");
