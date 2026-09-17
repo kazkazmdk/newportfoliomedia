@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { launchReport } from "@penta/catalog";
+import { FooterMeta } from "@/components/footer-meta";
 import { previewProduct } from "@/lib/preview-product";
 
 const PRODUCTS = [
@@ -101,6 +102,15 @@ export default function HubPage() {
           </dl>
         </section>
       </main>
+      <footer className="mx-auto w-full max-w-5xl px-6 pb-10">
+        <FooterMeta
+          product="Penta"
+          homeHref="/"
+          toolHref="/fixcode"
+          toolLabel="Explore the products"
+          note="Five independent decision products. Optional cookies stay off until you choose otherwise."
+        />
+      </footer>
     </div>
   );
 }
