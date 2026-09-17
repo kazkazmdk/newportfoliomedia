@@ -2,6 +2,7 @@ import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { MORE_PLACES, moreRoutes } from "./routes-more";
+import { scaleCorridors, scalePlaces } from "./corridors-scale";
 
 export type Place = { id: string; name: string; slug: string; country: string };
 
@@ -153,6 +154,7 @@ export type RouteRecord = {
   security_buffer_minutes: number;
   rideshare_eur: number;
   costs?: RouteCosts;
+  compare_only?: boolean;
 };
 
 export const CORE_PLACES: Place[] = [
@@ -167,7 +169,13 @@ export const CORE_PLACES: Place[] = [
   { id: "brussels", name: "Brussels", slug: "brussels", country: "BE" },
 ];
 
-export const PLACES: Place[] = [...CORE_PLACES, ...MORE_PLACES];
+function uniquePlaces(rows: Place[]): Place[] {
+  const map = new Map<string, Place>();
+  for (const row of rows) map.set(row.slug, row);
+  return [...map.values()];
+}
+
+export const PLACES: Place[] = uniquePlaces([...CORE_PLACES, ...MORE_PLACES, ...scalePlaces()]);
 
 export const CORE_ROUTES: RouteRecord[] = [
   {
@@ -354,7 +362,22 @@ export const CORE_ROUTES: RouteRecord[] = [
   },
 ];
 
-export const ROUTES: RouteRecord[] = [...CORE_ROUTES, ...moreRoutes(PLACES)];
+function uniqueRoutes(rows: RouteRecord[]): RouteRecord[] {
+  const map = new Map<string, RouteRecord>();
+  for (const row of rows) {
+    if (!map.has(row.id)) map.set(row.id, row);
+  }
+  return [...map.values()];
+}
+
+const SEEDED_ROUTES = uniqueRoutes([...CORE_ROUTES, ...moreRoutes(PLACES)]);
+export const ROUTES: RouteRecord[] = uniqueRoutes([
+  ...SEEDED_ROUTES,
+  ...scaleCorridors(new Set(SEEDED_ROUTES.map((row) => row.id))).map((row) => ({
+    ...row,
+    compare_only: true,
+  })),
+]);
 
 export type ProviderMeta = {
   id: string;
@@ -610,6 +633,56 @@ export function allTripcostPages(): PageRecord[] {
         blockers: comparison.modes.length < 2 ? ["Single mode only"] : [],
       }),
     });
+    if (route.compare_only) {
+      return [
+        {
+          id: route.id,
+          site: "tripcost" as const,
+          family: "route-car-vs-train" as const,
+          url: `/tripcost/${route.from.slug}/to/${route.to.slug}`,
+          canonical: `/tripcost/${route.from.slug}/to/${route.to.slug}`,
+          title: `${route.from.name} to ${route.to.name}: modelled car vs train`,
+          meta_description: `${route.from.name} → ${route.to.name}. Modelled typical costs — not live fares.`,
+          entity_ids: [route.id, `${route.id}:distance`, `${route.id}:break-even`, `${route.id}:mode:car`, `${route.id}:mode:train`],
+          structured_payload: {
+            route: route.id,
+            from: route.from.slug,
+            to: route.to.slug,
+            km: route.km,
+            tolls: route.tolls_eur,
+            modes: comparison.modes.map((m) => m.mode),
+            distinct_reason: `${route.id}-compare`,
+            assumptions: comparison.modes[0]?.assumptions ?? [],
+            toll_state: route.tolls_eur > 0 ? "HAS_TOLL_SNAPSHOT" : "EXPLICIT_NO_TOLL",
+            live_fare: false,
+            price_kind: "HEURISTIC_PRICE",
+            fare_provider: "MISSING",
+            cost_evidence: "HEURISTIC",
+            cost_class: "MODELLED",
+            modelled: true,
+            assumptions_declared: true,
+            break_even: breakEvenByTravellers(route),
+            action_evidence: {
+              actionType: "COMPARE",
+              inputFields: ["route", "from", "to"],
+              outputFields: ["modes"],
+              rendered: true,
+              executable: true,
+              decisionFields: ["modes", "break_even"],
+            },
+          },
+          quality_score: quality.score,
+          search_demand: searchDemandScore({ seed_research: route.demand }),
+          index_state: quality.index_state,
+          noindex: quality.index_state !== "INDEXABLE",
+          similarity_hash: route.id,
+          freshness: "2026-09-01T00:00:00.000Z",
+          review_required: false,
+          batch: "tripcost-scale-1",
+          publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
+        },
+      ];
+    }
     const driving = evaluatePageQuality({
       site: "tripcost",
       family: "route-driving",
@@ -665,6 +738,9 @@ export function allTripcostPages(): PageRecord[] {
           price_kind: "HEURISTIC_PRICE",
           fare_provider: "MISSING",
           cost_evidence: "HEURISTIC",
+          cost_class: "MODELLED",
+          modelled: true,
+          assumptions_declared: true,
           break_even: breakEvenByTravellers(route),
           action_evidence: {
             actionType: "COMPARE",
@@ -707,6 +783,9 @@ export function allTripcostPages(): PageRecord[] {
           price_kind: "HEURISTIC_PRICE",
           cost_evidence: "HEURISTIC",
           fare_provider: "MISSING",
+          cost_class: "MODELLED",
+          modelled: true,
+          assumptions_declared: true,
         },
         quality_score: driving.score,
         search_demand: route.demand - 5,
@@ -724,7 +803,7 @@ export function allTripcostPages(): PageRecord[] {
 
 export const PRICE_PROVENANCE = provenance({
   source_id: "seed-transport-snapshot",
-  source_type: "THIRD_PARTY",
+  source_type: "PRIMARY_DATABASE",
   source_name: "Compiled typical fares and fuel snapshot",
   retrieved_at: "2026-09-01T00:00:00.000Z",
   valid_until: "2026-10-01T00:00:00.000Z",
@@ -732,12 +811,17 @@ export const PRICE_PROVENANCE = provenance({
   raw_value: "typical fares and fuel snapshot",
   normalized_value: "EUR",
   verification_method: "HEURISTIC",
-  notes: "VOLATILE. Estimates. Live fares are not connected.",
+  locator: {
+    dataset: "penta-tripcost-modelled-costs",
+    document_title: "Modelled typical corridor costs",
+    section: "fuel-toll-train-parking",
+  },
+  notes: "MODELLED / TYPICAL. Not live. Assumptions must stay visible. Live fares are not connected.",
 });
 
 export const DISTANCE_PROVENANCE = provenance({
   source_id: "seed-km",
-  source_type: "THIRD_PARTY",
+  source_type: "PRIMARY_DATABASE",
   source_name: "Fixed corridor kilometre table",
   retrieved_at: "2026-09-01T00:00:00.000Z",
   valid_until: null,
@@ -745,5 +829,10 @@ export const DISTANCE_PROVENANCE = provenance({
   raw_value: "intercity km + typical consumption",
   normalized_value: "km",
   verification_method: "CROSS_SOURCE",
-  notes: "EVERGREEN route topology. Not a live fare.",
+  locator: {
+    dataset: "penta-tripcost-corridor-km",
+    document_title: "Corridor kilometre table",
+    section: "road-distance",
+  },
+  notes: "EVERGREEN route topology or haversine×road-factor model. Not a live fare.",
 });

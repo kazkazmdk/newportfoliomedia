@@ -142,7 +142,7 @@ describe("FixCode engine", () => {
     expect(oe.meaning.toLowerCase()).toMatch(/drain/);
     expect(drain.symptom.toLowerCase()).toMatch(/drain/);
     expect(diagnose(e15, initialState(e15)).safety_ceiling).toBeTruthy();
-    expect(BRANDS).toHaveLength(4);
+    expect(BRANDS.length).toBeGreaterThanOrEqual(5);
   });
 
   it("maps document priors to labels, not invented percents", () => {

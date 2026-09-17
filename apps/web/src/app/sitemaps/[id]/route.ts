@@ -1,6 +1,7 @@
 import { buildCatalog } from "@penta/catalog";
 import {
   SITEMAP_SEGMENT_IDS,
+  absoluteSitemapLoc,
   parseSitemapSegmentId,
   sitemapSegmentPages,
   urlsetXml,
@@ -21,7 +22,7 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
   const pages = sitemapSegmentPages([...buildCatalog().pages.values()], id);
   const xml = urlsetXml(
     pages.map((page) => ({
-      loc: page.canonical,
+      loc: absoluteSitemapLoc(page.canonical),
       lastmod: page.freshness || undefined,
     })),
   );

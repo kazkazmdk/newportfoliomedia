@@ -1,9 +1,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
+  applyAutoQaSample,
   buildCatalog,
+  DATA_VERSION,
+  GRAPH_VERSION,
   monitorCohorts,
-  qaSample,
+  qaReviewQueue,
   releaseCandidates,
   resetCatalogCache,
   scaleReport,
@@ -14,7 +17,8 @@ resetCatalogCache();
 const store = buildCatalog();
 const report = scaleReport(store);
 const candidates = releaseCandidates(store);
-const sample = qaSample(store, 20);
+const sample = applyAutoQaSample(store);
+const review = qaReviewQueue(store);
 const cohorts = monitorCohorts(store);
 
 mkdirSync(resolve("ops"), { recursive: true });
@@ -23,9 +27,12 @@ writeFileSync(
   `${JSON.stringify(
     {
       generated_at: "graph-derived",
+      data_version: DATA_VERSION,
+      graph_version: GRAPH_VERSION,
       public_site_live: process.env.PUBLIC_SITE_LIVE === "true",
       global_noindex: globalNoindex(),
       note: "PUBLISHABLE is a quality-layer release candidate. INDEXABLE still requires a demand path. Sitemap stays empty while PUBLIC_SITE_LIVE=false.",
+      target_publishable: 2500,
       scale: report,
       candidates,
     },
@@ -34,15 +41,32 @@ writeFileSync(
   )}\n`,
 );
 
+const demandRows = [
+  "URL,query,intent,tier,product,quality,sourceCoverage",
+  ...candidates.map((row) => {
+    const query = row.url.replace(/^\//, "").replaceAll("/", " ");
+    return [
+      row.url,
+      JSON.stringify(query),
+      row.intent,
+      row.catalogTier ?? "",
+      row.product,
+      row.quality,
+      row.realSourceCoverage,
+    ].join(",");
+  }),
+];
+writeFileSync(resolve("ops/DEMAND_VALIDATION_2500.csv"), `${demandRows.join("\n")}\n`);
+
 const rows = Object.values(report.byProduct);
 const table = [
-  "| Product | Generated | Publishable | Tier A | Tier B | Tier C | Noindex | Blocked | Limited |",
-  "| ------- | --------: | ----------: | -----: | -----: | -----: | ------: | ------: | ------: |",
+  "| Product | Generated | Publishable | Tier A | Tier B | Tier C | Noindex | Blocked | Limited | Real source coverage |",
+  "| ------- | --------: | ----------: | -----: | -----: | -----: | ------: | ------: | ------: | -------------------: |",
   ...rows.map(
     (row) =>
-      `| ${row.product} | ${row.generated} | ${row.publishable} | ${row.tierA} | ${row.tierB} | ${row.tierC} | ${row.noindex} | ${row.blocked} | ${row.limited} |`,
+      `| ${row.product} | ${row.generated} | ${row.publishable} | ${row.tierA} | ${row.tierB} | ${row.tierC} | ${row.noindex} | ${row.blocked} | ${row.limited} | ${row.realSourceCoverage} |`,
   ),
-  `| **total** | **${report.generated}** | **${report.publishable}** | **${rows.reduce((s, r) => s + r.tierA, 0)}** | **${rows.reduce((s, r) => s + r.tierB, 0)}** | **${rows.reduce((s, r) => s + r.tierC, 0)}** | **${report.noindex}** | **${report.blocked}** | **${report.limited}** |`,
+  `| **total** | **${report.generated}** | **${report.publishable}** | **${rows.reduce((s, r) => s + r.tierA, 0)}** | **${rows.reduce((s, r) => s + r.tierB, 0)}** | **${rows.reduce((s, r) => s + r.tierC, 0)}** | **${report.noindex}** | **${report.blocked}** | **${report.limited}** | |`,
 ].join("\n");
 
 const bandLines = Object.entries(report.qualityBands)
@@ -58,6 +82,8 @@ const perProduct = rows
 
 - total entities: ${row.entities}
 - total relations: ${row.relations}
+- sources: ${row.sources}
+- real source coverage: ${row.realSourceCoverage}
 - candidate URLs (SEO_CANDIDATE + INDEXABLE): ${row.candidateUrls}
 - publishable URLs (quality-layer): ${row.publishable}
 - Tier A: ${row.tierA}
@@ -84,6 +110,8 @@ The count is an **output of the data graph**. It is not a quota.
 - \`PUBLIC_SITE_LIVE=false\` keeps the kill switch: global noindex, empty \`/sitemap.xml\`.
 - Segmented sitemaps exist at \`/sitemaps/{product}-{a|b|c}.xml\` and stay empty until a page is both live-indexable and PUBLISHABLE.
 - lastmod is the latest entity / relation / source / decision update. Never \`new Date()\` per build.
+- data_version: \`${DATA_VERSION}\`
+- graph_version: \`${GRAPH_VERSION}\`
 
 ${table}
 
@@ -116,40 +144,45 @@ See \`joinGscToReleaseManifest\` in \`@penta/demand\`. No live GSC access is req
 );
 
 const qaLines = sample.map((row) => {
-  return `| ${row.product} | ${row.catalogTier ?? "—"} | ${row.family} | ${row.qualityBand} | ${row.publishState} | ${row.quality} | \`${row.url}\` |`;
+  return `| ${row.product} | ${row.catalogTier ?? "—"} | ${row.family} | ${row.qualityBand} | ${row.publishState} | ${row.qaStatus ?? "NOT_REVIEWED"} | ${row.quality} | \`${row.url}\` |`;
 });
 
 writeFileSync(
   resolve("docs/PROGRAMMATIC_RELEASE_QA.md"),
   `# Programmatic release QA sample
 
-This is a **manual QA sample**, not the SEO rollout cap.
+This is an **automated review queue**, not a completed human QA pass.
 
-After the sample is reviewed, every other URL that passes the same gates stays in the release candidate set.
+Statuses:
 
-Sample size: ${sample.length} URLs (~20 per product, stratified by tier / template / quality band / publish state).
+- \`NOT_REVIEWED\` — no human review, automated checks incomplete or not run
+- \`AUTO_VERIFIED\` — structural automated checks passed (canonical, robots state, decision surface, links, fingerprint, evidence/modelled label)
+- \`MANUAL_PASS\` / \`MANUAL_FAIL\` — human only; this generator never writes them
 
-## Checklist per URL
+No human has reviewed these URLs. Do not read this file as “100 URLs manually approved.”
 
-- page useful as a decision surface (not a generic article)
-- result unique vs siblings
-- visual quality / mobile
-- evidence and assumptions visible
-- internal links present
-- structured data / main entity present
-- canonical stable and self
-- no 404 / 500
-- no canonical toward a noindex page
+Sample size: ${sample.length} URLs (target 10 Tier A + 8 B + 4 C + 3 rejected per product). Review queue size: ${review.length}.
+
+## Automated checks (AUTO_VERIFIED)
+
+- canonical self, or explicit redirect target
+- noindex matches index_state
+- main decision fields present
+- internal link / hub / multi-entity
+- decision fingerprint present
+- evidence block or declared MODELLED assumptions
+
+HTTP 200, structured-data parse, and mobile overflow need a running server and stay unchecked here.
 
 ## Sample
 
-| Product | Tier | Template | Quality | State | Score | URL |
-| ------- | ---- | -------- | ------- | ----- | ----: | --- |
+| Product | Tier | Template | Quality | State | QA | Score | URL |
+| ------- | ---- | -------- | ------- | ----- | -- | ----: | --- |
 ${qaLines.join("\n")}
 
 ## How this sample was picked
 
-Stratified over product, catalog tier (A/B/C), page family, quality band, and publish state. It is not the top-100 by score and it is not a 50-page launch ceiling.
+Stratified over product and catalog tier (10 A / 8 B / 4 C / 3 rejected). It is not a claim that a human reviewed the set.
 `,
 );
 
@@ -157,11 +190,19 @@ console.log(
   JSON.stringify(
     {
       ok: true,
+      data_version: DATA_VERSION,
+      graph_version: GRAPH_VERSION,
       generated: report.generated,
       publishable: report.publishable,
       indexable: [...store.pages.values()].filter((p) => p.index_state === "INDEXABLE").length,
       public_site_live: process.env.PUBLIC_SITE_LIVE === "true",
       qa_sample: sample.length,
+      qa_statuses: {
+        NOT_REVIEWED: sample.filter((r) => r.qaStatus === "NOT_REVIEWED").length,
+        AUTO_VERIFIED: sample.filter((r) => r.qaStatus === "AUTO_VERIFIED").length,
+        MANUAL_PASS: sample.filter((r) => r.qaStatus === "MANUAL_PASS").length,
+        MANUAL_FAIL: sample.filter((r) => r.qaStatus === "MANUAL_FAIL").length,
+      },
       candidates: candidates.length,
     },
     null,

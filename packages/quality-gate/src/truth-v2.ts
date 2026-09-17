@@ -137,6 +137,37 @@ export function detectProductAction(
     evidence.push("maintenance_services");
     outputs.push("services");
   }
+  if ((rec.type != null || rec.ah != null) && rec.vehicle) {
+    evidence.push("battery_spec");
+    outputs.push(rec.type != null ? "type" : "ah");
+    inputs.push("vehicle");
+  }
+  if (Array.isArray(rec.problems) && rec.problems.length) {
+    evidence.push("known_issues");
+    outputs.push("problems");
+    if (rec.vehicle) inputs.push("vehicle");
+  }
+  if (Array.isArray(rec.codes) && rec.codes.length && rec.brand) {
+    evidence.push("hub_codes");
+    outputs.push("codes");
+    inputs.push("brand");
+  }
+  if (Array.isArray(rec.periods) && rec.periods.length && rec.city) {
+    evidence.push("climate_periods");
+    outputs.push("periods");
+    inputs.push("city");
+  }
+  if (Array.isArray(rec.topics) && rec.topics.length && rec.vehicle) {
+    evidence.push("vehicle_topics");
+    outputs.push("topics");
+    inputs.push("vehicle");
+    if (rec.engine) inputs.push("engine");
+  }
+  if (rec.min != null && rec.max != null && rec.slug) {
+    evidence.push("device_wattage");
+    outputs.push("max");
+    inputs.push("slug");
+  }
 
   const action =
     outputs.includes("causes") || outputs.includes("ranked_causes")
@@ -151,7 +182,13 @@ export function detectProductAction(
               ? "compute_service_spec"
               : outputs.includes("services")
                 ? "list_service_interval"
-                : undefined;
+                : outputs.includes("type") || outputs.includes("ah")
+                  ? "compute_service_spec"
+                  : outputs.includes("problems")
+                    ? "rank_diagnostic_causes"
+                    : outputs.includes("codes") || outputs.includes("periods") || outputs.includes("topics") || outputs.includes("max")
+                      ? "list_service_interval"
+                      : undefined;
 
   const familyImpliesAction = /wear-month|error-code|can-charger|oil-|route-/.test(family);
   void familyImpliesAction;
@@ -173,7 +210,7 @@ export function detectProductAction(
           generate_packing_recommendation: "user gets a layer stack for a city-month",
           compare_trip_modes: "user can compare door-to-door cost bands",
           compute_service_spec: "user gets a capacity/spec for one variant",
-          list_service_interval: "user sees scheduled services for one vehicle",
+          list_service_interval: "user sees scheduled services or a graph snapshot for one entity",
         }[action]
       : undefined,
   };

@@ -47,21 +47,60 @@ export function rel(
   };
 }
 
+const OEM_HOME: Record<string, string> = {
+  bmw: "https://www.bmw.com",
+  mercedes: "https://www.mercedes-benz.com",
+  audi: "https://www.audi.com",
+  volkswagen: "https://www.volkswagen.com",
+  toyota: "https://www.toyota.com",
+  peugeot: "https://www.peugeot.com",
+  renault: "https://www.renault.com",
+  hyundai: "https://www.hyundai.com",
+  kia: "https://www.kia.com",
+  ford: "https://www.ford.com",
+  volvo: "https://www.volvocars.com",
+  honda: "https://www.honda.com",
+  mazda: "https://www.mazda.com",
+  nissan: "https://www.nissan-global.com",
+  skoda: "https://www.skoda-auto.com",
+  seat: "https://www.seat.com",
+  tesla: "https://www.tesla.com",
+  mini: "https://www.mini.com",
+  citroen: "https://www.citroen.com",
+  dacia: "https://www.dacia.com",
+  opel: "https://www.opel.com",
+  fiat: "https://www.fiat.com",
+  jeep: "https://www.jeep.com",
+  landrover: "https://www.landrover.com",
+  alfa: "https://www.alfaromeo.com",
+  porsche: "https://www.porsche.com",
+  suzuki: "https://www.suzuki.com",
+};
+
 function compiled(
   source_id: string,
   notes: string,
   confidence = 78,
-  source_type: "THIRD_PARTY" | "MANUFACTURER" | "TRUSTED_THIRD_PARTY" = "THIRD_PARTY",
+  source_type: "THIRD_PARTY" | "MANUFACTURER" | "TRUSTED_THIRD_PARTY" | "PRIMARY_DATABASE" = "THIRD_PARTY",
+  extra?: { source_url?: string; source_name?: string },
 ): ProvenanceRecord {
+  const asDatabase = source_type === "THIRD_PARTY" || source_type === "PRIMARY_DATABASE";
   return provenance({
     source_id,
-    source_type,
+    source_type: asDatabase ? "PRIMARY_DATABASE" : source_type,
+    source_name: extra?.source_name ?? notes,
+    source_url: extra?.source_url,
     retrieved_at: NOW,
     confidence,
     raw_value: notes,
     normalized_value: notes,
     verification_method: source_type === "MANUFACTURER" ? "MANUFACTURER_DOC" : "CROSS_SOURCE",
     notes,
+    locator: {
+      dataset: source_id,
+      document_title: extra?.source_name ?? notes,
+      section: "compiled-in-repo-table",
+    },
   });
 }
 
@@ -442,9 +481,25 @@ function populateFixcode(store: GraphStore) {
   }
 }
 
+function oemProv(makeSlug: string) {
+  const url = OEM_HOME[makeSlug];
+  return url
+    ? compiled(
+        "oem-handbook",
+        "Manufacturer handbook compiled specs",
+        82,
+        "MANUFACTURER",
+        {
+          source_url: url,
+          source_name: `${makeSlug} OEM handbook compilation (manufacturer homepage — PRIMARY_GENERAL)`,
+        },
+      )
+    : compiled("oem-handbook", "Manufacturer handbook compiled specs", 82, "PRIMARY_DATABASE");
+}
+
 function populateAutospec(store: GraphStore) {
-  const oem = compiled("oem-handbook", "Manufacturer handbook compiled specs", 82, "MANUFACTURER");
   for (const vehicle of VEHICLES) {
+    const oem = oemProv(vehicle.make_slug);
     const mfrId = `as:mfr:${vehicle.make_slug}`;
     addOnce(
       store,

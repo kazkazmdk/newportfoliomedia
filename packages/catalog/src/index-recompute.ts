@@ -14,7 +14,8 @@ import {
   type SearchDemandEvidence,
 } from "@penta/quality-gate";
 import { lastmodFromGraph } from "@penta/publishing-core";
-import { assignDistribution } from "./distribution";
+import { applyAutoQaSample, assignDistribution } from "./distribution";
+import { computeSourceCoverage } from "./source-coverage";
 import { isFresh, isGenericSourceUrl, validateFactProvenance } from "@penta/data-provenance";
 import {
   assessDemand,
@@ -64,11 +65,8 @@ function pageRelations(store: GraphStore, page: PageRecord) {
   return page.entity_ids.flatMap((id) => store.related(id));
 }
 
-function neighborShortlist(store: GraphStore, page: PageRecord, n: number): PageRecord[] {
-  const familyBucket = [...store.pages.values()].filter(
-    (other) => other.site === page.site && other.family === page.family && other.url !== page.url,
-  );
-  const entityKey = String(
+function entityKeyOf(page: PageRecord): string {
+  return String(
     page.structured_payload.city ??
       page.structured_payload.slug ??
       page.structured_payload.brand ??
@@ -76,24 +74,58 @@ function neighborShortlist(store: GraphStore, page: PageRecord, n: number): Page
       page.entity_ids[0] ??
       "",
   );
-  const entityBucket = entityKey
-    ? familyBucket.filter((other) => {
-        const otherKey = String(
-          other.structured_payload.city ??
-            other.structured_payload.slug ??
-            other.structured_payload.brand ??
-            other.structured_payload.make ??
-            other.entity_ids[0] ??
-            "",
-        );
-        return otherKey === entityKey;
-      })
-    : [];
+}
+
+type NeighborIndex = {
+  bySiteFamily: Map<string, PageRecord[]>;
+  bySiteFamilyEntity: Map<string, PageRecord[]>;
+  bySite: Map<string, PageRecord[]>;
+  byUrl: Map<string, PageRecord>;
+  byId: Map<string, PageRecord>;
+};
+
+function buildNeighborIndex(store: GraphStore): NeighborIndex {
+  const bySiteFamily = new Map<string, PageRecord[]>();
+  const bySiteFamilyEntity = new Map<string, PageRecord[]>();
+  const bySite = new Map<string, PageRecord[]>();
+  const byUrl = new Map<string, PageRecord>();
+  const byId = new Map<string, PageRecord>();
+  for (const page of store.pages.values()) {
+    const fam = `${page.site}:${page.family}`;
+    const ent = `${fam}:${entityKeyOf(page)}`;
+    const famList = bySiteFamily.get(fam) ?? [];
+    famList.push(page);
+    bySiteFamily.set(fam, famList);
+    const entList = bySiteFamilyEntity.get(ent) ?? [];
+    entList.push(page);
+    bySiteFamilyEntity.set(ent, entList);
+    const siteList = bySite.get(page.site) ?? [];
+    siteList.push(page);
+    bySite.set(page.site, siteList);
+    byUrl.set(page.url, page);
+    byId.set(page.id, page);
+  }
+  return { bySiteFamily, bySiteFamilyEntity, bySite, byUrl, byId };
+}
+
+let neighborIndexCache: { store: GraphStore; index: NeighborIndex } | null = null;
+
+function neighborIndexFor(store: GraphStore): NeighborIndex {
+  if (neighborIndexCache?.store === store) return neighborIndexCache.index;
+  const index = buildNeighborIndex(store);
+  neighborIndexCache = { store, index };
+  return index;
+}
+
+function neighborShortlist(store: GraphStore, page: PageRecord, n: number): PageRecord[] {
+  const index = neighborIndexFor(store);
+  const fam = `${page.site}:${page.family}`;
+  const entityKey = entityKeyOf(page);
+  const entityBucket = (index.bySiteFamilyEntity.get(`${fam}:${entityKey}`) ?? []).filter((other) => other.url !== page.url);
   if (entityBucket.length >= n) return entityBucket.slice(0, 48);
+  const familyBucket = (index.bySiteFamily.get(fam) ?? []).filter((other) => other.url !== page.url);
   if (familyBucket.length >= n) return familyBucket.slice(0, 64);
-  return [...store.pages.values()]
-    .filter((other) => other.site === page.site && other.url !== page.url)
-    .slice(0, 64);
+  return (index.bySite.get(page.site) ?? []).filter((other) => other.url !== page.url).slice(0, 64);
 }
 
 export function nearestNeighbors(store: GraphStore, page: PageRecord, n = 5): NeighborRow[] {
@@ -145,23 +177,29 @@ function staleCurrent(store: GraphStore, page: PageRecord): boolean {
 }
 
 function parentPage(store: GraphStore, page: PageRecord): PageRecord | undefined {
-  if (page.family === "wear-month") {
+  const byUrl = neighborIndexFor(store).byUrl;
+  if (page.family === "wear-month" || page.family === "packing-month") {
     const slug = String(page.structured_payload.slug ?? "");
-    return [...store.pages.values()].find(
-      (p) =>
-        p.site === "wearthere" &&
-        p.family === "destination-hub" &&
-        (p.structured_payload.slug === slug || p.url === `/wearthere/${slug}`),
-    );
+    return byUrl.get(`/wearthere/${slug}`);
   }
   if (page.family === "can-charger-charge") {
     const device = String(page.structured_payload.device ?? "");
-    return [...store.pages.values()].find((p) => p.url === `/chargematch/${device}`);
+    return byUrl.get(`/chargematch/${device}`);
   }
   if (page.family === "error-code") {
     const brand = String(page.structured_payload.brand ?? "").toLowerCase();
     const appliance = String(page.structured_payload.appliance ?? "").toLowerCase();
-    return [...store.pages.values()].find((p) => p.family === "appliance-hub" && p.url.endsWith(`/${brand}/${appliance}`));
+    return byUrl.get(`/fixcode/${brand}/${appliance}`);
+  }
+  if (page.family === "route-driving") {
+    const from = String(page.structured_payload.from ?? "");
+    const to = String(page.structured_payload.to ?? "");
+    if (from && to) return byUrl.get(`/tripcost/${from}/to/${to}`);
+  }
+  if (page.site === "autospec" && page.family !== "vehicle-hub") {
+    const vehicle = String(page.structured_payload.vehicle ?? "");
+    const hub = neighborIndexFor(store).byId.get(vehicle);
+    if (hub?.family === "vehicle-hub") return hub;
   }
   return undefined;
 }
@@ -264,7 +302,11 @@ function qualityInputFromGraph(store: GraphStore, page: PageRecord, neighbor: Ne
     distinct_from_parent: false,
     near_duplicate: neighbor ? !neighbor.pass : false,
     year_only_variant: false,
-    city_without_specifics: page.site === "wearthere" && !page.structured_payload.tmin_c && page.family === "wear-month",
+    city_without_specifics:
+      page.site === "wearthere" &&
+      page.family === "wear-month" &&
+      page.structured_payload.tmin_c == null &&
+      page.structured_payload.tmax_c == null,
     obscure_without_demand: page.search_demand < 15,
     llm_filler: false,
     confidence: ents[0]?.confidence ?? "MEDIUM",
@@ -312,6 +354,7 @@ function publishState(state: IndexState): PageRecord["publish_state"] {
 }
 
 export function applyIndexGates(store: GraphStore): void {
+  neighborIndexCache = { store, index: buildNeighborIndex(store) };
   const neighborMap = new Map<string, NeighborRow[]>();
   for (const page of store.pages.values()) {
     neighborMap.set(page.url, nearestNeighbors(store, page, 5));
@@ -319,6 +362,30 @@ export function applyIndexGates(store: GraphStore): void {
   for (const page of store.pages.values()) {
     const neighbors = neighborMap.get(page.url) ?? [];
     const worst = neighbors.find((n) => !n.pass);
+    if (page.index_state === "REDIRECT" || page.structured_payload.redirect_to) {
+      const target = String(page.structured_payload.redirect_to ?? page.canonical);
+      page.index_state = "REDIRECT";
+      page.noindex = true;
+      page.publish_state = "DRAFT";
+      page.canonical = target;
+      page.decision_fingerprint = fingerprintFromPage(page);
+      page.freshness = lastmodFromGraph(store, page);
+      page.lifecycle_state = page.lifecycle_state ?? "new";
+      const coverage = computeSourceCoverage(page, store);
+      page.structured_payload = {
+        ...page.structured_payload,
+        redirect_to: target,
+        source_coverage: coverage.sourceCoverage,
+        decision_facts: coverage.facts,
+        decision_facts_count: coverage.decisionFacts,
+        sourced_decision_facts: coverage.sourcedDecisionFacts,
+        real_source_coverage: coverage.sourceCoverage,
+        decision_fingerprint: page.decision_fingerprint,
+        lastmod: page.freshness,
+        has_internal_link: true,
+      };
+      continue;
+    }
     const result = evaluatePageQuality(qualityInputFromGraph(store, page, worst ?? neighbors[0]));
     let state: IndexState = result.index_state;
     let seoValidation = result.seo_validation ?? "NONE";
@@ -352,10 +419,20 @@ export function applyIndexGates(store: GraphStore): void {
       seo_eligibility: result.demand_assessment?.seoEligibility ?? "NONE",
       decision_fingerprint: page.decision_fingerprint,
       lastmod: page.freshness,
-      has_internal_link: Boolean(parent) || page.family.includes("hub") || page.entity_ids.length > 1,
+      has_internal_link: Boolean(parent) || page.family.includes("hub") || page.entity_ids.length > 1 || pageRelations(store, page).length > 0,
+    };
+    const coverage = computeSourceCoverage(page, store);
+    page.structured_payload = {
+      ...page.structured_payload,
+      source_coverage: coverage.sourceCoverage,
+      decision_facts: coverage.facts,
+      decision_facts_count: coverage.decisionFacts,
+      sourced_decision_facts: coverage.sourcedDecisionFacts,
+      real_source_coverage: coverage.sourceCoverage,
     };
   }
   assignDistribution(store);
+  applyAutoQaSample(store);
 }
 
 export function similarityReport(store: GraphStore) {

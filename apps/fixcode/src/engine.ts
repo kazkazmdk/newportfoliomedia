@@ -5,6 +5,9 @@ import { ERRORS } from "./data-samsung";
 import { MORE_ERRORS } from "./data-more";
 import { SYMPTOMS as SEED_SYMPTOMS } from "./data-symptoms";
 import { BATCH2_ERRORS } from "./batch2";
+import { BATCH3_ERRORS } from "./batch3";
+import { BATCH4_ERRORS } from "./batch4";
+import { isAliasError } from "./error-families";
 import { symptomsFromErrors } from "./families";
 import { attachExactOem } from "./exact-sources";
 import { buildDiagnosticTree, nextSafeCheck, walkTree } from "./diagnostic-tree";
@@ -21,7 +24,11 @@ export const ALL_ERRORS: ErrorProfile[] = uniqueById([
   ...ERRORS,
   ...MORE_ERRORS,
   ...BATCH2_ERRORS,
+  ...BATCH3_ERRORS,
+  ...BATCH4_ERRORS,
 ]).map(attachExactOem);
+
+export { isAliasError, canonicalErrorCode, ERROR_FAMILIES } from "./error-families";
 
 export const ALL_SYMPTOMS: SymptomProfile[] = uniqueById([
   ...SEED_SYMPTOMS,

@@ -642,16 +642,22 @@ export {
 export type { ScaleCandidate, ScaleSnapshot, ScaleStopResult } from "./scale-stop";
 export {
   allCatalogRows,
+  applyAutoQaSample,
   assignDistribution,
+  autoQaChecks,
   catalogPublishState,
   CATALOG_SITES,
   CATALOG_TIERS,
   joinReleaseManifestToGsc,
   monitorCohorts,
+  priorityScore,
+  qaReviewQueue,
   qaSample,
   releaseCandidates,
   scaleReport,
   sourceCoverageOf,
   toReleaseCandidate,
 } from "./distribution";
-export type { CatalogPublishState, CatalogTier, MonitorCohort, ProductScaleRow, ReleaseCandidate, ScaleReport } from "./distribution";
+export type { CatalogPublishState, CatalogTier, MonitorCohort, ProductScaleRow, QaReviewStatus, ReleaseCandidate, ScaleReport } from "./distribution";
+export { computeSourceCoverage, coverageFromFacts, deriveDecisionFacts } from "./source-coverage";
+export { DATA_VERSION, GRAPH_VERSION } from "./versions";

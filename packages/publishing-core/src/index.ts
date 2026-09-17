@@ -1,12 +1,31 @@
 import type { GraphEntity, GraphRelation, GraphStore, IndexState, PageRecord, SiteId } from "@penta/graph-core";
 
+export function isPublicSiteLive(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.PUBLIC_SITE_LIVE === "true";
+}
+
+export function isPreviewDeploy(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.VERCEL_ENV === "preview" || env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+}
+
+/** Module snapshot for existing imports. Live checks must use isPublicSiteLive(). */
 export const PUBLIC_SITE_LIVE = process.env.PUBLIC_SITE_LIVE === "true";
 export const IS_PREVIEW =
   process.env.VERCEL_ENV === "preview" ||
   process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
 
-export function globalNoindex(): boolean {
-  return !PUBLIC_SITE_LIVE || IS_PREVIEW;
+export function globalNoindex(env: NodeJS.ProcessEnv = process.env): boolean {
+  return !isPublicSiteLive(env) || isPreviewDeploy(env);
+}
+
+export function publicSiteOrigin(env: NodeJS.ProcessEnv = process.env): string {
+  return (env.PUBLIC_SITE_ORIGIN || "https://penta.example.com").replace(/\/$/, "");
+}
+
+export function absoluteSitemapLoc(pathOrUrl: string, env: NodeJS.ProcessEnv = process.env): string {
+  if (/^https?:\/\//i.test(pathOrUrl)) return pathOrUrl;
+  const path = pathOrUrl.startsWith("/") ? pathOrUrl : `/${pathOrUrl}`;
+  return `${publicSiteOrigin(env)}${path}`;
 }
 
 export function robotsForSite(site: SiteId): string {
@@ -16,8 +35,8 @@ export function robotsForSite(site: SiteId): string {
   return `User-agent: *\nAllow: /\nDisallow: /trip/\nDisallow: /garage\nDisallow: /kit\nDisallow: /compare\nDisallow: /ops\nDisallow: /api/\nSitemap: https://${site}.example.com/sitemap.xml\n`;
 }
 
-export function shouldIndexPage(page: PageRecord): boolean {
-  if (globalNoindex()) return false;
+export function shouldIndexPage(page: PageRecord, env: NodeJS.ProcessEnv = process.env): boolean {
+  if (globalNoindex(env)) return false;
   return page.index_state === "INDEXABLE" && page.publish_state === "PUBLISHED" && !page.noindex;
 }
 
@@ -41,17 +60,21 @@ export function parseSitemapSegmentId(id: string): { site: SiteId; tier: Catalog
 }
 
 /** Sitemap may contain PUBLISHABLE+INDEXABLE only. Never LIMITED / NOINDEX / BLOCKED. */
-export function sitemapEligible(page: PageRecord): boolean {
-  if (!shouldIndexPage(page)) return false;
+export function sitemapEligible(page: PageRecord, env: NodeJS.ProcessEnv = process.env): boolean {
+  if (!shouldIndexPage(page, env)) return false;
   if (page.catalog_publish_state && page.catalog_publish_state !== "PUBLISHABLE") return false;
   return true;
 }
 
-export function sitemapSegmentPages(pages: PageRecord[], id: string): PageRecord[] {
+export function sitemapSegmentPages(
+  pages: PageRecord[],
+  id: string,
+  env: NodeJS.ProcessEnv = process.env,
+): PageRecord[] {
   const parsed = parseSitemapSegmentId(id);
   if (!parsed) return [];
   return pages.filter(
-    (page) => sitemapEligible(page) && page.site === parsed.site && page.catalog_tier === parsed.tier,
+    (page) => sitemapEligible(page, env) && page.site === parsed.site && page.catalog_tier === parsed.tier,
   );
 }
 
@@ -119,9 +142,13 @@ export const SITEMAP_FAMILIES: Record<SiteId, string[]> = {
   tripcost: ["routes", "calculators"],
 };
 
-export function sitemapPages(pages: PageRecord[], family?: string): PageRecord[] {
+export function sitemapPages(
+  pages: PageRecord[],
+  family?: string,
+  env: NodeJS.ProcessEnv = process.env,
+): PageRecord[] {
   return pages.filter((page) => {
-    if (!shouldIndexPage(page)) return false;
+    if (!shouldIndexPage(page, env)) return false;
     if (!family) return true;
     return sitemapFamily(page) === family;
   });

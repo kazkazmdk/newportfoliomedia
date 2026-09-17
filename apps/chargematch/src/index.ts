@@ -2,6 +2,7 @@ import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { MORE_CHARGERS, MORE_DEVICES, MORE_PAIRS } from "./catalog-more";
+import { SCALE_CHARGERS, SCALE_DEVICES } from "./catalog-scale";
 export { DEVICE_OEM_SOURCES, deviceOemSource, deviceProvenanceList } from "./oem-sources";
 
 export type ConfidenceTag =
@@ -131,7 +132,15 @@ export const CORE_DEVICES: DeviceProfile[] = [
   { id: "dev:watch", name: "Apple Watch", slug: "apple-watch", brand: "Apple", connector: "Watch", min_watts: 5, max_watts: 5, notes: "Does not charge from a USB-C PD laptop cable alone. Needs the Watch puck.", demand: 55, tag: "MANUFACTURER_VERIFIED" },
 ];
 
-export const DEVICES: DeviceProfile[] = [...CORE_DEVICES, ...MORE_DEVICES];
+function uniqueById<T extends { id: string }>(rows: T[]): T[] {
+  const map = new Map<string, T>();
+  for (const row of rows) {
+    if (!map.has(row.id)) map.set(row.id, row);
+  }
+  return [...map.values()];
+}
+
+export const DEVICES: DeviceProfile[] = uniqueById([...CORE_DEVICES, ...MORE_DEVICES, ...SCALE_DEVICES]);
 
 export const CORE_CHARGERS: ChargerProfile[] = [
   {
@@ -224,7 +233,7 @@ export const CORE_CHARGERS: ChargerProfile[] = [
   },
 ];
 
-export const CHARGERS: ChargerProfile[] = [...CORE_CHARGERS, ...MORE_CHARGERS];
+export const CHARGERS: ChargerProfile[] = uniqueById([...CORE_CHARGERS, ...MORE_CHARGERS, ...SCALE_CHARGERS]);
 
 export const POWER_KINDS = [
   "MEASURED",
@@ -618,6 +627,78 @@ export const POPULAR_PAIRS: Array<[string, string]> = [
   ...MORE_PAIRS,
 ];
 
+export type PairSurfaceKind = "CALCULABLE_PAIR" | "SEO_SURFACE_CANDIDATE";
+
+export function pairDecisionKey(
+  device: DeviceProfile,
+  charger: ChargerProfile,
+  result: CompatibilityResult,
+): string {
+  return [
+    result.match,
+    result.max_power ?? "na",
+    result.bottleneck,
+    result.protocol,
+    device.connector,
+    charger.ports.length > 1 ? "multiport" : "single",
+    device.pps ? "pps" : "pd",
+  ].join("|");
+}
+
+export function isSeoSurfaceCandidate(device: DeviceProfile, charger: ChargerProfile): boolean {
+  const result = compatibility(device, charger);
+  if (result.match === "UNKNOWN" && result.bottleneck === "none") return false;
+  const underpowered = result.match === "SLOW";
+  const fullSpeed = result.match === "EXCELLENT MATCH";
+  const mismatch = result.match === "INCOMPATIBLE";
+  const portLimit = result.bottleneck.includes("allocation") || result.bottleneck.includes("port");
+  const cable = result.bottleneck === "cable" || device.connector === "Lightning" || device.connector === "Watch";
+  const multiport = charger.ports.length > 1 && result.bottleneck.includes("allocation");
+  const wattageGap = Math.abs((result.max_power ?? 0) - device.max_watts) >= 5;
+  const ppsGap = Boolean(device.pps) && !charger.ports.some((p) => p.pdos.some((pdo) => pdo.pps));
+  return underpowered || fullSpeed || mismatch || portLimit || cable || multiport || wattageGap || ppsGap;
+}
+
+export function allCalculablePairs(): Array<{ device: DeviceProfile; charger: ChargerProfile; kind: PairSurfaceKind }> {
+  const rows: Array<{ device: DeviceProfile; charger: ChargerProfile; kind: PairSurfaceKind }> = [];
+  for (const device of DEVICES) {
+    for (const charger of CHARGERS) {
+      rows.push({
+        device,
+        charger,
+        kind: isSeoSurfaceCandidate(device, charger) ? "SEO_SURFACE_CANDIDATE" : "CALCULABLE_PAIR",
+      });
+    }
+  }
+  return rows;
+}
+
+export function seoSurfacePairs(): Array<[string, string]> {
+  const curated = new Set(POPULAR_PAIRS.map(([d, c]) => `${d}:${c}`));
+  const selected: Array<[string, string]> = [...POPULAR_PAIRS];
+  for (const device of DEVICES) {
+    const seenKeys = new Set<string>();
+    let added = 0;
+    for (const charger of CHARGERS) {
+      const key = `${device.slug}:${charger.slug}`;
+      if (curated.has(key)) {
+        const result = compatibility(device, charger);
+        seenKeys.add(pairDecisionKey(device, charger, result));
+        continue;
+      }
+      if (!isSeoSurfaceCandidate(device, charger)) continue;
+      const result = compatibility(device, charger);
+      const decision = pairDecisionKey(device, charger, result);
+      if (seenKeys.has(decision)) continue;
+      seenKeys.add(decision);
+      selected.push([device.slug, charger.slug]);
+      added += 1;
+      if (added >= 10) break;
+    }
+  }
+  return selected;
+}
+
 export function allChargematchPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const device of DEVICES) {
@@ -655,7 +736,21 @@ export function allChargematchPages(): PageRecord[] {
       title: `${device.name} charging wattage`,
       meta_description: `${device.name} takes ${device.min_watts}–${device.max_watts} W (${device.tag.replaceAll("_", " ")}). Check a charger.`,
       entity_ids: [device.id],
-      structured_payload: { slug: device.slug, min: device.min_watts, max: device.max_watts, pd: device.pd_version, distinct_reason: device.slug },
+      structured_payload: {
+        slug: device.slug,
+        min: device.min_watts,
+        max: device.max_watts,
+        pd: device.pd_version,
+        distinct_reason: device.slug,
+        action_evidence: {
+          actionType: "CALCULATE",
+          inputFields: ["slug"],
+          outputFields: ["min", "max"],
+          rendered: true,
+          executable: true,
+          decisionFields: ["min", "max"],
+        },
+      },
       quality_score: q.score,
       search_demand: device.demand,
       index_state: q.index_state,
@@ -668,10 +763,7 @@ export function allChargematchPages(): PageRecord[] {
     });
   }
   const seenPairs = new Set<string>();
-  const pairList: Array<[string, string]> = [
-    ...POPULAR_PAIRS,
-    ...DEVICES.flatMap((device) => CHARGERS.map((charger) => [device.slug, charger.slug] as [string, string])),
-  ];
+  const pairList = seoSurfacePairs();
   for (const [d, c] of pairList) {
     const key = `${d}:${c}`;
     if (seenPairs.has(key)) continue;
@@ -732,6 +824,7 @@ export function allChargematchPages(): PageRecord[] {
         bottleneck: result.bottleneck,
         measured: null,
         rated: true,
+        pair_kind: "SEO_SURFACE_CANDIDATE",
         action_evidence: {
           actionType: "VERIFY",
           inputFields: ["device", "charger"],
@@ -757,7 +850,7 @@ export function allChargematchPages(): PageRecord[] {
 
 export const POWER_PROVENANCE = provenance({
   source_id: "oem-power-specs",
-  source_type: "MANUFACTURER",
+  source_type: "PRIMARY_DATABASE",
   source_name: "Compiled device input and charger PDO tables",
   retrieved_at: "2026-06-01T00:00:00.000Z",
   verified_at: "2026-06-01T00:00:00.000Z",
@@ -765,4 +858,10 @@ export const POWER_PROVENANCE = provenance({
   raw_value: "device input + charger PDO tables",
   normalized_value: "watts",
   verification_method: "MANUFACTURER_DOC",
+  locator: {
+    dataset: "oem-power-specs",
+    document_title: "Compiled device input and charger PDO tables",
+    section: "device-max-input + charger-pdo",
+  },
+  notes: "In-repo compiled PDO/input table. Per-device OEM URLs attach separately when present. DATASET_GENERAL, not PRIMARY_EXACT.",
 });

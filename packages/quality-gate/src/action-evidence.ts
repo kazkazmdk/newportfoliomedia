@@ -124,6 +124,76 @@ export function deriveActionEvidence(payload: Record<string, unknown>): ActionEv
       decisionFields: ["services"],
     };
   }
+  if ((payload.type != null || payload.ah != null) && payload.vehicle && (payload.family === "battery" || payload.battery_decision === true || payload.ah != null)) {
+    return {
+      actionType: "CALCULATE",
+      inputFields: ["vehicle"],
+      outputFields: payload.type != null ? ["type"] : ["ah"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["type", "ah"].filter((k) => payload[k] != null),
+    };
+  }
+  if (Array.isArray(payload.problems) && payload.problems.length && payload.vehicle) {
+    return {
+      actionType: "RECOMMEND",
+      inputFields: ["vehicle"],
+      outputFields: ["problems"],
+      rendered: true,
+      executable: true,
+      decisionFields: payload.when_to_stop != null ? ["problems", "when_to_stop"] : ["problems"],
+    };
+  }
+  if (Array.isArray(payload.codes) && payload.codes.length && payload.brand) {
+    return {
+      actionType: "FILTER",
+      inputFields: payload.appliance != null ? ["brand", "appliance"] : ["brand"],
+      outputFields: ["codes"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["codes"],
+    };
+  }
+  if (Array.isArray(payload.topics) && payload.topics.length && payload.vehicle) {
+    return {
+      actionType: "FILTER",
+      inputFields: ["vehicle"],
+      outputFields: ["topics"],
+      rendered: true,
+      executable: true,
+      decisionFields: payload.engine != null ? ["topics", "engine"] : ["topics"],
+    };
+  }
+  if (Array.isArray(payload.periods) && payload.periods.length && payload.city) {
+    return {
+      actionType: "RECOMMEND",
+      inputFields: ["city"],
+      outputFields: ["periods"],
+      rendered: true,
+      executable: true,
+      decisionFields: payload.tmin_c != null ? ["periods", "tmin_c"] : ["periods"],
+    };
+  }
+  if (payload.min != null && payload.max != null && payload.slug) {
+    return {
+      actionType: "CALCULATE",
+      inputFields: ["slug"],
+      outputFields: ["min", "max"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["min", "max"],
+    };
+  }
+  if (payload.engine && payload.vehicle && (payload.spec != null || payload.viscosity != null || payload.oil != null)) {
+    return {
+      actionType: "CALCULATE",
+      inputFields: ["vehicle", "engine"],
+      outputFields: ["engine"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["engine"],
+    };
+  }
   return null;
 }
 

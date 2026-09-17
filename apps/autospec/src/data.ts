@@ -1,5 +1,6 @@
 import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { MORE_VEHICLES } from "./vehicles-more";
+import { SCALE_VEHICLES } from "./vehicles-scale";
 
 export type ServiceItem = {
   id: string;
@@ -585,7 +586,15 @@ const CORE: VehicleIdentity[] = [
   },
 ];
 
-export const VEHICLES: VehicleIdentity[] = [...CORE, ...MORE_VEHICLES];
+function uniqueById<T extends { id: string }>(rows: T[]): T[] {
+  const map = new Map<string, T>();
+  for (const row of rows) {
+    if (!map.has(row.id)) map.set(row.id, row);
+  }
+  return [...map.values()];
+}
+
+export const VEHICLES: VehicleIdentity[] = uniqueById([...CORE, ...MORE_VEHICLES, ...SCALE_VEHICLES]);
 
 export const VEHICLE_PROVENANCE = [
   mfr("BMW 320d G20 oil LL-04", "https://www.bmw.com", 86),

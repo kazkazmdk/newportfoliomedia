@@ -2,9 +2,9 @@
 
 > Generated report. Do not edit by hand.
 >
-> git SHA: `a940001d68fb7881e7c4f1ed3a89864ddd5f5ef3`
-> generated: `2026-09-15T11:46:34.631Z`
-> metrics snapshot hash: `b9764f20f76a7c4b`
+> git SHA: `5bd2b623afc0229e6596e34f0edc4113ae25f969`
+> generated: `2026-09-17T10:15:43.143Z`
+> metrics snapshot hash: `d663cf63d85311ed`
 
 This is the **only** current source of truth for live metrics. Older reports in `docs/` are historical unless they carry this same SHA + hash.
 
@@ -12,21 +12,21 @@ This is the **only** current source of truth for live metrics. Older reports in 
 
 | Metric | Value |
 | ------ | ----: |
-| pages | 806 |
-| entities | 5512 |
-| relations | 14047 |
+| pages | 4859 |
+| entities | 54345 |
+| relations | 88843 |
 | PRIMARY_EXACT | 379 |
 | REGULATORY_EXACT | 0 |
 | TRUSTED_DATASET_EXACT | 0 |
-| PRIMARY_GENERAL | 2455 |
-| DATASET_GENERAL | 2381 |
-| heuristic | 302 |
+| PRIMARY_GENERAL | 7087 |
+| DATASET_GENERAL | 47260 |
+| heuristic | 0 |
 | unknown | 0 |
-| SEO_CANDIDATE | 255 |
+| SEO_CANDIDATE | 4516 |
 | INDEXABLE | 0 |
-| REVIEW_REQUIRED | 98 |
-| GRAPH_ONLY | 264 |
-| NOINDEX_PRODUCT | 189 |
+| REVIEW_REQUIRED | 0 |
+| GRAPH_ONLY | 299 |
+| NOINDEX_PRODUCT | 34 |
 | real demand observations | 111 |
 | validated demand | 0 |
 
@@ -34,11 +34,11 @@ This is the **only** current source of truth for live metrics. Older reports in 
 
 | Product | Pages | SEO_CANDIDATE | INDEXABLE | REVIEW |
 | ------- | ----: | ------------: | --------: | -----: |
-| FixCode | 249 | 79 | 0 | 98 |
-| WearThere | 332 | 170 | 0 | 0 |
-| ChargeMatch | 64 | 6 | 0 | 0 |
-| AutoSpec | 123 | 0 | 0 | 0 |
-| TripCost | 38 | 0 | 0 | 0 |
+| FixCode | 652 | 607 | 0 | 0 |
+| WearThere | 1462 | 1191 | 0 | 0 |
+| ChargeMatch | 614 | 587 | 0 | 0 |
+| AutoSpec | 605 | 605 | 0 | 0 |
+| TripCost | 1526 | 1526 | 0 | 0 |
 
 ## Source depth (this pass)
 
@@ -46,10 +46,10 @@ This is the **only** current source of truth for live metrics. Older reports in 
 - exact source documents: **4** (Samsung washer table, Samsung 4E article, LG washer list, Bosch E15)
 - PRIMARY_EXACT graph facts: **379** (projections, not independent OEM documents)
 - WearThere climate: compiled in-repo normals classified as **DATASET_GENERAL**, not TRUSTED_DATASET_EXACT
-- WearThere surfaces after consolidation: **300** season/month pages + city hubs
-- AutoSpec EXACT facts (oil/tyre/battery scopes): **63**
-- ChargeMatch devices/chargers in catalog: **22 / 10** (rated specs, MEASURED empty)
-- TripCost cost fields: **152** heuristic / **0** non-heuristic
+- WearThere surfaces after consolidation: **694** season/month pages + city hubs
+- AutoSpec EXACT facts (oil/tyre/battery scopes): **315**
+- ChargeMatch devices/chargers in catalog: **72 / 26** (rated specs, MEASURED empty)
+- TripCost cost fields: **12056** heuristic / **0** non-heuristic
 
 ## Demand
 
@@ -59,4 +59,4 @@ Real observations imported: **111** (AUTOCOMPLETE). Collection queue: `ops/DEMAN
 
 - `PUBLIC_SITE_LIVE=false`
 - `INDEXABLE=0` is acceptable
-- Scale stops: none triggered
+- Scale stops: critical_provenance

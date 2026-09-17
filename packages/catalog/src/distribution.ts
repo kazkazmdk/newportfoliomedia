@@ -6,6 +6,11 @@ import {
   type ScaleQualityBand,
 } from "@penta/quality-gate";
 import { joinGscToReleaseManifest, type GscPerformanceRow, type LifecycleState } from "@penta/demand";
+import { sourceCoverageOf } from "./source-coverage";
+
+export type QaReviewStatus = "NOT_REVIEWED" | "AUTO_VERIFIED" | "MANUAL_PASS" | "MANUAL_FAIL";
+export { sourceCoverageOf } from "./source-coverage";
+export type { DecisionFact, SourceCoverageReport } from "./source-coverage";
 
 export const CATALOG_SITES: SiteId[] = ["fixcode", "autospec", "wearthere", "chargematch", "tripcost"];
 export const CATALOG_TIERS = ["A", "B", "C"] as const;
@@ -21,12 +26,17 @@ export type ReleaseCandidate = {
   catalogTier: CatalogTier | null;
   decisionFingerprint: string;
   sourceCoverage: number;
+  realSourceCoverage: number;
+  decisionFacts: number;
+  sourcedDecisionFacts: number;
   indexState: PageRecord["index_state"];
   family: string;
   qualityBand: ScaleQualityBand;
   lifecycle: LifecycleState;
   lastmod: string;
   reasons: string[];
+  qaStatus?: QaReviewStatus;
+  autoQa?: string[];
 };
 
 export type ProductScaleRow = {
@@ -44,6 +54,8 @@ export type ProductScaleRow = {
   tierC: number;
   duplicateClustersRemoved: number;
   qualityBands: Record<ScaleQualityBand, number>;
+  realSourceCoverage: number;
+  sources: number;
 };
 
 export type ScaleReport = {
@@ -72,14 +84,17 @@ function hardBlockers(page: PageRecord): string[] {
   return Array.isArray(raw) ? raw.map(String) : [];
 }
 
-export function sourceCoverageOf(page: PageRecord): number {
-  const stored = page.structured_payload.source_coverage;
-  if (typeof stored === "number" && Number.isFinite(stored)) {
-    return Math.max(0, Math.min(1, stored));
-  }
-  const entities = Math.min(1, page.entity_ids.length / 4);
-  const quality = Math.max(0, Math.min(1, page.quality_score / 100));
-  return Math.round((0.45 * entities + 0.55 * quality) * 100) / 100;
+/** Real prioritization: quality + coverage + demand + uniqueness + entity importance. */
+export function priorityScore(page: PageRecord): number {
+  const coverage = sourceCoverageOf(page);
+  const uniqueness = page.structured_payload.duplicate_of ? 0 : 12;
+  const importance = Math.min(20, page.entity_ids.length * 3 + (page.family.includes("hub") ? 4 : 0));
+  return page.quality_score + coverage * 40 + page.search_demand + uniqueness + importance;
+}
+
+function storedCount(page: PageRecord, key: "decision_facts_count" | "sourced_decision_facts"): number {
+  const value = page.structured_payload[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : 0;
 }
 
 export function catalogPublishState(page: PageRecord): CatalogPublishState {
@@ -212,18 +227,14 @@ export function assignDistribution(store: GraphStore): { duplicateClustersRemove
   for (const site of CATALOG_SITES) {
     const publishable = pages
       .filter((page) => page.site === site && page.catalog_publish_state === "PUBLISHABLE")
-      .sort((a, b) => {
-        const sa = a.quality_score * 2 + sourceCoverageOf(a) * 40 + a.search_demand;
-        const sb = b.quality_score * 2 + sourceCoverageOf(b) * 40 + b.search_demand;
-        return sb - sa;
-      });
+      .sort((a, b) => priorityScore(b) - priorityScore(a));
     const n = publishable.length;
     const tierA = Math.max(0, Math.ceil(n * 0.22));
     const tierB = Math.max(0, Math.ceil(n * 0.38));
     publishable.forEach((page, i) => {
       const tier: CatalogTier = i < tierA ? "A" : i < tierA + tierB ? "B" : "C";
       page.catalog_tier = tier;
-      page.structured_payload = { ...page.structured_payload, catalog_tier: tier };
+      page.structured_payload = { ...page.structured_payload, catalog_tier: tier, priority_score: priorityScore(page) };
     });
     for (const page of pages.filter((p) => p.site === site && p.catalog_publish_state !== "PUBLISHABLE")) {
       page.catalog_tier = null;
@@ -234,6 +245,12 @@ export function assignDistribution(store: GraphStore): { duplicateClustersRemove
 }
 
 export function toReleaseCandidate(page: PageRecord): ReleaseCandidate {
+  const coverage = sourceCoverageOf(page);
+  const qaRaw = page.structured_payload.qa_status;
+  const qaStatus: QaReviewStatus | undefined =
+    qaRaw === "NOT_REVIEWED" || qaRaw === "AUTO_VERIFIED" || qaRaw === "MANUAL_PASS" || qaRaw === "MANUAL_FAIL"
+      ? qaRaw
+      : undefined;
   return {
     url: page.url,
     product: page.site,
@@ -242,13 +259,18 @@ export function toReleaseCandidate(page: PageRecord): ReleaseCandidate {
     publishState: catalogPublishState(page),
     catalogTier: page.catalog_tier ?? null,
     decisionFingerprint: page.decision_fingerprint ?? fingerprintFromPage(page),
-    sourceCoverage: sourceCoverageOf(page),
+    sourceCoverage: coverage,
+    realSourceCoverage: coverage,
+    decisionFacts: storedCount(page, "decision_facts_count"),
+    sourcedDecisionFacts: storedCount(page, "sourced_decision_facts"),
     indexState: page.index_state,
     family: page.family,
     qualityBand: scaleQualityBand(page.quality_score),
     lifecycle: page.lifecycle_state ?? "new",
     lastmod: page.freshness,
     reasons: candidateReasons(page, typeof page.structured_payload.duplicate_of === "string" ? page.structured_payload.duplicate_of : undefined),
+    qaStatus,
+    autoQa: Array.isArray(page.structured_payload.auto_qa) ? page.structured_payload.auto_qa.map(String) : undefined,
   };
 }
 
@@ -294,6 +316,17 @@ export function scaleReport(store: GraphStore, duplicateClustersRemoved = 0): Sc
               .map((page) => page.decision_fingerprint ?? ""),
           )].filter(Boolean).length,
           qualityBands: scaleQualityDistribution(subset),
+          realSourceCoverage:
+            subset.length === 0
+              ? 0
+              : Math.round(
+                  (subset.reduce((sum, page) => sum + sourceCoverageOf(page), 0) / subset.length) * 1000,
+                ) / 1000,
+          sources: [...new Set(
+            [...store.entities.values()]
+              .filter((e) => e.site === site)
+              .flatMap((e) => e.provenance.map((p) => p.source_id)),
+          )].length,
         } satisfies ProductScaleRow,
       ];
     }),
@@ -340,7 +373,12 @@ export function monitorCohorts(store: GraphStore): MonitorCohort[] {
   return [...map.values()].sort((a, b) => b.publishable - a.publishable || b.urls - a.urls);
 }
 
-export function qaSample(store: GraphStore, perProduct = 20): ReleaseCandidate[] {
+function take(rows: ReleaseCandidate[], n: number, pred: (row: ReleaseCandidate) => boolean): ReleaseCandidate[] {
+  return rows.filter(pred).slice(0, n);
+}
+
+/** 10 Tier A + 8 B + 4 C + 3 rejected/limited per product. Auto-generation never claims MANUAL_*. */
+export function qaReviewQueue(store: GraphStore): ReleaseCandidate[] {
   const picked: ReleaseCandidate[] = [];
   for (const site of CATALOG_SITES) {
     const rows = [...store.pages.values()]
@@ -350,31 +388,93 @@ export function qaSample(store: GraphStore, perProduct = 20): ReleaseCandidate[]
         const tierRank = (tier: CatalogTier | null) => (tier === "A" ? 0 : tier === "B" ? 1 : tier === "C" ? 2 : 3);
         return tierRank(a.catalogTier) - tierRank(b.catalogTier) || b.quality - a.quality;
       });
-    const buckets = new Map<string, ReleaseCandidate[]>();
-    for (const row of rows) {
-      const key = `${row.family}:${row.catalogTier ?? "x"}:${row.qualityBand}:${row.publishState}`;
-      const list = buckets.get(key) ?? [];
-      list.push(row);
-      buckets.set(key, list);
+    const sitePick = [
+      ...take(rows, 10, (row) => row.catalogTier === "A" && row.publishState === "PUBLISHABLE"),
+      ...take(rows, 8, (row) => row.catalogTier === "B" && row.publishState === "PUBLISHABLE"),
+      ...take(rows, 4, (row) => row.catalogTier === "C" && row.publishState === "PUBLISHABLE"),
+      ...take(rows, 3, (row) => row.publishState === "LIMITED" || row.publishState === "NOINDEX" || row.publishState === "BLOCKED"),
+    ];
+    const seen = new Set<string>();
+    for (const row of sitePick) {
+      if (seen.has(row.url)) continue;
+      seen.add(row.url);
+      picked.push({ ...row, qaStatus: row.qaStatus ?? "NOT_REVIEWED" });
     }
-    const sitePick: ReleaseCandidate[] = [];
-    while (sitePick.length < perProduct) {
-      let added = false;
-      for (const list of buckets.values()) {
-        const next = list.shift();
-        if (!next) continue;
-        if (sitePick.some((row) => row.url === next.url)) continue;
-        sitePick.push(next);
-        added = true;
-        if (sitePick.length >= perProduct) break;
-      }
-      if (!added) break;
-    }
-    picked.push(...sitePick);
+  }
+  return picked;
+}
+
+export function qaSample(store: GraphStore, perProduct = 25): ReleaseCandidate[] {
+  if (perProduct === 25) return qaReviewQueue(store);
+  const picked: ReleaseCandidate[] = [];
+  for (const site of CATALOG_SITES) {
+    const rows = [...store.pages.values()]
+      .filter((page) => page.site === site)
+      .map(toReleaseCandidate)
+      .sort((a, b) => {
+        const tierRank = (tier: CatalogTier | null) => (tier === "A" ? 0 : tier === "B" ? 1 : tier === "C" ? 2 : 3);
+        return tierRank(a.catalogTier) - tierRank(b.catalogTier) || b.quality - a.quality;
+      });
+    picked.push(...rows.slice(0, perProduct).map((row) => ({ ...row, qaStatus: row.qaStatus ?? "NOT_REVIEWED" as QaReviewStatus })));
   }
   return picked;
 }
 
 export function joinReleaseManifestToGsc(store: GraphStore, gsc: GscPerformanceRow[] = []) {
   return joinGscToReleaseManifest(allCatalogRows(store), gsc);
+}
+
+const AUTO_QA_KEYS = [
+  "canonical_or_redirect",
+  "robots_matches_index_state",
+  "decision_surface",
+  "internal_link",
+  "fingerprint",
+  "evidence_or_modelled",
+] as const;
+
+export function autoQaChecks(page: PageRecord): string[] {
+  const checks: string[] = [];
+  const redirect = page.index_state === "REDIRECT" || Boolean(page.structured_payload.redirect_to);
+  if (redirect || (page.canonical === page.url && Boolean(page.canonical))) checks.push("canonical_or_redirect");
+  if (page.noindex === (page.index_state !== "INDEXABLE")) checks.push("robots_matches_index_state");
+  const payload = page.structured_payload;
+  if (
+    payload.action_evidence ||
+    payload.match != null ||
+    payload.meaning ||
+    payload.modes ||
+    payload.layers ||
+    payload.spec ||
+    payload.codes
+  ) {
+    checks.push("decision_surface");
+  }
+  if (payload.has_internal_link || page.family.includes("hub") || page.entity_ids.length > 1) {
+    checks.push("internal_link");
+  }
+  if (page.decision_fingerprint) checks.push("fingerprint");
+  if (
+    payload.source_coverage != null ||
+    payload.assumptions_declared === true ||
+    payload.cost_class === "MODELLED" ||
+    Array.isArray(payload.decision_facts)
+  ) {
+    checks.push("evidence_or_modelled");
+  }
+  return checks;
+}
+
+/** Structural AUTO_VERIFIED only. Never writes MANUAL_PASS / MANUAL_FAIL. */
+export function applyAutoQaSample(store: GraphStore): ReleaseCandidate[] {
+  const queue = qaReviewQueue(store);
+  const byUrl = new Map([...store.pages.values()].map((page) => [page.url, page]));
+  return queue.map((row) => {
+    const page = byUrl.get(row.url);
+    if (!page) return { ...row, qaStatus: "NOT_REVIEWED" as const };
+    const checks = autoQaChecks(page);
+    const qaStatus: QaReviewStatus = checks.length >= 4 ? "AUTO_VERIFIED" : "NOT_REVIEWED";
+    page.structured_payload = { ...page.structured_payload, qa_status: qaStatus, auto_qa: checks };
+    return { ...row, qaStatus, autoQa: checks };
+  });
 }

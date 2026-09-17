@@ -4,10 +4,14 @@ import {
   searchDemandScore,
   type PageQualityInput,
 } from "@penta/quality-gate";
-import { ALL_ERRORS, ALL_SYMPTOMS } from "./engine";
+import { ALL_ERRORS, ALL_SYMPTOMS, canonicalErrorCode, isAliasError } from "./engine";
 import { APPLIANCES, BRANDS } from "./data-symptoms";
 import type { ErrorProfile, SymptomProfile } from "./types";
 import { buildDiagnosticTree } from "./diagnostic-tree";
+
+function canonicalErrors(): ErrorProfile[] {
+  return ALL_ERRORS.filter((item) => !isAliasError(item.brand_slug, item.appliance_slug, item.code));
+}
 
 function requiredFields(profile: ErrorProfile): string[] {
   const fields = [
@@ -66,6 +70,37 @@ function hashPayload(payload: Record<string, unknown>): string {
 
 export function errorPage(profile: ErrorProfile): PageRecord {
   const url = `/${profile.brand_slug}/${profile.appliance_slug}/${profile.code_slug}`;
+  if (isAliasError(profile.brand_slug, profile.appliance_slug, profile.code)) {
+    const canon = canonicalErrorCode(profile.brand_slug, profile.appliance_slug, profile.code);
+    const canonUrl = `/fixcode/${profile.brand_slug}/${profile.appliance_slug}/${canon.toLowerCase()}-error`;
+    return {
+      id: profile.id,
+      site: "fixcode",
+      family: "error-code",
+      url: `/fixcode${url}`,
+      canonical: canonUrl,
+      title: `${profile.brand} ${profile.appliance} ${profile.code} → ${canon}`,
+      meta_description: `${profile.code} is a display alias of ${canon}.`,
+      entity_ids: [profile.id],
+      structured_payload: {
+        brand: profile.brand,
+        appliance: profile.appliance,
+        code: profile.code,
+        alias_of: canon,
+        redirect_to: canonUrl,
+        distinct_reason: `${profile.id}-alias`,
+      },
+      quality_score: 0,
+      search_demand: 0,
+      index_state: "REDIRECT",
+      noindex: true,
+      similarity_hash: `alias:${profile.id}`,
+      freshness: profile.provenance[0]?.retrieved_at ?? "",
+      review_required: false,
+      batch: "fixcode-alias",
+      publish_state: "DRAFT",
+    };
+  }
   const payload = {
     brand: profile.brand,
     appliance: profile.appliance,
@@ -116,8 +151,18 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
     brand: profile.brand,
     appliance: profile.appliance,
     symptom: profile.symptom,
+    meaning: profile.meaning,
     causes: profile.causes.map((cause) => cause.id),
+    tests: profile.questions.map((q) => q.id),
     distinct_reason: profile.id,
+    action_evidence: {
+      actionType: "DIAGNOSE",
+      inputFields: ["appliance", "symptom"],
+      outputFields: ["causes", "meaning"],
+      rendered: true,
+      executable: true,
+      decisionFields: ["causes", "meaning"],
+    },
   };
   const quality = evaluatePageQuality({
     site: "fixcode",
@@ -171,8 +216,20 @@ export function symptomPage(profile: SymptomProfile): PageRecord {
 export function hubPages(): PageRecord[] {
   const pages: PageRecord[] = [];
   for (const brand of BRANDS) {
-    const errors = ALL_ERRORS.filter((item) => item.brand_slug === brand.slug);
-    const payload = { brand: brand.slug, codes: errors.map((item) => item.code), distinct_reason: `hub-${brand.slug}` };
+    const errors = canonicalErrors().filter((item) => item.brand_slug === brand.slug);
+    const payload = {
+      brand: brand.slug,
+      codes: errors.map((item) => item.code),
+      distinct_reason: `hub-${brand.slug}`,
+      action_evidence: {
+        actionType: "FILTER",
+        inputFields: ["brand"],
+        outputFields: ["codes"],
+        rendered: true,
+        executable: true,
+        decisionFields: ["codes"],
+      },
+    };
     const quality = evaluatePageQuality({
       site: "fixcode",
       family: "brand-hub",
@@ -219,13 +276,26 @@ export function hubPages(): PageRecord[] {
     });
   }
   for (const brand of BRANDS) {
-    const appliances = [...new Set(ALL_ERRORS.filter((item) => item.brand_slug === brand.slug).map((item) => item.appliance_slug))];
+    const appliances = [...new Set(canonicalErrors().filter((item) => item.brand_slug === brand.slug).map((item) => item.appliance_slug))];
     for (const appliance of appliances) {
-      const errors = ALL_ERRORS.filter(
+      const errors = canonicalErrors().filter(
         (item) => item.brand_slug === brand.slug && item.appliance_slug === appliance,
       );
       const name = APPLIANCES.find((item) => item.slug === appliance)?.name ?? appliance;
-      const payload = { brand: brand.slug, appliance, codes: errors.map((item) => item.code), distinct_reason: `hub-${brand.slug}-${appliance}` };
+      const payload = {
+        brand: brand.slug,
+        appliance,
+        codes: errors.map((item) => item.code),
+        distinct_reason: `hub-${brand.slug}-${appliance}`,
+        action_evidence: {
+          actionType: "FILTER",
+          inputFields: ["brand", "appliance"],
+          outputFields: ["codes"],
+          rendered: true,
+          executable: true,
+          decisionFields: ["codes"],
+        },
+      };
       const quality = evaluatePageQuality({
         site: "fixcode",
         family: "appliance-hub",

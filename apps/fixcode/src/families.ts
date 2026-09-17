@@ -330,6 +330,13 @@ const SUPPORT: Record<string, { url: string; family: string }> = {
   lg: { url: "https://www.lg.com/us/support", family: "LG" },
   bosch: { url: "https://www.bosch-home.com/us/service", family: "Bosch / Siemens-group platforms" },
   miele: { url: "https://www.miele.com/en/m/service-3850.htm", family: "Miele" },
+  siemens: { url: "https://www.siemens-home.bsh-group.com/us/support", family: "Siemens (Bosch-group platforms)" },
+  aeg: { url: "https://www.aeg.co.uk/support/", family: "AEG / Electrolux-group platforms" },
+  electrolux: { url: "https://www.electrolux.com/support/", family: "Electrolux" },
+  whirlpool: { url: "https://www.whirlpool.com/services/", family: "Whirlpool" },
+  beko: { url: "https://www.beko.com/support", family: "Beko" },
+  candy: { url: "https://www.candy-home.com/en_GB/support/", family: "Candy" },
+  hotpoint: { url: "https://www.hotpoint.co.uk/support", family: "Hotpoint / Indesit-group platforms" },
 };
 
 export type CodeSeed = {
@@ -346,7 +353,10 @@ export type CodeSeed = {
 
 export function profileFromSeed(seed: CodeSeed): ErrorProfile {
   const pack = FAMILIES[seed.family];
-  const brand = SUPPORT[seed.brand_slug];
+  const brand = SUPPORT[seed.brand_slug] ?? {
+    url: `https://www.${seed.brand_slug}.com`,
+    family: seed.brand,
+  };
   const prefix = `${seed.brand_slug}-${seed.appliance_slug}-${seed.code.toLowerCase()}`;
   return {
     id: `fix:${seed.brand_slug}:${seed.appliance_slug}:${seed.code.toLowerCase()}`,
@@ -370,6 +380,7 @@ export function profileFromSeed(seed: CodeSeed): ErrorProfile {
       provenance({
         source_id: `${seed.brand_slug}-support`,
         source_type: "MANUFACTURER",
+        source_name: `${seed.brand} support (generic root — PRIMARY_GENERAL)`,
         source_url: brand.url,
         retrieved_at: "2026-08-12T00:00:00.000Z",
         valid_from: "2018-01-01",
@@ -378,6 +389,10 @@ export function profileFromSeed(seed: CodeSeed): ErrorProfile {
         raw_value: `${seed.code} ${seed.meaning}`,
         normalized_value: seed.meaning,
         verification_method: "MANUFACTURER_DOC",
+        locator: {
+          document_title: `${seed.brand} support`,
+          section: `${seed.appliance} ${seed.code}`,
+        },
       }),
     ],
     confidence: seed.demand >= 40 ? "HIGH" : "MEDIUM",
@@ -419,12 +434,18 @@ export function symptomsFromErrors(errors: ErrorProfile[]): SymptomProfile[] {
       provenance: [
         provenance({
           source_id: "fixcode-service-corpus",
-          source_type: "THIRD_PARTY",
+          source_type: "PRIMARY_DATABASE",
+          source_name: "FixCode service corpus — symptom compiled from attached error codes",
           retrieved_at: "2026-08-12T00:00:00.000Z",
           confidence: 78,
           raw_value: key,
           normalized_value: symptom_slug,
           verification_method: "CROSS_SOURCE",
+          locator: {
+            dataset: "fixcode-service-corpus",
+            document_title: "Symptom surfaces derived from manufacturer-linked error codes",
+            section: key,
+          },
         }),
       ],
       confidence: "MEDIUM",

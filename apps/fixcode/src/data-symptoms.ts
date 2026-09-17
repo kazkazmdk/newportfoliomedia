@@ -6,7 +6,8 @@ const RETRIEVED = "2026-08-12T00:00:00.000Z";
 function thirdParty(raw: string, confidence: number) {
   return provenance({
     source_id: "fixcode-service-corpus",
-    source_type: "THIRD_PARTY",
+    source_type: "PRIMARY_DATABASE",
+    source_name: "FixCode service corpus",
     retrieved_at: RETRIEVED,
     valid_from: "2024-01-01",
     valid_until: null,
@@ -15,6 +16,11 @@ function thirdParty(raw: string, confidence: number) {
     normalized_value: raw,
     verification_method: "CROSS_SOURCE",
     notes: "Aggregated from manufacturer codes plus consistent field reports. Not a substitute for the model service manual.",
+    locator: {
+      dataset: "fixcode-service-corpus",
+      document_title: "FixCode service corpus",
+      section: raw,
+    },
   });
 }
 
@@ -347,6 +353,13 @@ export const BRANDS = [
   { slug: "lg", name: "LG" },
   { slug: "bosch", name: "Bosch" },
   { slug: "miele", name: "Miele" },
+  { slug: "siemens", name: "Siemens" },
+  { slug: "aeg", name: "AEG" },
+  { slug: "electrolux", name: "Electrolux" },
+  { slug: "whirlpool", name: "Whirlpool" },
+  { slug: "beko", name: "Beko" },
+  { slug: "candy", name: "Candy" },
+  { slug: "hotpoint", name: "Hotpoint" },
 ] as const;
 
 export const UNSUPPORTED_NOTE =

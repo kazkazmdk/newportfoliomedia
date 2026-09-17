@@ -4,6 +4,7 @@ import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { climate, type MonthClimate } from "./climate";
 import { MORE_DESTINATIONS } from "./destinations-more";
+import { SCALE_DESTINATIONS } from "./destinations-scale";
 import type { Destination } from "./types";
 
 export type { MonthClimate } from "./climate";
@@ -233,7 +234,19 @@ const CORE_DESTINATIONS: Destination[] = [
   },
 ];
 
-export const DESTINATIONS: Destination[] = [...CORE_DESTINATIONS, ...MORE_DESTINATIONS];
+function uniqueDestinations(rows: Destination[]): Destination[] {
+  const map = new Map<string, Destination>();
+  for (const row of rows) {
+    if (!map.has(row.slug)) map.set(row.slug, row);
+  }
+  return [...map.values()];
+}
+
+export const DESTINATIONS: Destination[] = uniqueDestinations([
+  ...CORE_DESTINATIONS,
+  ...MORE_DESTINATIONS,
+  ...SCALE_DESTINATIONS,
+]);
 
 export const MONTHS = [
   "january","february","march","april","may","june",
@@ -583,7 +596,22 @@ export function allWeartherePages(): PageRecord[] {
       title: `What to wear in ${dest.city}`,
       meta_description: `Month-by-month typical weather and capsule packing for ${dest.city}.`,
       entity_ids: [dest.id],
-      structured_payload: { city: dest.city, months: dest.climate.length, distinct_reason: dest.slug },
+      structured_payload: {
+        city: dest.city,
+        months: dest.climate.length,
+        periods: destinationSurfaces(dest).map((s) => s.slug),
+        tmin_c: dest.climate[0]?.tmin_c,
+        tmax_c: dest.climate[6]?.tmax_c ?? dest.climate.at(-1)?.tmax_c,
+        distinct_reason: dest.slug,
+        action_evidence: {
+          actionType: "RECOMMEND",
+          inputFields: ["city"],
+          outputFields: ["periods"],
+          rendered: true,
+          executable: true,
+          decisionFields: ["periods", "tmin_c"],
+        },
+      },
       quality_score: hubQ.score,
       search_demand: dest.demand,
       index_state: hubQ.index_state,
@@ -651,6 +679,9 @@ export function allWeartherePages(): PageRecord[] {
           sample_years: 30,
           layers: capsuleFor(dest, month, "classic").pieces.map((p) => p.id),
           not_to_pack: capsuleFor(dest, month, "classic").pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.id),
+          activity: dest.activities_default[0] ?? "walk",
+          activities: dest.activities_default,
+          wind: w.wind_kmh,
           climate_season_model: model,
           season: surface.label,
           climate_source: "compiled-monthly-normals (DATASET_GENERAL — no station/grid/external URL)",
@@ -676,6 +707,81 @@ export function allWeartherePages(): PageRecord[] {
         review_required: false,
         batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
         publish_state: quality.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
+      });
+      const packingList = capsuleFor(dest, month, "classic").pieces.map((p) => ({
+        id: p.id,
+        qty: p.warmth >= 4 ? 1 : 2,
+      }));
+      const packQ = evaluatePageQuality({
+        site: "wearthere",
+        family: "packing-month",
+        unique_fields: 10,
+        required_fields_present: 8,
+        required_fields_total: 8,
+        search_demand: { seed_research: dest.demand - 8 },
+        product_cta: true,
+        interactive: true,
+        distinct_from_parent: true,
+        near_duplicate: false,
+        year_only_variant: false,
+        city_without_specifics: false,
+        obscure_without_demand: dest.demand < 50,
+        llm_filler: false,
+        confidence: "MEDIUM",
+        freshness_days: 200,
+        freshness_ttl_days: 400,
+        provenance_valid: true,
+        distinct_reason: `${dest.slug}-${surface.slug}-pack`,
+        forecast_as_climate: false,
+        verified_fact_count: 4,
+        decision_relation_count: 6,
+      });
+      pages.push({
+        id: `${dest.id}:${slug}:pack`,
+        site: "wearthere",
+        family: "packing-month",
+        url: `/wearthere/${dest.slug}/${slug}/packing`,
+        canonical: `/wearthere/${dest.slug}/${slug}/packing`,
+        title: `What to pack for ${dest.city} in ${label}`,
+        meta_description: `Suitcase list for typical ${dest.city} ${label}: quantities, bag class, and what to leave out.`,
+        entity_ids: [dest.id],
+        structured_payload: {
+          city: dest.city,
+          slug: dest.slug,
+          month,
+          period_slug: slug,
+          tmin_c: w.tmin_c,
+          tmax_c: w.tmax_c,
+          rain_days: w.rain_days,
+          humidity: w.humidity,
+          wind: w.wind_kmh,
+          activity: dest.activities_default[0] ?? "walk",
+          layers: packingList.map((p) => p.id),
+          packing_list: packingList,
+          bag: w.tmax_c >= 24 && w.rain_days < 8 ? "carry-on" : "checked-or-weekender",
+          not_to_pack: capsuleFor(dest, month, "classic").pieces.filter((p) => p.warmth >= 5 && w.tmax_c >= 22).map((p) => p.id),
+          distinct_reason: `${dest.slug}-${slug}-pack`,
+          kind: "PACKING_LIST",
+          climate_season_model: model,
+          season: surface.label,
+          action_evidence: {
+            actionType: "RECOMMEND",
+            inputFields: ["city", "month"],
+            outputFields: ["layers"],
+            rendered: true,
+            executable: true,
+            decisionFields: ["layers", "not_to_pack"],
+          },
+        },
+        quality_score: packQ.score,
+        search_demand: searchDemandScore({ seed_research: dest.demand - 8 }),
+        index_state: packQ.index_state,
+        noindex: packQ.index_state !== "INDEXABLE",
+        similarity_hash: `${dest.slug}-${slug}-pack`,
+        freshness: RETRIEVED,
+        review_required: false,
+        batch: dest.demand >= 80 ? "wearthere-batch-2" : "wearthere-batch-1",
+        publish_state: packQ.index_state === "INDEXABLE" ? "PUBLISHED" : "DRAFT",
       });
     }
   }

@@ -255,9 +255,23 @@ export function allAutospecPages(): PageRecord[] {
       generation: vehicle.generation,
       market_scope: vehicle.market,
       distinct_reason: vehicle.id,
-      fitment_scope: scope,
       make: vehicle.make,
       model: vehicle.model,
+      variant: vehicle.variant,
+      topics: TOPICS.filter((topic) => {
+        if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) return false;
+        if (topic.slug === "problems" && vehicle.issues.length === 0) return false;
+        return true;
+      }).map((topic) => topic.slug),
+      hub_snapshot: true,
+      action_evidence: {
+        actionType: "FILTER",
+        inputFields: ["vehicle", "engine"],
+        outputFields: ["topics"],
+        rendered: true,
+        executable: true,
+        decisionFields: ["topics", "engine"],
+      },
     };
     const hubQ = evaluatePageQuality({
       site: "autospec",
@@ -306,6 +320,7 @@ export function allAutospecPages(): PageRecord[] {
     });
     for (const topic of TOPICS) {
       if (topic.slug === "oil" && vehicle.oil.capacity_liters === 0) continue;
+      if (topic.slug === "problems" && vehicle.issues.length === 0) continue;
       const payload =
         topic.slug === "oil"
           ? {
@@ -320,6 +335,9 @@ export function allAutospecPages(): PageRecord[] {
               year_to: vehicle.years.at(-1),
               fitment_scope: fitmentScopeOf(vehicle, "oil"),
               distinct_reason: `${vehicle.engine_code}-oil`,
+              with_filter: vehicle.oil.with_filter,
+              handbook_row: `${vehicle.engine_code} ${vehicle.oil.viscosity} ${vehicle.oil.spec}`,
+              fill_scope: vehicle.oil.with_filter ? "engine+filter" : "engine",
               action_evidence: {
                 actionType: "CALCULATE",
                 inputFields: ["vehicle", "engine"],
@@ -336,30 +354,72 @@ export function allAutospecPages(): PageRecord[] {
                 market_scope: vehicle.market,
                 fitment_scope: fitmentScopeOf(vehicle, "tyre_pressure"),
                 distinct_reason: `${vehicle.engine_code}-tyres`,
+                size_front: vehicle.tyres.front,
+                size_rear: vehicle.tyres.rear,
+                pressure_condition: "door-sticker typical load",
+                action_evidence: {
+                  actionType: "CALCULATE",
+                  inputFields: ["vehicle"],
+                  outputFields: ["pressure_bar_front"],
+                  rendered: true,
+                  executable: true,
+                  decisionFields: ["pressure_bar_front", "pressure_bar_rear"],
+                },
               }
             : topic.slug === "battery"
               ? {
                   vehicle: vehicle.id,
                   ...vehicle.battery,
+                  battery_decision: true,
                   market_scope: vehicle.market,
                   fitment_scope: fitmentScopeOf(vehicle, "battery"),
                   distinct_reason: `${vehicle.engine_code}-battery`,
+                  group: vehicle.battery.type,
+                  fitment_confidence: "MEDIUM",
+                  action_evidence: {
+                    actionType: "CALCULATE",
+                    inputFields: ["vehicle"],
+                    outputFields: ["type"],
+                    rendered: true,
+                    executable: true,
+                    decisionFields: ["type", "ah"],
+                  },
                 }
               : topic.slug === "maintenance"
                 ? {
                     vehicle: vehicle.id,
                     services: vehicle.services.map((s) => s.id),
+                    interval_km: vehicle.services.map((s) => s.interval_km),
+                    interval_months: vehicle.services.map((s) => s.interval_months),
+                    service_items: vehicle.services.map((s) => `${s.id}:${s.interval_km}km/${s.interval_months}mo`),
                     market_scope: vehicle.market,
                     fitment_scope: fitmentScopeOf(vehicle, "maintenance"),
                     distinct_reason: `${vehicle.engine_code}-maint`,
+                    action_evidence: {
+                      actionType: "PLAN",
+                      inputFields: ["vehicle"],
+                      outputFields: ["services"],
+                      rendered: true,
+                      executable: true,
+                      decisionFields: ["services"],
+                    },
                   }
                 : {
                     vehicle: vehicle.id,
                     issues: vehicle.issues.map((i) => i.id),
-                    problems: vehicle.issues.map((i) => i.id),
+                    problems: vehicle.issues.map((i) => i.title ?? i.id),
+                    when_to_stop: vehicle.issues[0]?.when_to_stop ?? "If a red warning lamp appears, stop driving.",
                     market_scope: vehicle.market,
                     fitment_scope: scope,
                     distinct_reason: `${vehicle.engine_code}-issues`,
+                    action_evidence: {
+                      actionType: "RECOMMEND",
+                      inputFields: ["vehicle"],
+                      outputFields: ["problems"],
+                      rendered: true,
+                      executable: true,
+                      decisionFields: ["problems", "when_to_stop"],
+                    },
                   };
       const quality = evaluatePageQuality({
         site: "autospec",

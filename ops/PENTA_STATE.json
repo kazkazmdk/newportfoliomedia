@@ -1,103 +1,103 @@
 {
-  "sha": "a940001d68fb7881e7c4f1ed3a89864ddd5f5ef3",
-  "generatedAt": "2026-09-15T11:46:34.631Z",
-  "pages": 806,
-  "entities": 5512,
-  "relations": 14047,
+  "sha": "5bd2b623afc0229e6596e34f0edc4113ae25f969",
+  "generatedAt": "2026-09-17T10:15:43.143Z",
+  "pages": 4859,
+  "entities": 54345,
+  "relations": 88843,
   "indexable": 0,
-  "seo_candidate": 255,
-  "review_required": 98,
-  "graph_only": 264,
-  "noindex_product": 189,
+  "seo_candidate": 4516,
+  "review_required": 0,
+  "graph_only": 299,
+  "noindex_product": 34,
   "PRIMARY_EXACT": 379,
   "REGULATORY_EXACT": 0,
   "TRUSTED_DATASET_EXACT": 0,
-  "PRIMARY_GENERAL": 2455,
-  "DATASET_GENERAL": 2381,
-  "HEURISTIC": 302,
+  "PRIMARY_GENERAL": 7087,
+  "DATASET_GENERAL": 47260,
+  "HEURISTIC": 0,
   "UNKNOWN": 0,
   "real_demand_observations": 111,
   "validated_demand": 0,
   "fixcode_exact_pages": 25,
-  "wearthere_surfaces": 300,
-  "autospec_exact_facts": 63,
-  "autospec_scoped_or_exact": 63,
-  "chargematch_devices": 22,
-  "chargematch_chargers": 10,
-  "tripcost_heuristic_fields": 152,
+  "wearthere_surfaces": 694,
+  "autospec_exact_facts": 315,
+  "autospec_scoped_or_exact": 315,
+  "chargematch_devices": 72,
+  "chargematch_chargers": 26,
+  "tripcost_heuristic_fields": 12056,
   "tripcost_nonheuristic_fields": 0,
   "coverage": {
     "fixcode": {
-      "entities": 1961,
+      "entities": 5330,
       "entities_exact_provenance": 379,
-      "entities_general_provenance": 1961,
+      "entities_general_provenance": 5330,
       "entities_no_provenance": 0,
       "critical_facts_exact": 379,
-      "critical_facts_generic": 1843,
-      "critical_facts_missing": 1632,
-      "truth_ready_entities": 79,
-      "blocked_entities": 170
+      "critical_facts_generic": 5064,
+      "critical_facts_missing": 0,
+      "truth_ready_entities": 607,
+      "blocked_entities": 45
     },
     "autospec": {
-      "entities": 435,
+      "entities": 2021,
       "entities_exact_provenance": 0,
-      "entities_general_provenance": 435,
+      "entities_general_provenance": 2021,
       "entities_no_provenance": 0,
       "critical_facts_exact": 0,
-      "critical_facts_generic": 435,
-      "critical_facts_missing": 435,
-      "truth_ready_entities": 0,
-      "blocked_entities": 123
+      "critical_facts_generic": 2021,
+      "critical_facts_missing": 0,
+      "truth_ready_entities": 605,
+      "blocked_entities": 0
     },
     "wearthere": {
-      "entities": 2383,
+      "entities": 5491,
       "entities_exact_provenance": 0,
-      "entities_general_provenance": 2383,
+      "entities_general_provenance": 5491,
       "entities_no_provenance": 0,
       "critical_facts_exact": 0,
       "critical_facts_generic": 0,
-      "critical_facts_missing": 2,
-      "truth_ready_entities": 170,
-      "blocked_entities": 162
+      "critical_facts_missing": 0,
+      "truth_ready_entities": 1191,
+      "blocked_entities": 271
     },
     "chargematch": {
-      "entities": 175,
+      "entities": 402,
       "entities_exact_provenance": 0,
-      "entities_general_provenance": 175,
+      "entities_general_provenance": 402,
       "entities_no_provenance": 0,
       "critical_facts_exact": 0,
-      "critical_facts_generic": 177,
-      "critical_facts_missing": 175,
-      "truth_ready_entities": 6,
-      "blocked_entities": 58
+      "critical_facts_generic": 2,
+      "critical_facts_missing": 0,
+      "truth_ready_entities": 587,
+      "blocked_entities": 27
     },
     "tripcost": {
-      "entities": 558,
+      "entities": 41101,
       "entities_exact_provenance": 0,
-      "entities_general_provenance": 558,
+      "entities_general_provenance": 41101,
       "entities_no_provenance": 0,
       "critical_facts_exact": 0,
       "critical_facts_generic": 0,
-      "critical_facts_missing": 558,
-      "truth_ready_entities": 0,
-      "blocked_entities": 38
+      "critical_facts_missing": 0,
+      "truth_ready_entities": 1526,
+      "blocked_entities": 0
     }
   },
   "scaleStops": [
     {
       "id": "truth_ready_ratio",
       "triggered": false,
-      "value": 0.3164
+      "value": 0.9294
     },
     {
       "id": "critical_provenance",
-      "triggered": false,
-      "value": 0.0643
+      "triggered": true,
+      "value": 0.0069
     },
     {
       "id": "duplicate_rate",
       "triggered": false,
-      "value": 0
+      "value": 0.0004
     },
     {
       "id": "sitemap_parity",
@@ -112,12 +112,12 @@
     {
       "id": "source_truth_depth",
       "triggered": false,
-      "value": 0.978
+      "value": 0.9579
     },
     {
       "id": "unknown_critical_rate",
       "triggered": false,
-      "value": 0.4755
+      "value": 0
     },
     {
       "id": "demand_validated_ratio",
@@ -132,8 +132,8 @@
     {
       "id": "primary_exact_rate",
       "triggered": false,
-      "value": 0.0643
+      "value": 0.0069
     }
   ],
-  "hash": "b9764f20f76a7c4b"
+  "hash": "d663cf63d85311ed"
 }
