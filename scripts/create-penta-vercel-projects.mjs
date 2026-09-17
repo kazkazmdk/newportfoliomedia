@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Create five distinct Vercel preview projects for the same GitHub repo.
- * Requires VERCEL_TOKEN. Optional VERCEL_TEAM_ID / VERCEL_ORG_ID.
+ * Configure the five Penta Vercel projects. This script does NOT deploy.
  *
  *   VERCEL_TOKEN=... node scripts/create-penta-vercel-projects.mjs
+ *
+ * Use only when creating or repairing project settings. Routine QA stays local.
  */
 const TOKEN = process.env.VERCEL_TOKEN;
 if (!TOKEN) {
@@ -15,6 +16,7 @@ const TEAM = process.env.VERCEL_TEAM_ID || process.env.VERCEL_ORG_ID || "";
 const REPO = "kazkazmdk/newportfoliomedia";
 const PRODUCTS = ["fixcode", "wearthere", "chargematch", "autospec", "tripcost"];
 const API = "https://api.vercel.com";
+const IGNORE = "node scripts/vercel-should-build.mjs";
 
 function qs() {
   return TEAM ? `?teamId=${encodeURIComponent(TEAM)}` : "";
@@ -42,7 +44,7 @@ async function api(method, path, body) {
   return json;
 }
 
-async function ensureEnv(projectId, key, value) {
+async function ensureEnv(projectId, key, value, target = ["production", "preview", "development"]) {
   const list = await api("GET", `/v9/projects/${projectId}/env`);
   const rows = list.envs || list;
   const existing = (Array.isArray(rows) ? rows : []).filter((e) => e.key === key);
@@ -53,7 +55,7 @@ async function ensureEnv(projectId, key, value) {
     key,
     value,
     type: "plain",
-    target: ["preview", "development"],
+    target,
   });
 }
 
@@ -64,45 +66,34 @@ async function main() {
   for (const product of PRODUCTS) {
     const name = `penta-${product}`;
     let project = projects.find((p) => p.name === name);
+    const payload = {
+      framework: "nextjs",
+      buildCommand: "pnpm --filter web build",
+      installCommand: "pnpm install --frozen-lockfile",
+      outputDirectory: "apps/web/.next",
+      commandForIgnoringBuildStep: IGNORE,
+    };
     if (!project) {
       project = await api("POST", "/v10/projects", {
         name,
-        framework: "nextjs",
-        buildCommand: "pnpm --filter web build",
-        installCommand: "pnpm install --frozen-lockfile",
-        outputDirectory: "apps/web/.next",
+        ...payload,
         gitRepository: { type: "github", repo: REPO },
       });
-      console.log(`created ${name} ${project.id}`);
+      console.log(`created ${name} ${project.id} (no deployment)`);
     } else {
       console.log(`exists ${name} ${project.id}`);
-      await api("PATCH", `/v9/projects/${project.id}`, {
-        framework: "nextjs",
-        buildCommand: "pnpm --filter web build",
-        installCommand: "pnpm install --frozen-lockfile",
-        outputDirectory: "apps/web/.next",
-      }).catch((err) => console.warn(`patch ${name}: ${err.message}`));
+      await api("PATCH", `/v9/projects/${project.id}`, payload).catch((err) =>
+        console.warn(`patch ${name}: ${err.message}`),
+      );
     }
     await ensureEnv(project.id, "PUBLIC_SITE_LIVE", "false");
     await ensureEnv(project.id, "PENTA_PREVIEW_PRODUCT", product);
-    const deployment = await api("POST", "/v13/deployments", {
-      name,
-      project: project.id,
-      target: "preview",
-      gitSource: {
-        type: "github",
-        org: "kazkazmdk",
-        repo: "newportfoliomedia",
-        ref: "main",
-      },
-    });
     out.push({
       product,
       project: name,
       projectId: project.id,
-      deployment: deployment.id,
-      url: deployment.url ? `https://${deployment.url}` : null,
-      status: deployment.readyState || deployment.status || "QUEUED",
+      ignoreCommand: IGNORE,
+      deployed: false,
     });
   }
   console.log(JSON.stringify(out, null, 2));

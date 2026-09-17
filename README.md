@@ -34,6 +34,8 @@ pnpm dev
 
 Ouvre http://127.0.0.1:43121
 
+La validation agent est **locale**. Ne pas déployer sur Vercel pour un lint, un build, un screenshot ou un commit de routine. Voir `AGENTS.md` et `docs/VERCEL_DEPLOY_POLICY.md`.
+
 `PUBLIC_SITE_LIVE` reste `false` : **noindex global** (previews Vercel inclus). Passer à `true` uniquement sur le domaine custom vérifié.
 
 ## Architecture

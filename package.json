@@ -31,7 +31,8 @@
     "release:manifest": "tsx scripts/generate-release-manifest.ts",
     "state": "tsx scripts/penta-state.ts",
     "state:check": "tsx scripts/penta-state.ts --check",
-    "vercel:previews": "node scripts/create-penta-vercel-projects.mjs"
+    "vercel:should-build": "node scripts/vercel-should-build.mjs",
+    "vercel:configure": "node scripts/create-penta-vercel-projects.mjs"
   },
   "dependencies": {
     "@penta/catalog": "workspace:*",
