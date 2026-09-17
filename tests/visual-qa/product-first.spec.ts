@@ -7,9 +7,9 @@ const SHOT_DIR = path.join(process.cwd(), "docs/visual-product-qa");
 const ROUTES = [
   { name: "tripcost-home", path: "/tripcost", main: ".tc-hero" },
   { name: "tripcost-result", path: "/tripcost/paris/to/lyon?travellers=2", main: ".tc-verdicts" },
-  { name: "chargematch-home", path: "/chargematch", main: ".cm-expected" },
-  { name: "chargematch-result", path: "/chargematch/iphone-16/with/apple-20w", main: ".cm-result-bar" },
-  { name: "chargematch-multiport", path: "/chargematch/macbook-air-13-m3/with/anker-100w-2c", main: ".cm-result-bar" },
+  { name: "chargematch-home", path: "/chargematch", main: ".cm-verdict" },
+  { name: "chargematch-result", path: "/chargematch/iphone-16/with/apple-20w", main: ".cm-verdict" },
+  { name: "chargematch-multiport", path: "/chargematch/macbook-air-13-m3/with/anker-100w-2c", main: ".cm-verdict" },
   { name: "wearthere-home", path: "/wearthere", main: ".wt-hero" },
   { name: "wearthere-tokyo", path: "/wearthere/tokyo", main: ".wt-hero" },
   { name: "autospec-home", path: "/autospec", main: ".as-hero" },
@@ -109,12 +109,12 @@ test.describe("product-first visual QA", () => {
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByLabel("Device"), 844, "ChargeMatch Device");
     await fullyInViewport(page.getByLabel("Charger"), 844, "ChargeMatch Charger");
-    await fullyInViewport(page.locator(".cm-expected"), 844, "ChargeMatch Expected W");
-    await fullyInViewport(page.getByRole("button", { name: /check power/i }), 844, "ChargeMatch Check power");
+    await fullyInViewport(page.locator(".cm-verdict"), 844, "ChargeMatch Expected W");
+    await fullyInViewport(page.getByRole("button", { name: /check this path/i }), 844, "ChargeMatch Check path");
 
     await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
-    await fullyInViewport(page.getByText(/wear this/i).locator("visible=true").first(), 844, "Wear this");
-    const plan = page.getByRole("button", { name: /plan this trip/i });
+    await fullyInViewport(page.getByText(/the packing edit/i).locator("visible=true").first(), 844, "Packing edit");
+    const plan = page.getByRole("button", { name: /build my capsule/i });
     await expect(plan).toBeVisible();
     const planBox = await plan.boundingBox();
     expect(planBox, "Plan this trip exists").toBeTruthy();
@@ -177,11 +177,11 @@ test.describe("product integrity interactions", () => {
   test("ChargeMatch charger change updates expected watts", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
-    const expected = page.locator(".cm-expected .cm-mono.text-5xl");
+    const expected = page.locator(".cm-verdict-power strong");
     const before = (await expected.innerText()).trim();
     await page.getByLabel("Charger").selectOption({ label: "Anker 65W USB-C (Nano II class)" });
     await expect(expected).not.toHaveText(before);
-    await expect(page.locator(".cm-expected")).toContainText(/limited by/i);
+    await expect(page.locator(".cm-verdict")).toContainText(/bottleneck/i);
   });
 
   test("ChargeMatch multiport allocation changes when a second port is plugged", async ({ page }) => {
