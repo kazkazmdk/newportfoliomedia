@@ -6,7 +6,8 @@ These references define a visual language and a functional benchmark for each
 product. They are not templates to reproduce. Penta keeps its own data,
 interaction model, identity, accessibility requirements and truth boundaries.
 
-Comparison against the five production homes, and the sequenced plan, live in
+Comparison against the five production homes and the master execution plan
+(shared chrome + all five products, surfaces, honesty gates, QA) live in
 [PENTA_REFERENCE_PLAN.md](./PENTA_REFERENCE_PLAN.md).
 
 | Product | Awwwards (visual) | Live visual site | Practical site |
