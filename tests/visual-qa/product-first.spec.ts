@@ -108,7 +108,7 @@ test.describe("product-first visual QA", () => {
 
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByLabel("Device"), 844, "ChargeMatch Device");
-    await fullyInViewport(page.getByLabel("Charger"), 844, "ChargeMatch Charger");
+    await fullyInViewport(page.getByLabel("Charger", { exact: true }), 844, "ChargeMatch Charger");
     await fullyInViewport(page.locator(".cm-verdict"), 844, "ChargeMatch Expected W");
     await fullyInViewport(page.getByRole("button", { name: /check this path/i }), 844, "ChargeMatch Check path");
 
@@ -126,7 +126,7 @@ test.describe("product-first visual QA", () => {
 
     await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByText(/do this first/i).locator("visible=true").first(), 844, "Do this first");
-    await fullyInViewport(page.getByRole("link", { name: /start check/i }), 844, "Start check");
+    await fullyInViewport(page.getByRole("link", { name: /start guided check/i }), 844, "Start guided check");
   });
 
   test("mobile nav opens on each home", async ({ page }) => {
@@ -136,7 +136,7 @@ test.describe("product-first visual QA", () => {
       await page.goto(pathName, { waitUntil: "load" });
       const toggle = page.locator("header button[aria-expanded]").last();
       await expect(toggle).toBeVisible();
-      await toggle.dispatchEvent("click");
+      await toggle.click();
       await expect(toggle).toHaveAttribute("aria-expanded", "true");
     }
   });
@@ -179,7 +179,7 @@ test.describe("product integrity interactions", () => {
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     const expected = page.locator(".cm-verdict-power strong");
     const before = (await expected.innerText()).trim();
-    await page.getByLabel("Charger").selectOption({ label: "Anker 65W USB-C (Nano II class)" });
+    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Anker 65W USB-C (Nano II class)" });
     await expect(expected).not.toHaveText(before);
     await expect(page.locator(".cm-verdict")).toContainText(/bottleneck/i);
   });
@@ -252,7 +252,7 @@ test.describe("product integrity interactions", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
     const question = (await page.locator(".fc-do-first p.text-xl").innerText()).trim();
-    await page.getByRole("link", { name: /start check/i }).click();
+    await page.getByRole("link", { name: /start guided check/i }).click();
     await expect(page).toHaveURL(/\/fixcode\/diagnose/);
     await expect(page.getByText(question, { exact: false }).first()).toBeVisible();
   });
