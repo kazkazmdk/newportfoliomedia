@@ -40,7 +40,7 @@ export function ConnectHero({
   }
 
   return (
-    <section className="cm-hero cm-home-hero">
+    <section className="cm-hero cm-home-hero cm-bench">
       <div className="cm-hero-intro">
         <p className="cm-kicker cm-mono">Rated path · not measured</p>
         <h1>Build the right<br />power path.</h1>
@@ -60,6 +60,34 @@ export function ConnectHero({
           </dl>
           <p className="cm-verdict-note">Calculated from the rated device, charger, cable, and selected port. Not a measured wall draw.</p>
         </aside>
+
+        <div className="cm-product-stage">
+          <div className="cm-stage-topline cm-mono">
+            <span>Selected hardware</span>
+            <span className="cm-signal"><i /> Path active</span>
+          </div>
+          <div className="cm-connect">
+            <div className="cm-node">
+              <span className="cm-node-label cm-mono">Input</span>
+              <DeviceObject slug={d.slug} name={d.name} />
+              <p className="cm-node-spec cm-mono">{d.min_watts}–{d.max_watts}W acceptance</p>
+            </div>
+            <div className="cm-cable" aria-hidden>
+              <span className="cm-connector cm-connector-left" />
+              <svg viewBox="0 0 220 48">
+                <path d="M4 24 H216" stroke="currentColor" strokeWidth="2" />
+                <circle className="cm-flow-dot" r="4" fill="currentColor" />
+              </svg>
+              <span className="cm-connector cm-connector-right" />
+              <span className="cm-cable-label cm-mono">{selectedCable.connector}</span>
+            </div>
+            <div className="cm-node">
+              <span className="cm-node-label cm-mono">Source</span>
+              <ChargerObject watts={c.total_watts} ports={c.ports.length} />
+              <p className="cm-node-spec cm-mono">{c.total_watts}W rated brick</p>
+            </div>
+          </div>
+        </div>
 
         <div className="cm-builder-panel">
           <div className="cm-builder-heading">
@@ -156,35 +184,6 @@ export function ConnectHero({
               <span className="cm-field-meta cm-mono">{selectedCable.max_watts}W cable ceiling · selected {selectedPort.toUpperCase()}</span>
             </div>
           </div>
-        </div>
-
-        <div className="cm-product-stage">
-          <div className="cm-stage-topline cm-mono">
-            <span>Selected hardware</span>
-            <span className="cm-signal"><i /> Path active</span>
-          </div>
-          <div className="cm-connect">
-            <div className="cm-node">
-              <span className="cm-node-label cm-mono">Input</span>
-              <DeviceObject slug={d.slug} name={d.name} />
-              <p className="cm-node-spec cm-mono">{d.min_watts}–{d.max_watts}W acceptance</p>
-            </div>
-            <div className="cm-cable" aria-hidden>
-              <span className="cm-connector cm-connector-left" />
-              <svg viewBox="0 0 220 48">
-                <path d="M4 24 H216" stroke="currentColor" strokeWidth="2" />
-                <circle className="cm-flow-dot" r="4" fill="currentColor" />
-              </svg>
-              <span className="cm-connector cm-connector-right" />
-              <span className="cm-cable-label cm-mono">{selectedCable.connector}</span>
-            </div>
-            <div className="cm-node">
-              <span className="cm-node-label cm-mono">Source</span>
-              <ChargerObject watts={c.total_watts} ports={c.ports.length} />
-              <p className="cm-node-spec cm-mono">{c.total_watts}W rated brick</p>
-            </div>
-          </div>
-
         </div>
       </form>
     </section>

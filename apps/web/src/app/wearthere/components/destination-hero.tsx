@@ -1,6 +1,6 @@
 "use client";
 
-import { DESTINATIONS, capsuleFor, typicalWeather, type StyleId } from "@penta/wearthere";
+import { DESTINATIONS, capsuleFor, destinationSurfaces, typicalWeather, type StyleId } from "@penta/wearthere";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
@@ -42,11 +42,18 @@ export function DestinationHero({
     setMood(mood);
   }, [mood, setMood]);
 
-  const essential = capsule.pieces
+  const essentialPieces = capsule.pieces
     .filter((p) => p.layer === "shell" || p.layer === "mid" || p.layer === "shoes" || /coat|knit|rain|boot|sneaker/i.test(p.name))
-    .slice(0, 3)
-    .map((p) => p.name)
-    .join(" + ");
+    .slice(0, 3);
+  const essential = essentialPieces.map((p) => p.name).join(" + ");
+  const surfaces = destinationSurfaces(dest);
+
+  function setMonth(nextMonth: number) {
+    const padded = String(nextMonth).padStart(2, "0");
+    const year = start.slice(0, 4) || "2026";
+    setStart(`${year}-${padded}-12`);
+    setEnd(`${year}-${padded}-18`);
+  }
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
@@ -124,12 +131,30 @@ export function DestinationHero({
             <span aria-hidden="true">○</span>
             Typical monthly climate, not a live forecast
           </p>
+          {surfaces.length ? (
+            <div className="wt-hero-months" role="group" aria-label={`${dest.city} climate periods`}>
+              {surfaces.map((surface) => {
+                const representative = surface.months[Math.floor(surface.months.length / 2)] ?? surface.months[0];
+                const current = representative === month || surface.months.includes(month);
+                return (
+                  <button
+                    key={surface.slug}
+                    type="button"
+                    aria-pressed={current}
+                    onClick={() => representative && setMonth(representative)}
+                  >
+                    {surface.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
         <div className="wt-answer">
           <p className="wt-kicker">The packing edit</p>
           <p className="wt-serif mt-3 text-2xl leading-tight md:text-3xl">{essential || capsule.pieces[0]?.name}</p>
           <p className="mt-3 text-sm leading-6 opacity-75">
-            Selected for this month&apos;s temperature range, rain pattern and your {style} style.
+            Selected for this month&apos;s typical range, rain pattern and your {style} style. Not a live forecast.
           </p>
         </div>
         <CursorCanvas label="Explore" color="#f4eadf" className="wt-hero-frame">

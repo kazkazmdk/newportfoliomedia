@@ -121,6 +121,10 @@
   background: linear-gradient(to top, var(--wt-paper), transparent 42%);
 }
 
+.wt-hero-frame {
+  z-index: 1;
+}
+
 .wt-hero-inner,
 .wt-hero-grid {
   position: relative;
@@ -140,10 +144,10 @@
     min-height: 100svh;
   }
   .wt-hero-type { grid-column: 1; grid-row: 1; z-index: 2; align-self: end; padding: 0 1rem 1.4rem 0; }
-  .wt-answer { grid-column: 2; grid-row: 1; z-index: 3; align-self: end; }
+  .wt-answer { grid-column: 2; grid-row: 1; z-index: 3; align-self: end; justify-self: end; }
   .wt-planner { grid-column: 1 / -1; grid-row: 2; }
-  .wt-hero-frame { grid-column: 2; grid-row: 1; min-height: 66vh; }
-  .wt-photo { min-height: min(66vh, 720px); }
+  .wt-hero-frame { grid-column: 1 / -1; grid-row: 1; min-height: 72vh; }
+  .wt-photo { min-height: min(72vh, 780px); }
 }
 
 .wt-city {
@@ -234,13 +238,42 @@
   opacity: 0.72;
 }
 
-.wt-answer {
-  max-width: 22rem;
-  margin: 1.4rem;
-  padding: 1.15rem;
-  background: color-mix(in srgb, var(--wt-paper) 86%, transparent);
+.wt-hero-months {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+  margin-top: 1.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+}
+
+.wt-hero-months button {
+  flex: 0 0 auto;
+  min-height: 2.4rem;
+  padding: 0.4rem 0.85rem;
   border: 1px solid var(--wt-line);
-  backdrop-filter: blur(12px);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.wt-hero-months button[aria-pressed="true"] {
+  background: var(--wt-ink);
+  color: var(--wt-paper);
+}
+
+.wt-answer {
+  max-width: 20rem;
+  margin: 1.4rem;
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--wt-paper) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--wt-line) 70%, transparent);
+  backdrop-filter: blur(16px);
 }
 
 .wt-planner {
@@ -525,6 +558,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--wt-paper) 62%, transparent), transparent 58%);
 }
 [data-climate="rain"] .wt-weather-veil {
   background: linear-gradient(180deg, transparent, color-mix(in srgb, #8aa 18%, transparent));

@@ -765,6 +765,36 @@
   text-transform: uppercase;
 }
 
+.as-hero-identify {
+  align-items: start;
+}
+
+.as-hero-identify .as-hero-copy {
+  display: grid;
+  gap: 1.1rem;
+  align-content: start;
+}
+
+.as-hero-identify .as-hero-copy h1 {
+  max-width: 10ch;
+}
+
+.as-hero-identify .as-provenance-bar {
+  margin-top: 0.4rem;
+}
+
+.as-hero-identify .as-search-results {
+  grid-template-columns: 1fr;
+}
+
+.as-search-empty,
+.as-vin-status {
+  color: var(--as-night-mute);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .as-hero-onboard .as-vin {
   border-color: var(--as-night-line);
 }

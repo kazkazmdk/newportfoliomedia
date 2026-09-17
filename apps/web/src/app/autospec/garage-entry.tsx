@@ -1,26 +1,13 @@
 "use client";
 
-import { VIN_SUPPORT, decodeVin, findVehicles } from "@penta/autospec";
+import { VIN_SUPPORT, findVehicles } from "@penta/autospec";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export function GarageEntry() {
   const router = useRouter();
   const [q, setQ] = useState("320d");
-  const [vin, setVin] = useState("");
-  const [note, setNote] = useState("");
   const hits = useMemo(() => findVehicles(q), [q]);
-
-  async function onVin(event: FormEvent) {
-    event.preventDefault();
-    const result = await decodeVin(vin);
-    setNote(result.notes.join(" "));
-    if (result.vehicle) {
-      router.push(
-        `/autospec/garage?make=${result.vehicle.make_slug}&model=${result.vehicle.model_slug}&gen=${result.vehicle.generation_slug}&var=${result.vehicle.variant_slug}`,
-      );
-    }
-  }
 
   return (
     <div className="as-garage-entry">
@@ -32,7 +19,9 @@ export function GarageEntry() {
         <span className="as-search-count" aria-live="polite">{hits.length} covered matches</span>
       </div>
       <ul className="as-search-results" aria-label="Covered vehicle matches">
-        {hits.slice(0, 4).map((v) => (
+        {hits.length === 0 ? (
+          <li className="as-search-empty">Not on file. We will not guess a fitment.</li>
+        ) : hits.slice(0, 4).map((v) => (
           <li key={v.id}>
             <button
               type="button"
@@ -52,22 +41,7 @@ export function GarageEntry() {
           </li>
         ))}
       </ul>
-      <details className="as-vin">
-        <summary>
-          VIN identification
-          <span>Unavailable · support status: {VIN_SUPPORT}</span>
-        </summary>
-        <form onSubmit={onVin} className="mt-3 grid gap-2">
-          <label className="as-field">
-            VIN
-            <input aria-label="VIN support check" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
-          </label>
-          <button className="as-ghost-action" type="submit">
-            Check support status
-          </button>
-          {note ? <p className="text-sm text-[var(--as-mute)]">{note}</p> : null}
-        </form>
-      </details>
+      <p className="as-vin-status">VIN identification unavailable · {VIN_SUPPORT}</p>
     </div>
   );
 }

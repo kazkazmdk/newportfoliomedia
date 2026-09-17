@@ -47,7 +47,8 @@ export function HomeMap() {
   }
 
   return (
-    <section className="tc-hero tc-home-hero">
+    <section className="tc-hero tc-home-hero tc-split">
+      <div className="tc-split-panel">
       <div className="tc-map-intro">
         <p className="tc-kicker">Travel decision studio · Europe</p>
         <h1>See what the journey really asks of you.</h1>
@@ -55,7 +56,6 @@ export function HomeMap() {
           Compare typical cash and door-to-door time across every available mode. Estimates are transparent, never live tickets.
         </p>
       </div>
-      <RouteMap from={from} to={dest} mode={preview?.best} />
       <form onSubmit={onSubmit} className="tc-form tc-home-form">
         <p className="tc-form-title">
           <span>Build a comparison</span>
@@ -124,11 +124,18 @@ export function HomeMap() {
               <strong>{LABELS[preview.best]}</strong>
             </div>
           </div>
+          {corridor.fuel_eur_per_l ? (
+            <p className="tc-preview-assumptions">
+              Driving snapshot: {corridor.fuel_l_per_100} L/100 km · {corridor.fuel_eur_per_l.toFixed(2)} €/L · heuristic, not a live pump
+            </p>
+          ) : null}
           <p className="tc-preview-note">
             Heuristic estimates from existing corridor data · not live fares · full assumptions shown after comparison
           </p>
         </aside>
       ) : null}
+      </div>
+      <RouteMap from={from} to={dest} mode={preview?.best} />
     </section>
   );
 }

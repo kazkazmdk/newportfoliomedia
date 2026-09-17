@@ -242,7 +242,41 @@
   gap: 1.25rem;
   padding: 1.25rem;
   border: 1px solid var(--fc-line);
+  border-top: 3px solid var(--fc-signal);
   background: color-mix(in srgb, var(--fc-panel) 72%, transparent);
+}
+
+.fc-path-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+
+.fc-path-switch button {
+  min-height: 2.6rem;
+  border: 1px solid var(--fc-line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.fc-path-switch button[aria-pressed="true"] {
+  border-color: var(--fc-signal);
+  color: var(--fc-signal);
+  background: color-mix(in srgb, var(--fc-signal) 8%, transparent);
+}
+
+.fc-path-switch button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fc-panel-index {
+  color: var(--fc-signal);
 }
 
 .fc-panel-heading,

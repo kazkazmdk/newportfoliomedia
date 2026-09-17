@@ -16,39 +16,29 @@ export default function AutospecHome() {
   const featured = VEHICLES[0];
   return (
     <main>
-      <section className="as-hero as-hero-onboard">
+      <section className="as-hero as-hero-onboard as-hero-identify">
         <div className="as-hero-copy">
-          <p className="as-eyebrow">Digital ownership cockpit</p>
+          <p className="as-eyebrow">Identify your vehicle</p>
           <h1>
-            Know the car.
+            What do
             <br />
-            Own the next move.
+            you drive?
           </h1>
           <p className="as-lede">
-            Oil, tyres, battery, service and official recall portals for the exact identity we have on file.
-            Reference data, not simulated live telemetry.
+            Search a covered make, generation and engine. Oil, tyres, battery and official recall portals stay scoped to that identity. Reference data, not simulated live telemetry.
           </p>
+          <GarageEntry />
+          <div className="as-provenance-bar" aria-label="Data provenance">
+            <span><b>Source</b> Vehicle graph</span>
+            <span><b>State</b> Reference until you enter checks</span>
+            <span><b>VIN</b> {VIN_SUPPORT} · no decode field</span>
+          </div>
         </div>
         <VehicleStage
           makeSlug={featured?.make_slug}
           generationSlug={featured?.generation_slug}
           identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined}
         />
-        <div className="as-onboard-panel">
-          <div className="as-onboard-intro">
-            <p className="as-eyebrow">Identify your vehicle</p>
-            <p className="as-display">What do you drive?</p>
-            <p>
-              Search a covered make, generation and engine. We do not turn a partial match into a guessed fitment.
-            </p>
-          </div>
-          <GarageEntry />
-        </div>
-        <div className="as-provenance-bar" aria-label="Data provenance">
-          <span><b>Source</b> Vehicle graph</span>
-          <span><b>State</b> Reference until you enter checks</span>
-          <span><b>VIN</b> {VIN_SUPPORT}</span>
-        </div>
       </section>
       <section className="as-scene as-state-scene">
         <div className="as-section-heading">
