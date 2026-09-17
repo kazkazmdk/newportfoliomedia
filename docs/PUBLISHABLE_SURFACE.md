@@ -100,8 +100,8 @@ The count is an **output of the data graph**. It is not a quota.
 
 ### tripcost
 
-- total entities: 41101
-- total relations: 53368
+- total entities: 27535
+- total relations: 39802
 - sources: 2
 - real source coverage: 1
 - candidate URLs (SEO_CANDIDATE + INDEXABLE): 1526

@@ -215,7 +215,7 @@ describe("Truth Gate V2 invariants", () => {
 
   it("PUBLIC_SITE_LIVE remains false so the public sitemap is empty", () => {
     expect(process.env.PUBLIC_SITE_LIVE === "true").toBe(false);
-    const live = [...buildCatalog().pages.values()].filter(shouldIndexPage);
+    const live = [...buildCatalog().pages.values()].filter((page) => shouldIndexPage(page));
     expect(live).toHaveLength(0);
   });
 

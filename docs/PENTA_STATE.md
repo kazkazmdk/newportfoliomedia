@@ -2,9 +2,9 @@
 
 > Generated report. Do not edit by hand.
 >
-> git SHA: `5bd2b623afc0229e6596e34f0edc4113ae25f969`
-> generated: `2026-09-17T10:15:43.143Z`
-> metrics snapshot hash: `d663cf63d85311ed`
+> git SHA: `e3506c0a347a0f32d598de5b7412157fbfce4d19`
+> generated: `2026-09-17T10:35:28.706Z`
+> metrics snapshot hash: `25792b96ef6b0937`
 
 This is the **only** current source of truth for live metrics. Older reports in `docs/` are historical unless they carry this same SHA + hash.
 
@@ -13,13 +13,13 @@ This is the **only** current source of truth for live metrics. Older reports in 
 | Metric | Value |
 | ------ | ----: |
 | pages | 4859 |
-| entities | 54345 |
-| relations | 88843 |
+| entities | 40779 |
+| relations | 75277 |
 | PRIMARY_EXACT | 379 |
 | REGULATORY_EXACT | 0 |
 | TRUSTED_DATASET_EXACT | 0 |
 | PRIMARY_GENERAL | 7087 |
-| DATASET_GENERAL | 47260 |
+| DATASET_GENERAL | 33694 |
 | heuristic | 0 |
 | unknown | 0 |
 | SEO_CANDIDATE | 4516 |

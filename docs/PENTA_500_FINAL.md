@@ -12,7 +12,7 @@ graph_version: `graph-v4-depth-500`
 | wearthere | 1462 | 1027 | 0 | 435 | 226 | 391 | 410 | 5491 | 14688 | 1.000 |
 | chargematch | 614 | 571 | 0 | 43 | 126 | 217 | 228 | 402 | 2529 | 1.000 |
 | tripcost | 1526 | 1526 | 0 | 0 | 336 | 580 | 610 | 41101 | 53368 | 1.000 |
-| **total** | **4859** | **4336** | **34** | **489** | | | | **54345** | **88843** | |
+| **total** | **4859** | **4336** | **34** | **489** | | | | **40779** | **75277** | |
 
 INDEXABLE remains 0 (editorial demand only). Duplicate clusters: WearThere  climate-near-duplicates consolidated; ChargeMatch 14 identical pair decisions.
 

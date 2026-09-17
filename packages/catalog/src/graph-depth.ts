@@ -1630,60 +1630,28 @@ function populateTripcost(store: GraphStore) {
           type: "HAS_MODE",
           from_id: route.id,
           to_id: mid,
-          properties: { minutes_door: door, party_size_sensitive: mode === "car" || mode === "ev" },
+          properties: {
+            minutes_door: door,
+            party_size_sensitive: mode === "car" || mode === "ev",
+            time_bits:
+              mode === "flight"
+                ? {
+                    origin_transfer: route.airport_access_minutes,
+                    buffer: route.security_buffer_minutes,
+                    travel: route.flight_minutes,
+                    destination_transfer: route.city_transfer_minutes,
+                  }
+                : mode === "train"
+                  ? { waiting: 40, travel: route.train_minutes }
+                  : mode === "bus"
+                    ? { waiting: 30, travel: route.bus_minutes }
+                    : { travel: Math.round((route.km / 95) * 60) },
+          },
           provenance: [PRICE_PROVENANCE],
           confidence: "MEDIUM",
           index_eligible: false,
         }),
       );
-      const timeBits: Array<[string, number]> =
-        mode === "flight"
-          ? [
-              ["origin_transfer", route.airport_access_minutes],
-              ["buffer", route.security_buffer_minutes],
-              ["travel", route.flight_minutes],
-              ["destination_transfer", route.city_transfer_minutes],
-            ]
-          : mode === "train"
-            ? [
-                ["waiting", 40],
-                ["travel", route.train_minutes],
-              ]
-            : mode === "bus"
-              ? [
-                  ["waiting", 30],
-                  ["travel", route.bus_minutes],
-                ]
-              : [["travel", Math.round((route.km / 95) * 60)]];
-      for (const [bit, minutes] of timeBits) {
-        if (!minutes) continue;
-        const tid = `${mid}:time:${bit}`;
-        store.addEntity(
-          entity({
-            id: tid,
-            site: "tripcost",
-            type: "time_component",
-            slug: bit,
-            name: bit,
-            properties: { minutes, family: "EVERGREEN" },
-            provenance: [DISTANCE_PROVENANCE],
-            confidence: "MEDIUM",
-          }),
-        );
-        store.addRelation(
-          rel({
-            id: `${mid}->HAS_TIME_COMPONENT->${tid}`,
-            site: "tripcost",
-            type: "HAS_TIME_COMPONENT",
-            from_id: mid,
-            to_id: tid,
-            properties: { minutes, door_to_door: true },
-            provenance: [DISTANCE_PROVENANCE],
-            confidence: "MEDIUM",
-            index_eligible: false,
-          }),
-        );
-      }
     }
   }
 }

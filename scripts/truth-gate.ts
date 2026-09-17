@@ -11,7 +11,7 @@ if (process.env.PUBLIC_SITE_LIVE === "true") {
 }
 if (!globalNoindex()) issues.push("global noindex should be on");
 
-const live = [...store.pages.values()].filter(shouldIndexPage);
+const live = [...store.pages.values()].filter((page) => shouldIndexPage(page));
 if (live.length) issues.push(`public sitemap would include ${live.length} pages while prelaunch`);
 
 for (const page of store.pages.values()) {

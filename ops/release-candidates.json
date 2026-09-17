@@ -119,8 +119,8 @@
       },
       "tripcost": {
         "product": "tripcost",
-        "entities": 41101,
-        "relations": 53368,
+        "entities": 27535,
+        "relations": 39802,
         "generated": 1526,
         "candidateUrls": 1526,
         "publishable": 1526,

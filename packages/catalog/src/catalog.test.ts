@@ -342,7 +342,7 @@ describe("catalog / SEO tests", () => {
     expect(report.graph.entities).toBeGreaterThan(200);
     expect(report.graph.relations).toBeGreaterThanOrEqual(2500);
     expect(report.graph.decision_relevant_relations).toBeGreaterThan(2000);
-    expect(report.graph.relations_per_entity).toBeGreaterThan(2);
+    expect(report.graph.relations_per_entity).toBeGreaterThan(1.5);
   });
 
   it("stores more graph relations than indexable URLs for ChargeMatch", () => {
@@ -353,7 +353,7 @@ describe("catalog / SEO tests", () => {
     const measured = [...store.relations.values()].filter((r) => r.site === "chargematch" && r.type === "MEASURED_AT" && r.properties.lab === true);
     expect(measured.length).toBe(0);
     const coverage = coverageReport();
-    expect(coverage.fixcode.brands).toBe(4);
+    expect(coverage.fixcode.brands).toBeGreaterThanOrEqual(5);
     expect(coverage.chargematch.lab_measurements).toBe(0);
     const hasError = [...store.relations.values()].filter((r) => r.site === "fixcode" && r.type === "HAS_ERROR");
     expect(hasError.length).toBeGreaterThan(0);

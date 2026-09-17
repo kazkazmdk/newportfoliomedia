@@ -1,6 +1,6 @@
 # Deep graph baseline
 
-Generated: 2026-09-17T09:33:56.347Z
+Generated: 2026-09-17T10:35:44.233Z
 
 Recalculated from in-memory GraphStore after populateDecisionGraph + page builders. Stored README/JSON reports were not read. quality_score comes from evaluatePageQuality at page-build/recompute time, not from a previous markdown.
 
@@ -10,93 +10,92 @@ Recalculated from in-memory GraphStore after populateDecisionGraph + page builde
 
 ## Recalculated now
 
-- Entities: **5512**
-- Relations: **14047** (unique 13603, duplicate 444)
-- Relations/entity avg **2.55** · median **1** · P25 1 · P75 5 · P90 16
-- Decision-relevant relations: **12636** (2.29/entity, median degree 1)
-- Pages INDEXABLE **0** · SEO_CANDIDATE **265** · NOINDEX_PRODUCT **305** · GRAPH_ONLY **316** · REVIEW_REQUIRED **98** · CONFLICTED **0** · STALE **0**
-- Edge kinds SOURCE_TRUTH **3087** · DERIVED_RULE **6777** · PERSONALIZED_DECISION **0** · UNKNOWN **4183**
+- Entities: **40779**
+- Relations: **75277** (unique 74329, duplicate 948)
+- Relations/entity avg **1.85** · median **1** · P25 1 · P75 3 · P90 6
+- Decision-relevant relations: **68526** (1.68/entity, median degree 1)
+- Pages INDEXABLE **0** · SEO_CANDIDATE **4516** · NOINDEX_PRODUCT **34** · GRAPH_ONLY **299** · REVIEW_REQUIRED **0** · CONFLICTED **0** · STALE **0**
+- Edge kinds SOURCE_TRUTH **10801** · DERIVED_RULE **41990** · PERSONALIZED_DECISION **0** · UNKNOWN **22486**
 
 ### Entity degree
 
-isolated 11 · exactly 1: 2921 · 2–4: 1177 · ≥5: 1403 · ≥10: 740 · ≥20: 100
+isolated 11 · exactly 1: 27165 · 2–4: 8556 · ≥5: 5047 · ≥10: 3372 · ≥20: 1688
 
 ### Relation classes
 
-- DECISION_RELEVANT: 12636
-- DESCRIPTIVE: 1226
-- NAVIGATION_ONLY: 185
+- DECISION_RELEVANT: 68526
+- DESCRIPTIVE: 3342
+- NAVIGATION_ONLY: 3409
 - UNKNOWN: 0
 
 ### Truth status (entities + relations)
 
 - VERIFIED_PRIMARY: 0
-- VERIFIED_SECONDARY: 5897
+- VERIFIED_SECONDARY: 82685
 - TESTED: 0
 - REPORTED: 0
-- INFERRED: 145
-- ESTIMATED: 3120
+- INFERRED: 170
+- ESTIMATED: 8431
 - STALE: 0
-- UNKNOWN: 10397
+- UNKNOWN: 24770
 - CONFLICTING: 0
 
 ### Entities by type
 
-- cause: 458
-- fix: 458
-- historical_climate: 384
-- temperature_range: 384
-- precipitation: 384
-- humidity: 384
-- wind: 384
-- packing_decision: 384
-- test_result: 312
-- safety_hazard: 262
-- time_component: 180
-- test: 155
-- cost_component: 139
-- error_code: 131
-- service: 104
-- mode: 103
-- symptom: 98
-- component: 63
+- cost_component: 11166
+- mode: 7246
+- corridor: 1507
+- distance: 1507
+- consumption: 1507
+- energy_required: 1507
+- toll: 1507
+- break_even: 1507
+- cause: 1272
+- fix: 1272
+- historical_climate: 888
+- temperature_range: 888
+- precipitation: 888
+- humidity: 888
+- wind: 888
+- packing_decision: 888
+- test_result: 884
+- safety_hazard: 722
+- service: 512
+- test: 441
+- error_code: 361
+- component: 315
+- symptom: 246
+- power_profile: 109
+- part: 106
+- vehicle_configuration: 105
+- recall: 105
+- transmission: 105
+- year_range: 105
+- vin_scope: 105
+- engine: 99
+- generation: 95
+- issue: 95
+- model: 89
+- trim: 78
+- place: 76
+- fluid_spec: 74
+- destination: 74
+- climate_profile: 74
+- device: 72
+- device_port: 69
+- model_family: 56
+- family: 43
 - power_scenario: 42
-- power_profile: 38
-- model_family: 36
-- destination: 32
-- climate_profile: 32
-- fluid_spec: 27
-- family: 25
-- part: 22
-- device: 22
-- model: 21
-- generation: 21
-- vehicle_configuration: 21
-- recall: 21
-- transmission: 21
-- year_range: 21
-- vin_scope: 21
-- device_port: 21
-- engine: 20
-- trim: 20
-- corridor: 19
-- distance: 19
-- consumption: 19
-- energy_required: 19
-- toll: 19
-- break_even: 19
-- allocation_profile: 17
-- place: 17
-- charger_port: 16
-- manufacturer: 14
+- allocation_profile: 38
+- charger_port: 37
+- manufacturer: 26
+- charger: 26
 - garment: 13
 - tool: 12
-- issue: 11
-- charger: 10
+- brand: 11
 - protocol: 6
 - appliance_type: 5
 - drivetrain: 5
-- brand: 4
 - safety_state: 3
 - cable: 3
 - market: 2
@@ -109,82 +108,81 @@ isolated 11 · exactly 1: 2921 · 2–4: 1177 · ≥5: 1403 · ≥10: 740 · ≥
 
 ### Relation types
 
-- PACKS: 2909
-- PACKS_FOR_ACTIVITY: 828
-- TESTED_BY: 570
-- REQUIRES_TOOL: 469
-- MAY_BE_CAUSED_BY: 458
-- FIXED_BY: 458
-- SAFETY_CLASS: 458
-- RISK_LEVEL: 458
-- DIY_OR_TECH: 458
-- NEXT_ACTION: 458
-- TYPICAL_CLIMATE: 416
-- HAS_TEMPERATURE_RANGE: 384
-- HAS_PRECIPITATION: 384
-- HAS_HUMIDITY: 384
-- HAS_WIND: 384
-- HAS_PACKING_DECISION: 384
-- DIFFERS_FROM: 352
-- OBSERVED_ON_MODEL: 313
-- HAS_ERROR: 313
-- RETURNS: 312
-- SAFETY_HAZARD: 262
-- CAN_CHARGE: 220
-- INDICATES: 201
-- MAY_INDICATE: 192
-- HAS_TIME_COMPONENT: 180
-- HAS_COST_COMPONENT: 139
-- ON_APPLIANCE: 131
-- HAS_ERROR_CODE: 131
-- IN_FAMILY: 131
+- HAS_COST_COMPONENT: 11166
+- ROUTE_ALTERNATIVE: 7827
+- HAS_MODE: 7246
+- PACKS: 6636
+- CAN_CHARGE: 1872
+- PACKS_FOR_ACTIVITY: 1836
+- TESTED_BY: 1640
+- FROM_PLACE: 1507
+- TO_PLACE: 1507
+- HAS_DISTANCE: 1507
+- HAS_CONSUMPTION: 1507
+- VEHICLE_CONSUMPTION: 1507
+- ROUTE_ENERGY_REQUIRED: 1507
+- ROUTE_WEAR_COST: 1507
+- ROUTE_BREAK_EVEN: 1507
+- REQUIRES_TOOL: 1315
+- MAY_BE_CAUSED_BY: 1272
+- FIXED_BY: 1272
+- SAFETY_CLASS: 1272
+- RISK_LEVEL: 1272
+- DIY_OR_TECH: 1272
+- NEXT_ACTION: 1272
+- ROUTE_HAS_TOLL: 1022
+- TYPICAL_CLIMATE: 962
+- HAS_TEMPERATURE_RANGE: 888
+- HAS_PRECIPITATION: 888
+- HAS_HUMIDITY: 888
+- HAS_WIND: 888
+- HAS_PACKING_DECISION: 888
+- RETURNS: 884
+- DIFFERS_FROM: 814
+- SAFETY_HAZARD: 722
+- OBSERVED_ON_MODEL: 582
+- HAS_ERROR: 582
+- INDICATES: 554
+- MAY_INDICATE: 542
+- HAS_SERVICE_INTERVAL: 512
+- ROUTE_NO_TOLL: 485
+- ON_APPLIANCE: 361
+- HAS_ERROR_CODE: 361
+- IN_FAMILY: 361
+- COVERS_YEARS: 210
 - HAS_SCENARIO: 126
-- HAS_SERVICE_INTERVAL: 104
-- HAS_MODE: 103
-- ROUTE_ALTERNATIVE: 96
-- FAMILY_HAS_MODEL: 56
-- COVERS_YEARS: 42
-- SUPPORTS_PROTOCOL: 28
-- SOLD_IN: 25
-- BRAND_HAS_FAMILY: 25
-- FITS: 24
-- NEXT_TEST: 24
-- AVAILABLE_WITH_ENGINE: 22
-- MAX_INPUT: 22
-- HAS_MODEL: 21
-- HAS_GENERATION: 21
-- IS_CONFIGURATION_OF: 21
-- USES_ENGINE: 21
-- SUBJECT_TO_RECALL: 21
-- HAS_COMPONENT: 21
-- USES_TRANSMISSION: 21
-- HAS_BATTERY: 21
-- HAS_WIPERS: 21
-- HAS_TRIM: 21
-- USES_DRIVETRAIN: 21
-- DEVICE_HAS_PORT: 21
-- DEVICE_ACCEPTS_MAX_WATTAGE: 21
-- FROM_PLACE: 19
-- TO_PLACE: 19
-- HAS_DISTANCE: 19
-- HAS_CONSUMPTION: 19
-- VEHICLE_CONSUMPTION: 19
-- ROUTE_ENERGY_REQUIRED: 19
-- ROUTE_WEAR_COST: 19
-- ROUTE_BREAK_EVEN: 19
-- PORT_SUPPORTS_PROTOCOL: 18
-- REQUIRES_FLUID_SPEC: 17
-- OIL_CAPACITY: 17
-- MAKES_APPLIANCE: 16
-- HAS_PORT: 16
-- MAX_OUTPUT: 16
-- HAS_POWER_ALLOCATION: 16
-- CHARGER_SPLITS_POWER_AS: 16
-- ROUTE_HAS_TOLL: 12
-- HAS_ISSUE: 11
-- HAS_TRANS_FLUID: 7
-- ROUTE_NO_TOLL: 7
-- HAS_BRAKE_FLUID: 4
+- SOLD_IN: 109
+- FITS: 108
+- AVAILABLE_WITH_ENGINE: 106
+- IS_CONFIGURATION_OF: 105
+- USES_ENGINE: 105
+- SUBJECT_TO_RECALL: 105
+- HAS_COMPONENT: 105
+- USES_TRANSMISSION: 105
+- HAS_BATTERY: 105
+- HAS_WIPERS: 105
+- HAS_TRIM: 105
+- USES_DRIVETRAIN: 105
+- HAS_GENERATION: 95
+- HAS_ISSUE: 95
+- SUPPORTS_PROTOCOL: 94
+- HAS_MODEL: 89
+- REQUIRES_FLUID_SPEC: 88
+- OIL_CAPACITY: 84
+- NEXT_TEST: 80
+- FAMILY_HAS_MODEL: 76
+- MAX_INPUT: 72
+- DEVICE_HAS_PORT: 69
+- DEVICE_ACCEPTS_MAX_WATTAGE: 69
+- PORT_SUPPORTS_PROTOCOL: 66
+- BRAND_HAS_FAMILY: 43
+- HAS_PORT: 37
+- MAX_OUTPUT: 37
+- HAS_POWER_ALLOCATION: 37
+- CHARGER_SPLITS_POWER_AS: 37
+- MAKES_APPLIANCE: 34
+- HAS_TRANS_FLUID: 30
+- HAS_BRAKE_FLUID: 16
 - SUPPORTS: 3
 - CABLE_MAX_CURRENT: 3
 - CABLE_EMARKED: 3
@@ -196,15 +194,15 @@ isolated 11 · exactly 1: 2921 · 2–4: 1177 · ≥5: 1403 · ≥10: 740 · ≥
 
 | Product | Entities | Relations | Avg | Median | Decision rel/entity | Isolated | ≥5 | ≥10 | INDEX | NOINDEX | GRAPH_ONLY |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| fixcode | 1961 | 5894 | 3.01 | 3 | 2.4 | 0 | 835 | 236 | 0 | 52 | 20 |
-| autospec | 435 | 506 | 1.16 | 1 | 0.77 | 0 | 25 | 22 | 0 | 60 | 63 |
-| wearthere | 2383 | 6425 | 2.7 | 1 | 2.7 | 4 | 427 | 427 | 0 | 3 | 159 |
-| chargematch | 175 | 533 | 3.05 | 2 | 3.02 | 4 | 36 | 34 | 0 | 152 | 74 |
-| tripcost | 558 | 689 | 1.23 | 1 | 1.17 | 3 | 80 | 21 | 0 | 38 | 0 |
+| fixcode | 5330 | 15769 | 2.96 | 3 | 2.41 | 0 | 2265 | 612 | 0 | 34 | 1 |
+| autospec | 2021 | 2489 | 1.23 | 1 | 0.83 | 0 | 130 | 112 | 0 | 0 | 0 |
+| wearthere | 5491 | 14688 | 2.67 | 1 | 2.67 | 4 | 973 | 973 | 0 | 0 | 271 |
+| chargematch | 402 | 2529 | 6.29 | 2 | 6.28 | 4 | 103 | 100 | 0 | 0 | 27 |
+| tripcost | 27535 | 39802 | 1.45 | 1 | 1.34 | 3 | 1576 | 1575 | 0 | 0 | 0 |
 
 ## Quality distribution (recomputed scores, not a previous report)
 
-mean 63.4 · median 68 · p10 48 · p25 61 · p75 68 · p90 68 · min 38 · max 81
+mean 67.1 · median 68 · p10 68 · p25 68 · p75 68 · p90 68 · min 0 · max 81
 
 INDEXABLE mean 0 · min 0
 
@@ -212,11 +210,11 @@ Share of pages ≥90: **0%** — gate suspect: **false**
 
 | Bucket | Count | % | INDEXABLE |
 | --- | ---: | ---: | ---: |
-| 0-49 | 123 | 12.5% | 0 |
-| 50-59 | 120 | 12.2% | 0 |
-| 60-69 | 716 | 72.8% | 0 |
-| 70-79 | 18 | 1.8% | 0 |
-| 80-84 | 7 | 0.7% | 0 |
+| 0-49 | 10 | 0.2% | 0 |
+| 50-59 | 248 | 5.1% | 0 |
+| 60-69 | 4579 | 94.2% | 0 |
+| 70-79 | 17 | 0.3% | 0 |
+| 80-84 | 5 | 0.1% | 0 |
 | 85-89 | 0 | 0% | 0 |
 | 90-94 | 0 | 0% | 0 |
 | 95-100 | 0 | 0% | 0 |

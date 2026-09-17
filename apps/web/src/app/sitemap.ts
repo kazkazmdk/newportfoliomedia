@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   if (globalNoindex()) return [];
-  return [...buildCatalog().pages.values()].filter(sitemapEligible).map((page) => ({
+  return [...buildCatalog().pages.values()].filter((page) => sitemapEligible(page)).map((page) => ({
     url: page.canonical,
     lastModified: page.freshness || undefined,
   }));

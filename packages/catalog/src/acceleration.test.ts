@@ -120,7 +120,7 @@ describe("action evidence", () => {
 
 describe("FixCode", () => {
   it("does not fabricate a diagnosis for an unsupported brand/code", () => {
-    const unknown = ALL_ERRORS.find((e) => e.brand === "Whirlpool");
+    const unknown = ALL_ERRORS.find((e) => e.brand === "Gorenje");
     expect(unknown).toBeUndefined();
   });
 

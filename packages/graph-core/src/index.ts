@@ -153,6 +153,7 @@ export class GraphStore {
   entities = new Map<string, GraphEntity>();
   relations = new Map<string, GraphRelation>();
   pages = new Map<string, PageRecord>();
+  private relationsByEndpoint = new Map<string, GraphRelation[]>();
   conflicts: Array<{ id: string; entity_id: string; field: string }> = [];
   demandSignals: Array<{
     query: string;
@@ -167,6 +168,12 @@ export class GraphStore {
 
   addRelation(relation: GraphRelation): void {
     this.relations.set(relation.id, relation);
+    const ends = relation.from_id === relation.to_id ? [relation.from_id] : [relation.from_id, relation.to_id];
+    for (const id of ends) {
+      const list = this.relationsByEndpoint.get(id) ?? [];
+      list.push(relation);
+      this.relationsByEndpoint.set(id, list);
+    }
   }
 
   addPage(page: PageRecord): void {
@@ -184,11 +191,8 @@ export class GraphStore {
   }
 
   related(id: string, type?: string): GraphRelation[] {
-    return [...this.relations.values()].filter(
-      (relation) =>
-        (relation.from_id === id || relation.to_id === id) &&
-        (!type || relation.type === type),
-    );
+    const list = this.relationsByEndpoint.get(id) ?? [];
+    return type ? list.filter((relation) => relation.type === type) : list;
   }
 
   pagesFor(site: SiteId, indexState?: IndexState): PageRecord[] {

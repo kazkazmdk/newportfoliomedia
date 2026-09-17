@@ -1,9 +1,9 @@
 {
-  "sha": "5bd2b623afc0229e6596e34f0edc4113ae25f969",
-  "generatedAt": "2026-09-17T10:15:43.143Z",
+  "sha": "e3506c0a347a0f32d598de5b7412157fbfce4d19",
+  "generatedAt": "2026-09-17T10:35:28.706Z",
   "pages": 4859,
-  "entities": 54345,
-  "relations": 88843,
+  "entities": 40779,
+  "relations": 75277,
   "indexable": 0,
   "seo_candidate": 4516,
   "review_required": 0,
@@ -13,7 +13,7 @@
   "REGULATORY_EXACT": 0,
   "TRUSTED_DATASET_EXACT": 0,
   "PRIMARY_GENERAL": 7087,
-  "DATASET_GENERAL": 47260,
+  "DATASET_GENERAL": 33694,
   "HEURISTIC": 0,
   "UNKNOWN": 0,
   "real_demand_observations": 111,
@@ -72,9 +72,9 @@
       "blocked_entities": 27
     },
     "tripcost": {
-      "entities": 41101,
+      "entities": 27535,
       "entities_exact_provenance": 0,
-      "entities_general_provenance": 41101,
+      "entities_general_provenance": 27535,
       "entities_no_provenance": 0,
       "critical_facts_exact": 0,
       "critical_facts_generic": 0,
@@ -92,7 +92,7 @@
     {
       "id": "critical_provenance",
       "triggered": true,
-      "value": 0.0069
+      "value": 0.0092
     },
     {
       "id": "duplicate_rate",
@@ -112,7 +112,7 @@
     {
       "id": "source_truth_depth",
       "triggered": false,
-      "value": 0.9579
+      "value": 0.9503
     },
     {
       "id": "unknown_critical_rate",
@@ -132,8 +132,8 @@
     {
       "id": "primary_exact_rate",
       "triggered": false,
-      "value": 0.0069
+      "value": 0.0092
     }
   ],
-  "hash": "d663cf63d85311ed"
+  "hash": "25792b96ef6b0937"
 }

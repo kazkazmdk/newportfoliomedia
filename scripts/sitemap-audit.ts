@@ -5,7 +5,7 @@ resetCatalogCache();
 const store = buildCatalog();
 const pages = [...store.pages.values()];
 const live = process.env.PUBLIC_SITE_LIVE === "true";
-const sitemapUrls = live ? pages.filter(shouldIndexPage).map((page) => page.canonical) : [];
+const sitemapUrls = live ? pages.filter((page) => shouldIndexPage(page)).map((page) => page.canonical) : [];
 const report = surfaceParity({ pages, sitemapUrls, publicSiteLive: live });
 const issues = parityIssues(report);
 
