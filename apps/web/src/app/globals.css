@@ -80,3 +80,363 @@ body {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
+
+.penta-footer-meta {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid currentColor;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.penta-footer-product {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.penta-footer-note {
+  max-width: 42rem;
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  opacity: 0.72;
+}
+
+.penta-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  font-size: 0.72rem;
+}
+
+.penta-footer-legal a,
+.penta-footer-legal button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.28em;
+  cursor: pointer;
+}
+
+.penta-footer-copyright {
+  margin: 0;
+  font-size: 0.68rem;
+  opacity: 0.58;
+}
+
+@media (min-width: 900px) {
+  .penta-footer-meta {
+    grid-template-columns: minmax(18rem, 1.4fr) minmax(20rem, 1fr) auto;
+  }
+
+  .penta-footer-copyright {
+    text-align: right;
+  }
+}
+
+.cookie-banner,
+.cookie-dialog {
+  --cookie-ink: #171714;
+  --cookie-paper: #f8f6f0;
+  --cookie-line: #b8b4aa;
+  color: var(--cookie-ink);
+  background: var(--cookie-paper);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.cookie-banner {
+  position: fixed;
+  z-index: 100;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  display: grid;
+  gap: 1.25rem;
+  max-width: 70rem;
+  margin: 0 auto;
+  padding: 1.2rem;
+  border: 1px solid var(--cookie-ink);
+  box-shadow: 0 18px 70px rgb(0 0 0 / 18%);
+}
+
+.cookie-eyebrow {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cookie-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.cookie-copy,
+.cookie-dialog-note {
+  max-width: 48rem;
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #55524b;
+}
+
+.cookie-copy a,
+.cookie-dialog-note a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.cookie-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.cookie-button,
+.cookie-close {
+  min-height: 2.65rem;
+  border: 1px solid var(--cookie-ink);
+  padding: 0.62rem 0.85rem;
+  color: var(--cookie-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.cookie-button.primary {
+  color: var(--cookie-paper);
+  background: var(--cookie-ink);
+}
+
+.cookie-dialog-backdrop {
+  position: fixed;
+  z-index: 110;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(10 10 8 / 55%);
+}
+
+.cookie-dialog {
+  width: min(100%, 38rem);
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+  border: 1px solid var(--cookie-ink);
+  padding: 1.25rem;
+  box-shadow: 0 24px 90px rgb(0 0 0 / 25%);
+}
+
+.cookie-dialog-head,
+.cookie-option {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cookie-dialog-head h2 {
+  margin: 0.35rem 0 0;
+  font-size: 1.45rem;
+}
+
+.cookie-close {
+  width: 2.65rem;
+  padding: 0;
+  font-size: 1.4rem;
+}
+
+.cookie-option {
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--cookie-line);
+}
+
+.cookie-option h3,
+.cookie-option strong {
+  display: block;
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.cookie-option p,
+.cookie-option small {
+  display: block;
+  max-width: 28rem;
+  margin: 0.3rem 0 0;
+  color: #5c5850;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.cookie-option input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--cookie-ink);
+}
+
+.cookie-always {
+  flex: 0 0 auto;
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.cookie-dialog .cookie-actions {
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+
+@media (min-width: 760px) {
+  .cookie-banner {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding: 1.35rem 1.5rem;
+  }
+}
+
+.legal-page {
+  min-height: 100svh;
+  color: #1a1916;
+  background: #f6f4ef;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.legal-header,
+.legal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 1.2rem clamp(1.25rem, 4vw, 3rem);
+  border-bottom: 1px solid #c8c3b8;
+}
+
+.legal-header nav,
+.legal-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  font-size: 0.76rem;
+}
+
+.legal-header a,
+.legal-footer a {
+  color: inherit;
+  text-underline-offset: 0.25em;
+}
+
+.legal-brand {
+  font-weight: 750;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.legal-main {
+  width: min(100% - 2.5rem, 47rem);
+  margin: 0 auto;
+  padding: clamp(3.5rem, 8vw, 7rem) 0;
+}
+
+.legal-eyebrow,
+.legal-updated {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.legal-main > h1 {
+  max-width: 40rem;
+  margin: 0.75rem 0 0;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.legal-updated {
+  margin-top: 1.25rem;
+  color: #6a665e;
+}
+
+.legal-content {
+  display: grid;
+  gap: 2.2rem;
+  margin-top: 4rem;
+}
+
+.legal-content section {
+  padding-top: 1.2rem;
+  border-top: 1px solid #c8c3b8;
+}
+
+.legal-content h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.legal-content p {
+  margin: 0.7rem 0 0;
+  color: #49463f;
+  font-size: 0.94rem;
+  line-height: 1.8;
+}
+
+.legal-table-wrap {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.legal-content table {
+  width: 100%;
+  min-width: 38rem;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.legal-content th,
+.legal-content td {
+  padding: 0.8rem;
+  border: 1px solid #c8c3b8;
+  vertical-align: top;
+}
+
+.legal-cookie-button {
+  margin-top: 1rem;
+  border: 1px solid #1a1916;
+  padding: 0.7rem 0.9rem;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.legal-footer {
+  border-top: 1px solid #c8c3b8;
+  border-bottom: 0;
+  color: #666159;
+  font-size: 0.72rem;
+}
+
+.legal-footer p {
+  margin: 0;
+}

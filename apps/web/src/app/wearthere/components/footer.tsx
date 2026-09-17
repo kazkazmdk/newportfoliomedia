@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { DESTINATIONS } from "@penta/wearthere";
+import { FooterMeta } from "@/components/footer-meta";
 
 export function WearthereFooter() {
-  const list = [...DESTINATIONS].sort((a, b) => a.city.localeCompare(b.city));
+  const list = [...DESTINATIONS].sort((a, b) => a.city.localeCompare(b.city)).slice(0, 18);
   return (
     <footer className="wt-footer">
       <div>
@@ -15,7 +16,15 @@ export function WearthereFooter() {
             {d.city}
           </Link>
         ))}
+        <Link href="/wearthere">Explore all destinations →</Link>
       </div>
+      <FooterMeta
+        product="WearThere"
+        homeHref="/wearthere"
+        toolHref="/wearthere/trip"
+        toolLabel="Plan a trip"
+        note="Packing guidance uses typical climate patterns, not a live forecast. Check current conditions before departure."
+      />
     </footer>
   );
 }

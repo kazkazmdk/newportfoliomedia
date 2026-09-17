@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { VEHICLES, vehicleUrl } from "@penta/autospec";
+import { FooterMeta } from "@/components/footer-meta";
 
 export function AutospecFooter() {
   return (
@@ -20,6 +21,13 @@ export function AutospecFooter() {
           </li>
         ))}
       </ul>
+      <FooterMeta
+        product="AutoSpec"
+        homeHref="/autospec"
+        toolHref="/autospec/garage"
+        toolLabel="My garage"
+        note="Fitment is scoped to the identified generation, variant and engine. Confirm safety-critical work with the official source."
+      />
     </footer>
   );
 }

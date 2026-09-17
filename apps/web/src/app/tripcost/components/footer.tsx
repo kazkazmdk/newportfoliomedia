@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ROUTES } from "@penta/tripcost";
+import { FooterMeta } from "@/components/footer-meta";
 
 export function TripcostFooter() {
   return (
@@ -11,7 +12,7 @@ export function TripcostFooter() {
         </p>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2">
-        {ROUTES.map((r) => (
+        {ROUTES.slice(0, 10).map((r) => (
           <li key={r.id}>
             <Link href={`/tripcost/${r.from.slug}/to/${r.to.slug}`} className="flex justify-between border-b border-[var(--tc-line)] py-2 text-sm">
               <span>
@@ -22,6 +23,13 @@ export function TripcostFooter() {
           </li>
         ))}
       </ul>
+      <FooterMeta
+        product="TripCost"
+        homeHref="/tripcost"
+        toolHref="/tripcost"
+        toolLabel="Compare a trip"
+        note="Costs are modelled from declared assumptions unless a dated quote says otherwise. No result is presented as a live fare."
+      />
     </footer>
   );
 }

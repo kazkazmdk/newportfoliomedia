@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DEVICES } from "@penta/chargematch";
+import { FooterMeta } from "@/components/footer-meta";
 
 export function ChargematchFooter() {
   return (
@@ -20,6 +21,13 @@ export function ChargematchFooter() {
           </li>
         ))}
       </ul>
+      <FooterMeta
+        product="ChargeMatch"
+        homeHref="/chargematch"
+        toolHref="/chargematch/kit"
+        toolLabel="Build a power kit"
+        note="Results describe the rated negotiation path. A measured wattage is shown only when measurement evidence exists."
+      />
     </footer>
   );
 }

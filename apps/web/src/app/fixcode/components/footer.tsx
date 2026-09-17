@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ALL_ERRORS, BRANDS } from "@penta/fixcode";
+import { FooterMeta } from "@/components/footer-meta";
 
 export function FixcodeFooter() {
   const index = ALL_ERRORS.slice(0, 8);
@@ -30,6 +31,13 @@ export function FixcodeFooter() {
           Source trace lives with every diagnosis
         </p>
       </div>
+      <FooterMeta
+        product="FixCode"
+        homeHref="/fixcode"
+        toolHref="/fixcode/diagnose"
+        toolLabel="Start diagnosis"
+        note="Codes and diagnostic branches are evidence-scoped. Stop when the safety boundary says to stop."
+      />
     </footer>
   );
 }

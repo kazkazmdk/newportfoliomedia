@@ -256,4 +256,32 @@ test.describe("product integrity interactions", () => {
     await expect(page).toHaveURL(/\/fixcode\/diagnose/);
     await expect(page.getByText(question, { exact: false }).first()).toBeVisible();
   });
+
+  test("optional cookies are off until an explicit choice and settings reopen", async ({ page }) => {
+    await page.goto("/fixcode", { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("region", { name: "Cookie notice" })).toBeVisible();
+    await page.getByRole("button", { name: "Customize" }).click();
+    await expect(page.getByRole("checkbox", { name: /analytics/i })).not.toBeChecked();
+    await expect(page.getByRole("checkbox", { name: /preferences/i })).not.toBeChecked();
+    await page.getByRole("button", { name: "Save choices" }).click();
+    await expect.poll(() => page.evaluate(() => document.cookie)).toContain("penta_consent=");
+
+    await page.locator(".fc-footer").getByRole("button", { name: "Cookie settings" }).click();
+    await expect(page.getByRole("dialog", { name: "Cookie settings" })).toBeVisible();
+  });
+
+  test("all product footers expose product, legal, and privacy controls", async ({ page }) => {
+    for (const route of ["/fixcode", "/autospec", "/wearthere", "/chargematch", "/tripcost"]) {
+      await page.goto(route, { waitUntil: "domcontentloaded" });
+      const notice = page.getByRole("region", { name: "Cookie notice" });
+      if (await notice.isVisible()) {
+        await page.getByRole("button", { name: "Reject optional" }).click();
+      }
+      const footer = page.locator("footer");
+      await expect(footer.getByRole("link", { name: "Privacy" })).toHaveAttribute("href", "/privacy");
+      await expect(footer.getByRole("link", { name: "Cookies" })).toHaveAttribute("href", "/cookies");
+      await expect(footer.getByRole("link", { name: "Terms" })).toHaveAttribute("href", "/terms");
+      await expect(footer.getByRole("button", { name: "Cookie settings" })).toBeVisible();
+    }
+  });
 });
