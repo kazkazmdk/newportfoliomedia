@@ -776,8 +776,16 @@ button.fc-kicker:focus-visible,
 @media (max-width: 560px) {
   .fc-appliance-grid { grid-template-columns: 1fr; }
   .fc-appliance-card { min-height: 14rem; }
-  .fc-identity-plate { grid-template-columns: 1fr; }
-  .fc-identity-plate div + div { border-left: 0; border-top: 1px solid var(--fc-line); }
+  .fc-code-giant { font-size: 5rem; }
+  .fc-identity-plate { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-block: 0.8rem; }
+  .fc-identity-plate div { min-width: 0; padding: 0.5rem 0.3rem; }
+  .fc-identity-plate div + div { border-top: 0; border-left: 1px solid var(--fc-line); }
+  .fc-identity-plate dd { overflow-wrap: anywhere; }
+  .fc-process { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fc-process-step { display: block; padding: 0.5rem 0.35rem; }
+  .fc-process-step + .fc-process-step { border-top: 0; border-left: 1px solid var(--fc-line); }
+  .fc-process-step small { display: none; }
+  .fc-do-first { padding: 0.75rem; }
   .fc-hypo { grid-template-columns: auto minmax(0, 1fr); }
   .fc-hypo > :last-child { grid-column: 2; justify-self: start; text-align: left; }
   .fc-cause-meta { justify-items: start; text-align: left; }
