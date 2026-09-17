@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { CockpitCell, type CockpitState } from "./components/cockpit-cell";
 import { IdentityStrip } from "./components/identity-strip";
 import { OwnershipTimeline } from "./components/ownership-timeline";
 import { VehicleStage } from "./components/vehicle-stage";
@@ -83,6 +84,13 @@ export function GarageApp() {
 
   const due = km != null ? nextService(vehicle, km) : [];
   const nextScheduled = due[0];
+  const serviceState: CockpitState = nextScheduled
+    ? nextScheduled.km_left != null && nextScheduled.km_left <= 0
+      ? "now"
+      : nextScheduled.km_left != null && nextScheduled.km_left <= 5_000
+        ? "soon"
+        : "reference"
+    : "reference";
   const oilRow = vehicle.services.find((s) => s.id === "oil");
   const oilUntil =
     km != null && lastOilKm != null && oilRow
@@ -101,12 +109,12 @@ export function GarageApp() {
   return (
     <div>
       <section className="as-hero">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em]">My Garage · this session · noindex</p>
-          <h1 className="mt-4 text-5xl leading-[0.9] md:text-7xl">
+        <div className="as-hero-copy">
+          <p className="as-eyebrow">My Garage · this session · noindex</p>
+          <h1>
             {vehicle.make} {vehicle.variant}
           </h1>
-          <p className="mt-3 text-lg text-[var(--as-mute)]">
+          <p className="as-hero-index">
             {vehicle.engine_code} · {vehicle.years[0]}–{vehicle.years.at(-1)}
             {km != null ? ` · ${km.toLocaleString()} km entered` : ""}
           </p>
@@ -132,29 +140,32 @@ export function GarageApp() {
             </form>
           ) : null}
           <div className="as-cockpit">
-            <div className="as-cockpit-cell">
-              <p>Next scheduled interval</p>
-              <strong>
-                {nextScheduled ? scheduledIntervalCopy(nextScheduled.km_left) : "Enter mileage"}
-              </strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Oil</p>
-              <strong>{vehicle.oil.capacity_liters ? `${vehicle.oil.spec} · ${vehicle.oil.capacity_liters} L` : "EV — none"}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Tyres</p>
-              <strong>{tyreLabel(tyreChecked, tyreOk)}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Battery</p>
-              <strong>{battery && battery !== "UNKNOWN" ? battery : "Not checked"}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Recalls</p>
-              <strong>VIN required</strong>
-            </div>
+            <CockpitCell
+              label="Next scheduled interval"
+              state={serviceState}
+              value={nextScheduled ? scheduledIntervalCopy(nextScheduled.km_left) : "Enter mileage"}
+              provenance={km != null ? "Entered mileage · standard interval" : "Mileage not entered"}
+            />
+            <CockpitCell
+              label="Oil"
+              value={vehicle.oil.capacity_liters ? `${vehicle.oil.spec} · ${vehicle.oil.capacity_liters} L` : "EV — none"}
+              provenance="Vehicle graph reference"
+            />
+            <CockpitCell
+              label="Tyres"
+              value={tyreLabel(tyreChecked, tyreOk)}
+              state={tyreOk === false ? "now" : "reference"}
+              provenance={tyreChecked ? "Owner-entered check" : "Not checked"}
+            />
+            <CockpitCell
+              label="Battery"
+              value={battery && battery !== "UNKNOWN" ? battery : "Not checked"}
+              state={battery === "WEAK" ? "now" : "reference"}
+              provenance={battery && battery !== "UNKNOWN" ? "Owner-entered check" : "Not checked"}
+            />
+            <CockpitCell label="Recalls" value="VIN required" provenance="Official portal required" />
           </div>
+          <p className="as-cockpit-truth">Session state · values are entered or calculated, never live telemetry.</p>
           {km != null ? (
             <p className="mt-3 text-sm text-[var(--as-mute)]">Based on the standard maintenance interval. Assumes the maintenance schedule has been followed.</p>
           ) : null}

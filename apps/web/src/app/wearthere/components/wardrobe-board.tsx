@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { ClothingPiece } from "@penta/wearthere";
+import { useState } from "react";
+import type { ClothingPiece, MonthClimate } from "@penta/wearthere";
 import { GarmentSvg, garmentKind } from "./garment-svg";
 
 const LOOK_KINDS = ["coat", "knit", "trousers", "boots"] as const;
@@ -10,10 +10,45 @@ function packLabel(on: boolean) {
   return on ? "Remove from case" : "Add to case";
 }
 
-export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
-  const [packed, setPacked] = useState<string[]>(() => pieces.map((p) => p.id));
-  const visible = useMemo(() => pieces, [pieces]);
-  const packedPieces = visible.filter((piece) => packed.includes(piece.id));
+function recommendationReason(
+  piece: ClothingPiece,
+  weather?: MonthClimate,
+  activities: string[] = [],
+) {
+  if (weather && piece.water_resistance >= 4 && weather.rain_days >= 8) {
+    return `Rain layer: this period typically has ${weather.rain_days} rain days.`;
+  }
+  if (weather && piece.warmth >= 5 && weather.tmin_c < 10) {
+    return `Cold-weather anchor: typical lows reach ${weather.tmin_c}°C.`;
+  }
+  if (weather && piece.breathability >= 4 && weather.tmax_c >= 24) {
+    return `Breathable option for typical highs around ${weather.tmax_c}°C.`;
+  }
+  if (weather && piece.layer === "shoes" && weather.rain_days >= 8) {
+    return `Footwear chosen for a typically wetter period.`;
+  }
+  const covered = activities.filter((activity) => piece.activity.includes(activity));
+  if (covered.length > 0) {
+    return `Included for ${covered.slice(0, 2).join(" and ")}.`;
+  }
+  if (piece.layer === "mid" || piece.layer === "shell") {
+    return "A flexible layer for temperature changes through the day.";
+  }
+  return "A versatile base for more than one outfit combination.";
+}
+
+export function WardrobeBoard({
+  pieces,
+  weather,
+  activities = [],
+}: {
+  pieces: ClothingPiece[];
+  weather?: MonthClimate;
+  activities?: string[];
+}) {
+  const [unpacked, setUnpacked] = useState<string[]>([]);
+  const visible = pieces;
+  const packedPieces = visible.filter((piece) => !unpacked.includes(piece.id));
   const count = packedPieces.length;
   const hero =
     packedPieces.find((p) => garmentKind(p) === "coat") ??
@@ -25,7 +60,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
   const secondary = visible.filter((p) => !worn.some((w) => w.id === p.id));
 
   function toggle(id: string) {
-    setPacked((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setUnpacked((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
   return (
@@ -63,7 +98,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
               </p>
               {hero ? (
                 <button type="button" className="wt-pack mt-5" onClick={() => toggle(hero.id)}>
-                  {packLabel(packed.includes(hero.id))}
+                  {packLabel(!unpacked.includes(hero.id))}
                 </button>
               ) : null}
             </>
@@ -71,14 +106,15 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
         </article>
         <div className="grid gap-3">
           {secondary.slice(0, 4).map((piece) => {
-            const on = packed.includes(piece.id);
+            const on = !unpacked.includes(piece.id);
             return (
               <article key={piece.id} className={`wt-garment ${on ? "is-packed" : "is-open"}`}>
                 <GarmentSvg kind={garmentKind(piece)} />
                 <h3 className="wt-serif mt-3 text-2xl">{piece.name}</h3>
-                <p className="mt-1 text-sm opacity-70">
+                <p className="wt-garment-meta">
                   {piece.layer} · warmth {piece.warmth}
                 </p>
+                <p className="wt-garment-reason">{recommendationReason(piece, weather, activities)}</p>
                 <button type="button" className="wt-pack mt-3" onClick={() => toggle(piece.id)}>
                   {packLabel(on)}
                 </button>
@@ -89,7 +125,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
       </div>
       <div className="wt-board">
         {visible.map((piece, i) => {
-          const on = packed.includes(piece.id);
+          const on = !unpacked.includes(piece.id);
           return (
             <article
               key={piece.id}
@@ -100,9 +136,10 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
               <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">{String(i + 1).padStart(2, "0")}</p>
               <GarmentSvg kind={garmentKind(piece)} />
               <h3 className="wt-serif mt-4 text-3xl">{piece.name}</h3>
-              <p className="mt-2 text-sm opacity-70">
+              <p className="wt-garment-meta">
                 {piece.layer} · warmth {piece.warmth} · rain {piece.water_resistance}
               </p>
+              <p className="wt-garment-reason">{recommendationReason(piece, weather, activities)}</p>
               <button type="button" className="wt-pack mt-5" onClick={() => toggle(piece.id)}>
                 {packLabel(on)}
               </button>
@@ -116,7 +153,7 @@ export function WardrobeBoard({ pieces }: { pieces: ClothingPiece[] }) {
         onDrop={(event) => {
           event.preventDefault();
           const id = event.dataTransfer.getData("text/plain");
-          if (id) setPacked((prev) => (prev.includes(id) ? prev : [...prev, id]));
+          if (id) setUnpacked((prev) => prev.filter((pieceId) => pieceId !== id));
         }}
       >
         Suitcase zone — buttons also pack and unpack

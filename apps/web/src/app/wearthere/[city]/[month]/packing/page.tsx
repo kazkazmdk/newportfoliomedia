@@ -12,6 +12,7 @@ import { Feedback } from "@/components/feedback";
 import { ViewportScene } from "@/components/creative";
 import { ClimateRibbon } from "../../../components/climate-ribbon";
 import { DestinationHero } from "../../../components/destination-hero";
+import { SeasonRail } from "../../../components/season-rail";
 import { WardrobeBoard } from "../../../components/wardrobe-board";
 
 export function generateStaticParams() {
@@ -47,19 +48,24 @@ export default async function PackingPage({ params }: { params: Promise<{ city: 
     <main>
       <DestinationHero initialCity={dest.slug} />
       <ClimateRibbon weather={w} />
-      <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Packing list · typical {label}</p>
+      <ViewportScene className="wt-scene wt-editorial-intro">
+        <p className="wt-kicker">Packing list · typical {label}</p>
         <h1 className="mt-4 max-w-4xl text-5xl leading-none md:text-7xl">
           What to pack for {dest.city} in {label[0].toUpperCase() + label.slice(1)}
         </h1>
         <p className="wt-serif mt-6 text-3xl">{bag}. Quantities for a 5-night stay, not a live forecast.</p>
       </ViewportScene>
-      <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Suitcase</p>
-        <WardrobeBoard pieces={cap.pieces} />
+      <ViewportScene className="wt-scene wt-season-section">
+        <SeasonRail dest={dest} active={resolved.surface.slug} />
+      </ViewportScene>
+      <ViewportScene className="wt-scene wt-capsule-section" id="capsule">
+        <p className="wt-kicker">Suitcase · why each piece earns its place</p>
+        <div className="mt-10">
+          <WardrobeBoard pieces={cap.pieces} weather={w} activities={dest.activities_default} />
+        </div>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Leave this behind</p>
+        <p className="wt-kicker">Leave this behind</p>
         <p className="wt-serif mt-4 max-w-xl text-4xl leading-none">
           {skip.length ? skip.join(", ") : "No heavy layers flagged for this period."}
         </p>

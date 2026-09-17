@@ -32,6 +32,10 @@ export function VehicleStage({
 
   return (
     <CursorCanvas label="Inspect" color="#101418" className="as-stage">
+      <div className="as-stage-hud" aria-hidden>
+        <span>Object / vehicle</span>
+        <span>View / reference still</span>
+      </div>
       <div className="as-depth">
         <div className="as-plane" aria-hidden />
         {media ? (
@@ -59,23 +63,28 @@ export function VehicleStage({
         ) : (
           <p className="text-sm text-[var(--as-mute)]">No licensed vehicle still for this identity. Silhouette withheld.</p>
         )}
-        <p className="as-credit">
-          {identity ?? "BMW 320d G20"}
-          {media ? ` · ${media.note}` : ""}
-        </p>
       </div>
-      <div className="mt-6 flex flex-wrap gap-3">
-        {ZONES.filter((z) => z !== "body").map((z) => (
-          <button
-            key={z}
-            type="button"
-            className="text-[10px] uppercase tracking-[0.2em]"
-            onClick={() => setZone(z)}
-            style={{ color: zone === z ? "var(--as-metal)" : "inherit" }}
-          >
-            {z}
-          </button>
-        ))}
+      <div className="as-stage-footer">
+        <div>
+          <p className="as-credit">
+            {identity ?? "BMW 320d G20"}
+            {media ? ` · ${media.note}` : ""}
+          </p>
+          <p className="as-stage-truth">Static licensed image · inspection markers are contextual, not component locations or live telemetry.</p>
+        </div>
+        <div className="as-zone-controls" aria-label="Inspect vehicle reference areas">
+          {ZONES.filter((z) => z !== "body").map((z) => (
+            <button
+              key={z}
+              type="button"
+              aria-pressed={zone === z}
+              onClick={() => setZone(z)}
+            >
+              <span aria-hidden>{String(ZONES.indexOf(z)).padStart(2, "0")}</span>
+              {z}
+            </button>
+          ))}
+        </div>
       </div>
     </CursorCanvas>
   );

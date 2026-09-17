@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { VEHICLES, vehicleUrl } from "@penta/autospec";
+import { VEHICLES, VIN_SUPPORT, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import Image from "next/image";
 import { vehicleMediaOf } from "@/lib/media-catalog";
@@ -17,45 +17,88 @@ export default function AutospecHome() {
   return (
     <main>
       <section className="as-hero as-hero-onboard">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--as-mute)]">Digital garage</p>
-          <h1 className="mt-5 text-5xl leading-[0.9] md:text-7xl">
-            What do
+        <div className="as-hero-copy">
+          <p className="as-eyebrow">Digital ownership cockpit</p>
+          <h1>
+            Know the car.
             <br />
-            you drive?
+            Own the next move.
           </h1>
-          <p className="mt-5 max-w-md text-sm leading-6 text-[var(--as-mute)]">
-            Search a make and generation we already cover. Oil, tyres, battery and service come from the vehicle graph — not a guessed VIN decode.
+          <p className="as-lede">
+            Oil, tyres, battery, service and official recall portals for the exact identity we have on file.
+            Reference data, not simulated live telemetry.
           </p>
-          <GarageEntry />
         </div>
         <VehicleStage
           makeSlug={featured?.make_slug}
           generationSlug={featured?.generation_slug}
           identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined}
         />
+        <div className="as-onboard-panel">
+          <div className="as-onboard-intro">
+            <p className="as-eyebrow">Identify your vehicle</p>
+            <p className="as-display">What do you drive?</p>
+            <p>
+              Search a covered make, generation and engine. We do not turn a partial match into a guessed fitment.
+            </p>
+          </div>
+          <GarageEntry />
+        </div>
+        <div className="as-provenance-bar" aria-label="Data provenance">
+          <span><b>Source</b> Vehicle graph</span>
+          <span><b>State</b> Reference until you enter checks</span>
+          <span><b>VIN</b> {VIN_SUPPORT}</span>
+        </div>
       </section>
-      <section className="as-scene">
-        <p className="text-[11px] uppercase tracking-[0.2em]">Once the car is identified</p>
-        <p className="as-display mt-4 max-w-xl text-4xl">My vehicle becomes an ownership state.</p>
-        <p className="mt-4 max-w-lg text-sm leading-6 text-[var(--as-mute)]">
-          Service interval, oil spec, tyre size, 12V battery, and recall portals. Nothing invented beyond the graph.
-        </p>
+      <section className="as-scene as-state-scene">
+        <div className="as-section-heading">
+          <p className="as-eyebrow">Ownership state model</p>
+          <p className="as-display">One cockpit. Three levels of certainty.</p>
+          <p>
+            AutoSpec separates action from schedule and reference, so an unknown check never looks healthy by default.
+          </p>
+        </div>
+        <ol className="as-state-grid">
+          <li className="is-now">
+            <span>01 / Now</span>
+            <h2>Needs attention</h2>
+            <p>Shown only when entered mileage or checks support an immediate state.</p>
+          </li>
+          <li className="is-soon">
+            <span>02 / Soon</span>
+            <h2>Coming by interval</h2>
+            <p>Scheduled context based on mileage and the standard maintenance interval.</p>
+          </li>
+          <li className="is-reference">
+            <span>03 / Reference</span>
+            <h2>Know the specification</h2>
+            <p>Vehicle-graph facts scoped to generation, variant, engine and market.</p>
+          </li>
+        </ol>
         {featured ? (
-          <Link className="as-cta mt-8 inline-block" href={vehicleUrl(featured)}>
-            Open {featured.make} {featured.variant}
+          <Link className="as-cta as-cta-arrow" href={vehicleUrl(featured)}>
+            Explore a complete vehicle profile <span aria-hidden>↗</span>
           </Link>
         ) : null}
       </section>
       <section className="as-scene" id="identities">
-        <p className="text-[11px] uppercase tracking-[0.2em]">Covered identities</p>
-        <p className="mt-3 max-w-lg text-sm text-[var(--as-mute)]">
-          Discover after you know what AutoSpec does. These are generation/engine pages, not a catalogue home.
-        </p>
-        <ul className="mt-8 grid gap-3 md:grid-cols-2">
+        <div className="as-section-heading as-section-heading-row">
+          <div>
+            <p className="as-eyebrow">Covered identities</p>
+            <p className="as-display">Built around the vehicle, not the catalogue.</p>
+          </div>
+          <p>
+            Every destination below is a generation and engine page. Other markets are not invented.
+          </p>
+        </div>
+        <ul className="as-vehicle-grid">
           {VEHICLES.slice(0, 8).map((v) => (
             <li key={v.id}>
               <Link href={vehicleUrl(v)} className="as-tile">
+                <div className="as-tile-topline">
+                  <span>Reference profile</span>
+                  <span>{v.years[0]}–{v.years.at(-1)}</span>
+                </div>
                 {vehicleMediaOf(v.make_slug, v.generation_slug) ? (
                   <Image
                     src={vehicleMediaOf(v.make_slug, v.generation_slug)!.src}
@@ -66,17 +109,15 @@ export default function AutospecHome() {
                     className="as-tile-img"
                   />
                 ) : null}
-                <p className="text-[11px] uppercase tracking-[0.16em]">{v.generation} {v.engine_code}</p>
-                <p className="as-display text-4xl">
-                  {v.make}
-                  <br />
-                  {v.variant}
-                </p>
+                <div>
+                  <p className="as-tile-spec">{v.generation} · {v.engine_code}</p>
+                  <p className="as-display">{v.make} {v.variant}</p>
+                </div>
               </Link>
             </li>
           ))}
         </ul>
-        <p className="mt-8 text-sm text-[var(--as-mute)]">
+        <p className="as-coverage-note">
           {VEHICLES.length > 8 ? `${VEHICLES.length - 8} more generation/engine pages. ` : ""}
           Other markets are not invented.
         </p>

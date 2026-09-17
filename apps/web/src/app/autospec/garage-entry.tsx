@@ -23,40 +23,47 @@ export function GarageEntry() {
   }
 
   return (
-    <div className="mt-8 grid max-w-md gap-5">
-      <label className="as-field">
-        Make / model / generation
-        <input aria-label="Search make and model" value={q} onChange={(e) => setQ(e.target.value)} placeholder="BMW 320d G20" />
-      </label>
-      <ul className="grid gap-2">
+    <div className="as-garage-entry">
+      <div className="as-search-row">
+        <label className="as-field">
+          Make / model / generation
+          <input aria-label="Search make and model" value={q} onChange={(e) => setQ(e.target.value)} placeholder="BMW 320d G20" />
+        </label>
+        <span className="as-search-count" aria-live="polite">{hits.length} covered matches</span>
+      </div>
+      <ul className="as-search-results" aria-label="Covered vehicle matches">
         {hits.slice(0, 4).map((v) => (
           <li key={v.id}>
             <button
               type="button"
-              className="as-cta"
+              className="as-search-hit"
               onClick={() =>
                 router.push(
                   `/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`,
                 )
               }
             >
-              Add {v.make} {v.variant} {v.generation}
+              <span>
+                <b>{v.make} {v.variant}</b>
+                <small>{v.generation} · {v.engine_code}</small>
+              </span>
+              <span aria-hidden>Add ↗</span>
             </button>
           </li>
         ))}
       </ul>
       <details className="as-vin">
         <summary>
-          VIN decode
-          <span>Unavailable · {VIN_SUPPORT === "NOT_IMPLEMENTED" ? "stub" : VIN_SUPPORT}</span>
+          VIN identification
+          <span>Unavailable · support status: {VIN_SUPPORT}</span>
         </summary>
         <form onSubmit={onVin} className="mt-3 grid gap-2">
           <label className="as-field">
             VIN
-            <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
+            <input aria-label="VIN support check" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="17 characters" />
           </label>
-          <button className="justify-self-start border border-[var(--as-ink)] px-4 py-2 text-[11px] uppercase tracking-[0.16em]" type="submit">
-            Try decode (demo)
+          <button className="as-ghost-action" type="submit">
+            Check support status
           </button>
           {note ? <p className="text-sm text-[var(--as-mute)]">{note}</p> : null}
         </form>

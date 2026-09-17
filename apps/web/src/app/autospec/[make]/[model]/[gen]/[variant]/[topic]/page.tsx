@@ -51,13 +51,14 @@ export default async function TopicPage({
   return (
     <main>
       <section className="as-hero">
-        <div>
-          <Link href={vehicleUrl(v)} className="text-[11px] uppercase tracking-[0.18em]">
+        <div className="as-hero-copy">
+          <Link href={vehicleUrl(v)} className="as-eyebrow as-back-link">
             {v.make} {v.generation} {v.variant}
           </Link>
-          <h1 className="mt-4 text-6xl capitalize">{topic}</h1>
-          <aside className="mt-6 max-w-xl text-sm leading-6">
-            <p className="uppercase tracking-[0.14em]">Fitment scope · {scope.confidence}</p>
+          <h1 className="capitalize">{topic}</h1>
+          <p className="as-hero-index">Reference topic · {v.engine_code} · no live vehicle connection</p>
+          <aside className="as-fitment-panel">
+            <p className="as-fitment-title"><span>Provenance</span> Fitment scope · {scope.confidence}</p>
             <p className="mt-2">
               {scope.make} {scope.model}
               {scope.generation ? ` · generation ${scope.generation}` : ""}
@@ -74,7 +75,12 @@ export default async function TopicPage({
             </p>
           </aside>
         </div>
-        <VehicleStage focus={focus} />
+        <VehicleStage
+          focus={focus}
+          makeSlug={v.make_slug}
+          generationSlug={v.generation_slug}
+          identity={`${v.make} ${v.variant} ${v.generation}`}
+        />
       </section>
       <IdentityStrip vehicle={v} />
       <section className="as-scene">

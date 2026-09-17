@@ -21,8 +21,8 @@ export function HomeForm() {
       <form onSubmit={goDiagnose} className="grid gap-3">
         <div className="grid gap-3 sm:grid-cols-3">
           <button type="button" className="border border-[#d8d3c8] bg-[#fffcf7] px-4 py-4 text-left" onClick={() => router.push("/fixcode/diagnose?mode=scan")}>
-            <span className="block text-sm text-[#6a6a64]">Photo</span>
-            Scan the error
+            <span className="block text-sm text-[#6a6a64]">Manual reference</span>
+            Add a panel photo
           </button>
           <button type="submit" className="border border-[#1c1c1a] bg-[#1c1c1a] px-4 py-4 text-left text-[#f7f5f1]">
             <span className="block text-sm text-[#c9c7c0]">Typed</span>

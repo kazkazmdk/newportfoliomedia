@@ -42,95 +42,147 @@ export function PairStudio({
 
   return (
     <div>
-      <section className="cm-hero">
-        <p className="cm-mono text-[11px] uppercase tracking-[0.2em]">{result.tag.replaceAll("_", " ")}</p>
-        <div className="cm-result-bar">
-          <div>
-            <p className="cm-mono text-[10px] uppercase tracking-[0.18em]">Expected</p>
-            <p className="cm-mono text-6xl leading-none">{chain.watts}W</p>
-          </div>
-          <div>
-            <h1 className="text-3xl md:text-5xl">{result.match.replaceAll("_", " ")}</h1>
-            <p className="mt-2 text-sm uppercase tracking-[0.14em] text-[var(--cm-mute)]">
-              Limited by {chain.limitingComponent} · {chain.protocol.replaceAll("_", " ")}
-            </p>
-          </div>
-          <p className="max-w-sm text-sm leading-6 text-[var(--cm-mute)]">{result.safety_note}</p>
+      <section className="cm-hero cm-detail-hero">
+        <div className="cm-detail-heading">
+          <p className="cm-kicker cm-mono">{result.tag.replaceAll("_", " ")} · rated path</p>
+          <h1>{device.name}<br /><span>with {charger.name}</span></h1>
+          <p>{result.explanation}</p>
         </div>
-        <div className="cm-connect mt-8" style={{ display: "grid" }}>
-          <div className="cm-node">
-            <DeviceObject slug={device.slug} name={device.name} />
-            <p className="cm-mono mt-3">{device.max_watts}W cap</p>
+
+        <div className="cm-product-stage cm-detail-stage">
+          <div className="cm-stage-topline cm-mono">
+            <span>Compatibility assembly</span>
+            <span className="cm-signal"><i /> Rated · not measured</span>
           </div>
-          <div className="cm-cable" aria-hidden>
-            <svg viewBox="0 0 220 88">
-              <path d="M110 8 V80" stroke="currentColor" strokeWidth="3" />
-              <text x="122" y="48" fontSize="10" fill="currentColor">USB-C</text>
-            </svg>
+          <div className="cm-connect">
+            <div className="cm-node">
+              <span className="cm-node-label cm-mono">Device</span>
+              <DeviceObject slug={device.slug} name={device.name} />
+              <p className="cm-node-spec cm-mono">{device.max_watts}W input cap</p>
+            </div>
+            <div className="cm-cable" aria-hidden>
+              <span className="cm-connector cm-connector-left" />
+              <svg viewBox="0 0 220 48">
+                <path d="M4 24 H216" stroke="currentColor" strokeWidth="2" />
+                <circle className="cm-flow-dot" r="4" fill="currentColor" />
+              </svg>
+              <span className="cm-connector cm-connector-right" />
+              <span className="cm-cable-label cm-mono">USB-C power path</span>
+            </div>
+            <div className="cm-node">
+              <span className="cm-node-label cm-mono">Charger</span>
+              <ChargerObject watts={charger.total_watts} ports={charger.ports.length} />
+              <p className="cm-node-spec cm-mono">{charger.total_watts}W rated brick</p>
+            </div>
           </div>
-          <div className="cm-node">
-            <ChargerObject watts={charger.total_watts} ports={charger.ports.length} />
-            <p className="cm-mono mt-3">{charger.total_watts}W brick</p>
-          </div>
+
+          <aside className="cm-verdict cm-verdict-sticky" aria-live="polite" aria-label="Compatibility verdict">
+            <div className="cm-verdict-power">
+              <span className="cm-field-label cm-mono">Expected ceiling</span>
+              <strong className="cm-mono">{chain.watts}<small>W</small></strong>
+            </div>
+            <div className="cm-verdict-match">
+              <span className="cm-field-label cm-mono">Verdict</span>
+              <strong>{result.match.replaceAll("_", " ")}</strong>
+            </div>
+            <dl className="cm-verdict-facts">
+              <div><dt className="cm-mono">Protocol</dt><dd>{chain.protocol.replaceAll("_", " ")}</dd></div>
+              <div><dt className="cm-mono">Bottleneck</dt><dd>{chain.limitingComponent}</dd></div>
+              <div><dt className="cm-mono">Port</dt><dd>{port.toUpperCase()}</dd></div>
+            </dl>
+            <p className="cm-verdict-note">{result.safety_note} Not a measured wall draw.</p>
+          </aside>
         </div>
       </section>
-      <section className="cm-scene">
-        <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">How the path negotiates</p>
-        <div className="mt-8 grid gap-8 lg:grid-cols-[0.7fr_1.3fr]">
+
+      <section className="cm-scene cm-path-scene">
+        <div className="cm-section-heading">
+          <p className="cm-kicker cm-mono">01 · Configure the path</p>
+          <h2>Choose the active port.<br />See every ceiling.</h2>
+          <p>The selected face changes the published port limit. Open any row to inspect why it matters.</p>
+        </div>
+        <div className="cm-path-grid">
           <Faceplate charger={charger} selected={port} onSelect={setPort} />
           <PowerFlow chain={chain} sourceWatts={charger.total_watts} />
         </div>
       </section>
-      <section className="cm-scene">
-        <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">What limits your charging speed?</p>
-        <p className="mt-4 max-w-xl text-3xl leading-tight">{result.bottleneck}</p>
-        <p className="cm-mono mt-4 text-sm">
-          Compatible {result.compatible ? "YES" : "NO"} · certified path {result.safe ? "YES" : "UNKNOWN"} · evidence {result.evidence.replaceAll("_", " ")} · lab measured NONE
-        </p>
+
+      <section className="cm-scene cm-limit-scene">
+        <div className="cm-section-heading">
+          <p className="cm-kicker cm-mono">02 · Read the limit</p>
+          <h2>What sets the speed?</h2>
+        </div>
+        <div className="cm-limit-card">
+          <span className="cm-limit-marker cm-mono">Current bottleneck</span>
+          <p>{result.bottleneck}</p>
+          <dl className="cm-technical-row">
+            <div><dt>Compatible</dt><dd>{result.compatible ? "Yes" : "No"}</dd></div>
+            <div><dt>Certified path</dt><dd>{result.safe ? "Yes" : "Unknown"}</dd></div>
+            <div><dt>Evidence</dt><dd>{result.evidence.replaceAll("_", " ")}</dd></div>
+            <div><dt>Lab measured</dt><dd>None</dd></div>
+          </dl>
+        </div>
       </section>
-      <section className="cm-scene">
-        <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">One brick, several devices</p>
-        <h2 className="mt-4 text-4xl">How power splits</h2>
-        {charger.ports.length > 1 ? (
-          <>
-            <div className="cm-plug">
-              {charger.ports.map((p, i) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`cm-port ${plugged > i ? "is-on" : ""}`}
-                  onClick={() => setPlugged(i + 1)}
-                >
-                  {p.label} {plugged > i ? "plugged" : "empty"}
-                </button>
-              ))}
-            </div>
-            {multi ? (
-              <div className="mt-8">
-                <MultiportTree
-                  total={charger.total_watts}
-                  branches={multi.ports.map((p) => ({
-                    id: p,
-                    label: `${labels[p] ?? p} · ${charger.ports.find((x) => x.id === p)?.label ?? p}`,
-                    watts: multi.byPort?.[p] ?? 0,
-                  }))}
-                />
+
+      <section className="cm-scene cm-multi-scene">
+        <div className="cm-section-heading">
+          <p className="cm-kicker cm-mono">03 · Add devices</p>
+          <h2>One brick.<br />Several demands.</h2>
+          <p>Activate ports to see the published allocation change.</p>
+        </div>
+        <div className="cm-multi-panel">
+          {charger.ports.length > 1 ? (
+            <>
+              <div className="cm-plug" aria-label="Number of occupied charger ports">
+                {charger.ports.map((p, i) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`cm-port ${plugged > i ? "is-on" : ""}`}
+                    onClick={() => setPlugged(i + 1)}
+                    aria-pressed={plugged > i}
+                  >
+                    <span>{p.label}</span>
+                    <span className="cm-mono">{plugged > i ? "Plugged" : "Empty"}</span>
+                  </button>
+                ))}
               </div>
-            ) : null}
-            <p className="mt-4 text-sm text-[var(--cm-mute)]">
-              Allocation from the published port map. Plug a second device to see watts move — not a measured wall draw.
-            </p>
-          </>
-        ) : (
-          <p className="mt-4 text-sm text-[var(--cm-mute)]">Single-port brick. No split allocation on file.</p>
-        )}
+              {multi ? (
+                <div className="cm-multi-visual">
+                  <MultiportTree
+                    total={charger.total_watts}
+                    branches={multi.ports.map((p) => ({
+                      id: p,
+                      label: `${labels[p] ?? p} · ${charger.ports.find((x) => x.id === p)?.label ?? p}`,
+                      watts: multi.byPort?.[p] ?? 0,
+                    }))}
+                  />
+                </div>
+              ) : null}
+              <p className="cm-evidence-note">Allocation from the published port map. Plug a second device to see watts move — not a measured wall draw.</p>
+            </>
+          ) : (
+            <p className="cm-evidence-note">Single-port brick. No split allocation on file.</p>
+          )}
+        </div>
       </section>
-      <section className="cm-scene">
-        <p className="cm-mono text-[11px] uppercase tracking-[0.18em]">Rated path, not measured</p>
-        <p className="mt-4 max-w-xl leading-7">{result.explanation} Wattage is negotiated, not measured, unless a lab row exists.</p>
-        <p className="cm-mono mt-4 text-xs">{result.rule_version} · {result.trace.facts.join(" · ")}</p>
-        <ExpertToggle chargerName={charger.name} pd={charger.pd_version} ports={charger.ports} />
-        <div className="mt-10">
+
+      <section className="cm-scene cm-evidence-scene">
+        <details className="cm-disclosure">
+          <summary>
+            <span>
+              <span className="cm-kicker cm-mono">Technical evidence</span>
+              <strong>Rated path, not measured</strong>
+            </span>
+            <span className="cm-disclosure-action cm-mono">Open details</span>
+          </summary>
+          <div className="cm-disclosure-body">
+            <p>{result.explanation} Wattage is negotiated, not measured, unless a lab row exists.</p>
+            <p className="cm-mono">{result.rule_version} · {result.trace.facts.join(" · ")}</p>
+            <ExpertToggle chargerName={charger.name} pd={charger.pd_version} ports={charger.ports} />
+          </div>
+        </details>
+        <div className="cm-feedback-wrap">
           <Feedback site="chargematch" />
         </div>
       </section>

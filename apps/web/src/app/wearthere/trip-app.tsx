@@ -46,10 +46,10 @@ export function TripApp() {
 
   return (
     <div>
-      <DestinationHero initialCity={dest.slug} />
+      <DestinationHero initialCity={dest.slug} initialStart={start} initialEnd={end} initialStyle={style} />
       <ClimateRibbon weather={capsule.weather} />
       <section className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Private trip · noindex · {source.label}</p>
+        <p className="wt-kicker">Private trip · noindex · {source.label}</p>
         <h1 className="wt-serif mt-4 text-6xl">{dest.city}</h1>
         <p className="mt-2 text-xl">
           {start} – {end}
@@ -59,7 +59,12 @@ export function TripApp() {
           {capsule.pieces.length} pieces · {capsule.outfits} outfits · {capsule.weight_kg} kg · {capsule.volume_l} L
         </p>
       </section>
-      <WardrobeBoard pieces={capsule.pieces} />
+      <section className="wt-scene wt-capsule-section" id="capsule">
+        <p className="wt-kicker">Your editable case</p>
+        <div className="mt-10">
+          <WardrobeBoard pieces={capsule.pieces} weather={capsule.weather} activities={dest.activities_default} />
+        </div>
+      </section>
       <section className="wt-scene">
         {capsule.remove_hint ? <p>{capsule.remove_hint}</p> : null}
         {capsule.missing.map((m) => (

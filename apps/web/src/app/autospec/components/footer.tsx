@@ -5,9 +5,10 @@ import { FooterMeta } from "@/components/footer-meta";
 export function AutospecFooter() {
   return (
     <footer className="as-footer">
-      <div>
-        <p className="text-[11px] uppercase tracking-[0.22em]">Garage index</p>
-        <p className="as-display mt-4 text-4xl">Ownership OS</p>
+      <div className="as-footer-intro">
+        <p className="as-eyebrow">Garage index</p>
+        <p className="as-display">Ownership, with the unknowns left visible.</p>
+        <p>Vehicle-graph reference plus the checks you choose to enter. No live connection is implied.</p>
       </div>
       <ul className="grid gap-2 sm:grid-cols-2">
         {VEHICLES.slice(0, 8).map((v) => (

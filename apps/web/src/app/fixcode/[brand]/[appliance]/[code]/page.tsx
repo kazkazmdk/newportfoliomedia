@@ -7,6 +7,13 @@ import { Feedback } from "@/components/feedback";
 import { ViewportScene } from "@/components/creative";
 import { CheckDiagram, checkKindFromText } from "../../../components/machine-diagrams";
 import { ErrorHero } from "../../../components/error-hero";
+import { SectionLabel, StateBadge, type FixcodeState } from "../../../components/system-ui";
+
+function safetyState(safety: string): FixcodeState {
+  if (safety === "STOP_USE" || safety === "PROFESSIONAL_ONLY") return "stop";
+  if (safety === "CAUTION") return "caution";
+  return "ready";
+}
 
 export function generateStaticParams() {
   const errors = ALL_ERRORS.map((item) => ({
@@ -73,21 +80,28 @@ export default async function ErrorPage({
         diagnoseHref={`/fixcode/diagnose?brand=${brand}&appliance=${appliance}&code=${isError ? error!.code : symptom!.symptom_slug}`}
       />
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Why this check first</p>
+        <SectionLabel number="02">Why this check comes first</SectionLabel>
         {profile.questions[0] ? (
-          <p className="mt-5 max-w-xl text-2xl leading-tight">{profile.questions[0].why}</p>
+          <div className="fc-rationale">
+            <StateBadge state="ready">Reversible first</StateBadge>
+            <p>{profile.questions[0].why}</p>
+          </div>
         ) : (
-          <p className="mt-5 max-w-xl text-2xl">No safe first check on file. Do not invent a step.</p>
+          <div className="fc-rationale">
+            <StateBadge state="caution">No safe check on file</StateBadge>
+            <p>Do not invent a step.</p>
+          </div>
         )}
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Other checks</p>
+        <SectionLabel number="03">Continue narrowing</SectionLabel>
         <ol className="mt-6 grid max-w-3xl gap-5">
-          {profile.questions.slice(1).map((q) => (
+          {profile.questions.slice(1).map((q, index) => (
             <li key={q.id} className="fc-check">
               <CheckDiagram kind={checkKindFromText(`${q.text} ${q.why}`)} />
               <div>
-                {q.text}
+                <span className="fixcode-mono text-[10px] text-[var(--fc-mute)]">{String(index + 2).padStart(2, "0")}</span>
+                <p className="mt-1">{q.text}</p>
                 <span className="block text-sm text-[var(--fc-mute)]">{q.why}</span>
               </div>
             </li>
@@ -95,17 +109,21 @@ export default async function ErrorPage({
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">When to stop</p>
+        <SectionLabel number="04">DIY boundary</SectionLabel>
         {diyStop ? (
-          <p className="mt-5 max-w-xl text-2xl text-[var(--fc-signal)]">
-            {tree.boundaries.find((b) => b.blocksSelfService)?.text ?? "Stop self-service if the tree hits a professional or stop-use boundary."}
-          </p>
+          <div className="fc-boundary fc-boundary--stop mt-6">
+            <StateBadge state="stop">Stop self-service</StateBadge>
+            <p>{tree.boundaries.find((b) => b.blocksSelfService)?.text ?? "Stop self-service if the tree hits a professional or stop-use boundary."}</p>
+          </div>
         ) : (
-          <p className="mt-5 max-w-xl text-2xl">No stop-use boundary on this tree. Risk still sits on each cause.</p>
+          <div className="fc-boundary mt-6">
+            <StateBadge state="caution">Check each cause</StateBadge>
+            <p>No stop-use boundary is recorded on this tree. Risk still sits on each cause.</p>
+          </div>
         )}
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Alternative causes</p>
+        <SectionLabel number="05">Cause register</SectionLabel>
         <ol className="mt-8">
           {profile.causes.map((cause, index) => (
             <li key={cause.id} className="fc-hypo">
@@ -114,17 +132,16 @@ export default async function ErrorPage({
                 <p>{cause.name}</p>
                 <p className="mt-1 text-sm leading-6 text-[var(--fc-mute)]">{cause.summary}</p>
               </div>
-              <p className="text-right text-xs text-[var(--fc-mute)]">
-                {cause.safety.replaceAll("_", " ")}
-                <br />
-                {cause.time_minutes} min · €{cause.cost_eur_min}–{cause.cost_eur_max || 0}
-              </p>
+              <div className="fc-cause-meta">
+                <StateBadge state={safetyState(cause.safety)}>{cause.safety.replaceAll("_", " ")}</StateBadge>
+                <span>{cause.time_minutes} min · €{cause.cost_eur_min}–{cause.cost_eur_max || 0}</span>
+              </div>
             </li>
           ))}
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Manufacturer source</p>
+        <SectionLabel number="06">Manufacturer source</SectionLabel>
         <ul className="mt-6 max-w-xl text-sm leading-7">
           {profile.provenance.map((row) => (
             <li key={row.source_id} className="fc-evidence border-t border-[var(--fc-line)] py-4">
@@ -146,7 +163,7 @@ export default async function ErrorPage({
         </ul>
       </ViewportScene>
       <ViewportScene className="fc-scene">
-        <p className="fc-kicker">Related</p>
+        <SectionLabel number="07">Related paths</SectionLabel>
         {"related_symptoms" in profile && profile.related_symptoms.length ? (
           <ul className="mt-8 flex flex-wrap gap-3">
             {profile.related_symptoms.map((slug) => (

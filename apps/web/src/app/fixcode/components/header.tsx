@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { StateBadge, type FixcodeState } from "./system-ui";
 
 const NAV = [
-  { href: "/fixcode/diagnose", label: "Diagnose" },
-  { href: "/fixcode/samsung/washer", label: "Errors" },
-  { href: "/fixcode/samsung/washer", label: "Appliances" },
+  { href: "/fixcode/diagnose", label: "Start diagnosis" },
+  { href: "/fixcode#code-index", label: "Code index" },
+  { href: "/fixcode#appliance-index", label: "Appliances" },
 ];
 
 export function FixcodeHeader({
@@ -20,6 +21,7 @@ export function FixcodeHeader({
   const pathname = usePathname();
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
+  const systemState: FixcodeState = status === "risk" ? "stop" : status === "warn" ? "caution" : "ready";
 
   useEffect(() => {
     const onScroll = () => setCompact(window.scrollY > 24);
@@ -34,12 +36,12 @@ export function FixcodeHeader({
         <span className="fc-mark-dot">FC.</span>
         <span className="fc-mark-name">FixCode / FC.01</span>
       </Link>
-      <nav className={`fc-nav ${open ? "is-open" : ""}`}>
+      <nav id="fixcode-navigation" className={`fc-nav ${open ? "is-open" : ""}`} aria-label="FixCode">
         {NAV.map((item) => (
           <Link
-            key={item.label}
+            key={item.href}
             href={item.href}
-            aria-current={pathname.startsWith(item.href) ? "page" : undefined}
+            aria-current={item.href === "/fixcode/diagnose" && pathname.startsWith(item.href) ? "page" : undefined}
             onClick={() => setOpen(false)}
           >
             {item.label}
@@ -47,8 +49,7 @@ export function FixcodeHeader({
         ))}
       </nav>
       <div className="fc-status">
-        <span className="fixcode-mono">Ready</span>
-        <span className={`fc-led ${status === "risk" ? "risk" : status === "warn" ? "warn" : ""}`} />
+        <StateBadge state={systemState}>{systemState === "ready" ? "System ready" : undefined}</StateBadge>
         {onOpenTrace ? (
           <button type="button" className="fixcode-mono" onClick={onOpenTrace}>
             Source trace
@@ -59,7 +60,7 @@ export function FixcodeHeader({
           </Link>
         )}
       </div>
-      <button type="button" className="fc-menu" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+      <button type="button" className="fc-menu" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-controls="fixcode-navigation">
         Menu
       </button>
     </header>

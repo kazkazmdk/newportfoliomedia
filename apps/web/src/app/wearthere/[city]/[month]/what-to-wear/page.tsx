@@ -12,6 +12,7 @@ import { Feedback } from "@/components/feedback";
 import { ViewportScene } from "@/components/creative";
 import { ClimateRibbon } from "../../../components/climate-ribbon";
 import { DestinationHero } from "../../../components/destination-hero";
+import { SeasonRail } from "../../../components/season-rail";
 import { WardrobeBoard } from "../../../components/wardrobe-board";
 import { climateCopy, climateMood } from "../../../components/climate-theme";
 
@@ -48,8 +49,8 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
     <main>
       <DestinationHero initialCity={dest.slug} />
       <ClimateRibbon weather={w} />
-      <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">
+      <ViewportScene className="wt-scene wt-editorial-intro">
+        <p className="wt-kicker">
           Typical {label} · compiled climate normals
         </p>
         <h1 className="mt-4 max-w-4xl text-5xl leading-none md:text-7xl">
@@ -57,25 +58,31 @@ export default async function WearPeriodPage({ params }: { params: Promise<{ cit
         </h1>
         <p className="wt-serif mt-6 text-3xl">{climateCopy(mood)}</p>
       </ViewportScene>
+      <ViewportScene className="wt-scene wt-season-section">
+        <SeasonRail dest={dest} active={resolved.surface.slug} />
+      </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">How it typically feels</p>
+        <p className="wt-kicker">How it typically feels</p>
         <p className="wt-serif mt-4 text-6xl">
           {w.tmin_c}–{w.tmax_c}°C
         </p>
         <p className="mt-4 max-w-lg leading-7 opacity-80">Range, not today / tomorrow. About {w.rain_days} rain days · {w.rain_mm} mm.</p>
       </ViewportScene>
-      <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Your {dest.city} capsule · {cap.pieces.length} pieces · {cap.outfits} outfits</p>
-        <WardrobeBoard pieces={cap.pieces} />
+      <ViewportScene className="wt-scene wt-capsule-section" id="capsule">
+        <p className="wt-kicker">Your {dest.city} capsule · {cap.pieces.length} pieces · {cap.outfits} outfits</p>
+        <h2 className="wt-serif mt-4 max-w-2xl text-5xl leading-none">Packed for a reason, not a trend.</h2>
+        <div className="mt-10">
+          <WardrobeBoard pieces={cap.pieces} weather={w} activities={dest.activities_default} />
+        </div>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Leave this behind</p>
+        <p className="wt-kicker">Leave this behind</p>
         <p className="wt-serif mt-4 max-w-xl text-4xl leading-none">
           {skip.length ? skip.join(", ") : "No heavy layers flagged for this period."}
         </p>
       </ViewportScene>
       <ViewportScene className="wt-scene">
-        <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Climate source</p>
+        <p className="wt-kicker">Climate source</p>
         <p className="mt-4 max-w-xl leading-7 opacity-80">
           Compiled monthly normals. No station ID, no official dataset API locator. Period labelled 1991–2020 in-repo only. Weather coverage {cap.coverage.weather_coverage}%.
         </p>

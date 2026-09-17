@@ -23,7 +23,7 @@ export function WearthereHeader() {
       <nav className={`wt-nav ${open ? "is-open" : ""}`}>
         <Link href="/wearthere#destinations" onClick={() => setOpen(false)}>Destinations</Link>
         <Link href="/wearthere#weather" onClick={() => setOpen(false)}>Weather</Link>
-        <Link href="/wearthere/tokyo" onClick={() => setOpen(false)}>Capsule</Link>
+        <Link href="/wearthere#capsule" onClick={() => setOpen(false)}>Capsule</Link>
       </nav>
       <Link href="/wearthere#plan" className={`wt-plan ${open ? "is-open" : ""}`}>
         Search / Plan trip

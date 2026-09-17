@@ -57,16 +57,18 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
 
   return (
     <div>
-      <section className="tc-hero is-result">
-        <div className="tc-form">
+      <section className="tc-hero is-result tc-result-hero">
+        <div className="tc-result-intro">
+          <p className="tc-kicker">Corridor comparison · {route.km} km</p>
+          <p>One journey, measured across cash, total time and group size.</p>
+        </div>
+        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} />
+        <div className="tc-form tc-result-form">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em]">This corridor</p>
+            <p className="tc-kicker">A → B · this corridor</p>
             <h1 className="mt-1 text-3xl md:text-4xl">
               {route.from.name} → {route.to.name}
             </h1>
-            <p className="mt-1 text-sm text-[var(--tc-mute)]">
-              {route.km} km · {costLabel("HEURISTIC")} — not a live ticket
-            </p>
           </div>
           <label>
             People · {travellers}
@@ -79,9 +81,11 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
               onChange={(e) => setTravellers(Number(e.target.value))}
             />
           </label>
-          <p className="tc-mono text-xl self-end">Best for {travellers} · {LABELS[partyBest]}</p>
+          <div className="tc-result-status">
+            <span>Current signal</span>
+            <strong>Best for {travellers} · {LABELS[partyBest]}</strong>
+          </div>
         </div>
-        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} compact />
         <div className="tc-verdicts" aria-label="Trip comparison">
           {fastest ? (
             <div className="tc-verdict" data-verdict="fastest">
@@ -108,16 +112,33 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
             </div>
           ) : null}
         </div>
+        <div className="tc-source-strip">
+          <p>
+            <span>Model</span>
+            <strong>{costLabel("HEURISTIC")}</strong>
+          </p>
+          <p>
+            <span>Fare status</span>
+            <strong>Typical estimates · not live tickets</strong>
+          </p>
+          <p>
+            <span>Map status</span>
+            <strong>Geodesic diagram · not road routing</strong>
+          </p>
+          <a href="#assumptions">Inspect assumptions ↓</a>
+        </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Best option for this trip</p>
+        <p className="tc-section-index tc-mono">01 / Decision</p>
+        <h2 className="tc-scene-title">Best option for this trip</h2>
         <p className="mt-4 text-5xl">{LABELS[result.best]}</p>
         <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--tc-mute)]">
           Cash = fuel + tolls + parking. True cost adds wear. Train/bus/flight figures are typical estimates, not current tickets.
         </p>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Door to door</p>
+        <p className="tc-section-index tc-mono">02 / Time</p>
+        <h2 className="tc-scene-title">Door to door</h2>
         <div className="mt-6">
           <DoorToDoorTimeline
             rows={result.modes.map((m) => ({
@@ -157,7 +178,8 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Cash cost</p>
+        <p className="tc-section-index tc-mono">03 / Cost</p>
+        <h2 className="tc-scene-title">Cash cost</h2>
         <div className="mt-6">
           <CostRace
             best={result.best}
@@ -172,7 +194,9 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Adjust the assumptions</p>
+        <p className="tc-section-index tc-mono">04 / Model</p>
+        <h2 className="tc-scene-title">Adjust the assumptions</h2>
+        <p className="tc-scene-deck">Change the inputs, not the evidence status. Every result below remains a modelled estimate.</p>
         <label className="mt-4 flex items-center gap-2 text-sm">
           <input type="checkbox" checked={trueCost} onChange={(e) => setTrueCost(e.target.checked)} />
           Show true cost (wear). Cash cost stays the default figure.
@@ -193,7 +217,8 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
         </div>
       </section>
       <section className="tc-scene">
-        <p className="text-[11px] uppercase tracking-[0.18em]">When driving becomes cheaper</p>
+        <p className="tc-section-index tc-mono">05 / Group</p>
+        <h2 className="tc-scene-title">When driving becomes cheaper</h2>
         <BreakEvenChart
           rows={table.map((row) => {
             const ev = compareRoute(adjusted, row.travellers, false).modes.find((m) => m.mode === "ev");
@@ -218,22 +243,24 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
         ) : null}
       </section>
       <section className="tc-scene" id="assumptions">
-        <p className="text-[11px] uppercase tracking-[0.18em]">Assumptions and evidence</p>
-        <ul className="mt-4 grid gap-1 text-xs uppercase tracking-wide text-[var(--tc-mute)] md:grid-cols-2">
-          <li>Fuel — {costs.fuel.evidence} · {costLabel(costs.fuel.evidence)}</li>
-          <li>Tolls — {costs.tolls.evidence} · {costLabel(costs.tolls.evidence)}</li>
-          <li>Parking — {costs.parking.evidence} · {costLabel(costs.parking.evidence)}</li>
-          <li>Train — {costs.train.evidence} · {costLabel(costs.train.evidence)}</li>
+        <p className="tc-section-index tc-mono">06 / Evidence</p>
+        <h2 className="tc-scene-title">Assumptions and provenance</h2>
+        <p className="tc-scene-deck">The model says what it knows. These labels describe the evidence behind each cost input.</p>
+        <ul className="tc-evidence-grid">
+          <li><span>Fuel</span><strong>{costLabel(costs.fuel.evidence)}</strong><small>{costs.fuel.evidence}</small></li>
+          <li><span>Tolls</span><strong>{costLabel(costs.tolls.evidence)}</strong><small>{costs.tolls.evidence}</small></li>
+          <li><span>Parking</span><strong>{costLabel(costs.parking.evidence)}</strong><small>{costs.parking.evidence}</small></li>
+          <li><span>Train</span><strong>{costLabel(costs.train.evidence)}</strong><small>{costs.train.evidence}</small></li>
         </ul>
-        <ul className="mt-8 grid gap-4">
+        <ul className="tc-assumption-list">
           {result.modes.map((m) => (
             <li key={m.mode}>
-              <p className="text-sm">
+              <p>
                 {LABELS[m.mode]} · {m.stale ? "fare unavailable as current" : m.price_kind === "HEURISTIC_PRICE" ? "Typical estimate" : m.price_kind.replaceAll("_", " ")}
                 {" — "}
                 not a live ticket · €{m.per_person_cash}/person · {m.confidence} confidence
               </p>
-              <ul className="mt-2 text-sm text-[var(--tc-mute)]">
+              <ul>
                 {m.assumptions.map((a) => (
                   <li key={a}>{a}</li>
                 ))}

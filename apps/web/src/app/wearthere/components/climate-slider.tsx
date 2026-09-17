@@ -16,10 +16,17 @@ export function ClimateSlider({ dest }: { dest: Destination }) {
   }, [dest, temp]);
   const capsule = useMemo(() => capsuleFor(dest, month.month, "classic"), [dest, month.month]);
   return (
-    <section className="wt-scene">
-      <p className="text-[11px] uppercase tracking-[0.24em] opacity-70">Climate → wardrobe</p>
-      <label className="mt-6 grid max-w-md gap-2 text-xs uppercase tracking-[0.18em]">
-        Typical temperature {temp}°C
+    <section className="wt-scene wt-climate-tool">
+      <div>
+        <p className="wt-kicker">Climate → wardrobe</p>
+        <h2 className="wt-serif mt-4 max-w-xl text-5xl leading-none">See how a typical temperature changes the edit.</h2>
+        <p className="mt-5 max-w-lg text-sm leading-6 opacity-75">
+          This explores compiled monthly normals for {dest.city}. It does not simulate or predict live weather.
+        </p>
+      </div>
+      <div className="wt-slider-control">
+      <label className="grid gap-3 text-xs uppercase tracking-[0.18em]">
+        Typical temperature <strong className="wt-serif text-5xl normal-case tracking-normal">{temp}°C</strong>
         <input
           type="range"
           min={-8}
@@ -31,8 +38,9 @@ export function ClimateSlider({ dest }: { dest: Destination }) {
       <p className="mt-3 text-sm opacity-80">
         Closest compiled month: {month.month} · {month.tmin_c}–{month.tmax_c}°C · {month.rain_days} rain days
       </p>
-      <div className="mt-8">
-        <WardrobeBoard pieces={capsule.pieces} />
+      </div>
+      <div className="wt-slider-result">
+        <WardrobeBoard pieces={capsule.pieces} weather={month} activities={dest.activities_default} />
       </div>
     </section>
   );

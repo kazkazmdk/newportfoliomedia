@@ -7,6 +7,7 @@ import { Feedback } from "@/components/feedback";
 import { AnimatedNumber, CursorCanvas } from "@/components/creative";
 import { MachineVisual, zoneFromText } from "./components/machine-visual";
 import { SourceTrace } from "./components/source-trace";
+import { ProcessRail, SectionLabel, StateBadge, type FixcodeState } from "./components/system-ui";
 
 export function DiagnoseTool() {
   const params = useSearchParams();
@@ -37,6 +38,11 @@ export function DiagnoseTool() {
 
   const current: DiagnosisState = state ?? initialState(profile);
   const result: DiagnosisResult = diagnose(profile, current);
+  const safetyState: FixcodeState = result.self_service_blocked || result.safety_ceiling === "STOP_USE"
+    ? "stop"
+    : result.safety_ceiling === "CAUTION"
+      ? "caution"
+      : "ready";
   const zone = zoneFromText(`${result.headline_cause?.name ?? ""} ${"code" in profile ? profile.code : profile.symptom} ${profile.meaning}`);
   const top = result.causes[0]?.probability ?? 0;
   const live = result.causes.slice(0, 2).flatMap((c) => {
@@ -54,15 +60,16 @@ export function DiagnoseTool() {
     <div>
       <SourceTrace open={traceOpen} onClose={() => setTraceOpen(false)} rows={profile.provenance} />
       {mode === "scan" ? (
-        <section className="fc-scene">
-          <p className="fc-kicker">Scan the panel</p>
-          <h2 className="mt-3 text-3xl">Confirm what the machine shows</h2>
+        <section className="fc-scene fc-manual-capture">
+          <SectionLabel number="00">Manual photo reference</SectionLabel>
+          <h2 className="mt-5 text-3xl">Add context, then type what the machine shows.</h2>
           <p className="mt-3 max-w-lg text-sm leading-6 text-[var(--fc-mute)]">
-            Photos of the screen, model sticker, or appliance are useful. Vision is not run without confirmation.
+            A photo can help you read the panel or model sticker. FixCode does not analyze it automatically and will not infer a model or error from the image.
           </p>
-          <input type="file" accept="image/*" capture="environment" className="mt-5 block text-sm" />
+          <input type="file" accept="image/*" capture="environment" className="fc-file-input mt-5 block text-sm" aria-describedby="manual-photo-note" />
+          <p id="manual-photo-note" className="mt-2 text-xs text-[var(--fc-mute)]">You must confirm the brand, appliance and displayed characters yourself.</p>
           <label className="fc-field mt-4 max-w-md">
-            <span>What do you see?</span>
+            <span>Confirmed panel or label text</span>
             <input className="fc-input" value={scanNote} onChange={(e) => setScanNote(e.target.value)} placeholder="Samsung WW… 4C" />
           </label>
         </section>
@@ -71,14 +78,18 @@ export function DiagnoseTool() {
       <section className="fc-hero">
         <div className="fc-hero-copy">
           <div>
-            <p className="fc-kicker">
-              {"code" in profile ? `${profile.brand} ${profile.appliance}` : profile.appliance} · {result.confidence_level.toLowerCase()} confidence · {result.rule_version}
-              {result.display_probabilities ? "" : " · common possibilities, not calibrated %"}
-            </p>
-            {result.self_service_blocked || result.safety_ceiling === "STOP_USE" ? (
-              <p className="mt-4 border border-[var(--fc-signal)] px-3 py-2 text-sm text-[var(--fc-signal)]">
-                {result.stop_boundary ?? "Stop using the appliance. This is not a DIY path."} Book a technician.
+            <div className="fc-eyebrow-row">
+              <p className="fc-kicker">
+                {"code" in profile ? `${profile.brand} ${profile.appliance}` : profile.appliance} · {result.confidence_level.toLowerCase()} confidence · {result.rule_version}
+                {result.display_probabilities ? "" : " · common possibilities, not calibrated %"}
               </p>
+              <StateBadge state={safetyState} />
+            </div>
+            {result.self_service_blocked || result.safety_ceiling === "STOP_USE" ? (
+              <div className="fc-boundary fc-boundary--stop mt-4">
+                <StateBadge state="stop">DIY boundary reached</StateBadge>
+                <p>{result.stop_boundary ?? "Stop using the appliance. This is not a DIY path."} Book a technician.</p>
+              </div>
             ) : null}
             <h1 className="fc-code-giant mt-4">
               {"code" in profile ? profile.code : "SY"}
@@ -90,9 +101,16 @@ export function DiagnoseTool() {
               Open source trace
             </button>
           </div>
+          <ProcessRail active={result.next_question && !result.self_service_blocked ? 2 : 3} />
           {result.next_question && !result.self_service_blocked ? (
             <div className="fc-do-first">
-              <p className="fc-kicker">Do this first</p>
+              <div className="fc-first-heading">
+                <span className="fc-panel-index">{String(current.answers.length + 1).padStart(2, "0")}</span>
+                <div>
+                  <p className="fc-kicker">Next reversible check</p>
+                  <StateBadge state="ready">Safe branch</StateBadge>
+                </div>
+              </div>
               <p className="mt-2 text-sm leading-6 text-[var(--fc-mute)]">{result.why_this_question}</p>
               <h2 className="mt-4 text-2xl">{result.next_question.text}</h2>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -138,18 +156,22 @@ export function DiagnoseTool() {
             </div>
           )}
         </div>
-        <CursorCanvas label="Trace" color="#161513" className="fc-stage">
+        <CursorCanvas label="Diagnostic path" color="#161513" className="fc-stage">
+          <div className="fc-stage-header">
+            <span className="fixcode-mono">FC / ACTIVE TREE</span>
+            <StateBadge state={safetyState} />
+          </div>
           <div className="fc-scan ready" />
           <MachineVisual zone={zone} ready appliance={appliance} liveSystems={live} dimSystems={dim} />
-          <p className="absolute bottom-5 left-5 fixcode-mono text-[10px] uppercase tracking-[0.2em]">
-            {result.causes.length} possible causes
-            {state ? ` · narrowed` : ""}
-          </p>
+          <div className="fc-stage-readout">
+            <span className="fixcode-mono">{result.causes.length} possible causes{state ? " · narrowed" : ""}</span>
+            <span>Diagram reflects answers and documented rules</span>
+          </div>
         </CursorCanvas>
       </section>
 
       <section className="fc-scene">
-        <p className="fc-kicker">Diagnostic narrowing · {result.causes.length} possible causes</p>
+        <SectionLabel number="02">Diagnostic narrowing · {result.causes.length} possible causes</SectionLabel>
         <ol className="mt-8">
           {result.causes.map((cause, index) => (
             <li key={cause.id} className={`fc-hypo ${index > 1 ? "is-dim" : ""}`}>

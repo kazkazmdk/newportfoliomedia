@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { VEHICLES, allAutospecPages, getVehicle, serviceIntervalLabel, typicalServiceInterval, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { CockpitCell } from "../../../../components/cockpit-cell";
 import { IdentityStrip } from "../../../../components/identity-strip";
 import { OwnershipTimeline } from "../../../../components/ownership-timeline";
 import { VehicleStage } from "../../../../components/vehicle-stage";
@@ -47,42 +48,40 @@ export default async function VehicleHub({
   return (
     <main>
       <section className="as-hero">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--as-mute)]">
+        <div className="as-hero-copy">
+          <p className="as-eyebrow">
             {v.make} · {v.generation} · {v.engine_code}
           </p>
-          <h1 className="mt-4 text-5xl leading-[0.9] md:text-7xl">
+          <h1>
             {v.make} {v.model}
             <br />
             {v.variant}
           </h1>
-          <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-[var(--as-mute)]">
+          <p className="as-hero-index">
             {v.generation} · {v.engine_code} · {v.years[0]}–{v.years.at(-1)}
           </p>
           <div className="as-cockpit">
-            <div className="as-cockpit-cell">
-              <p>Typical service interval</p>
-              <strong>{typical ? serviceIntervalLabel(typical) : "No interval on file"}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Oil</p>
-              <strong>{v.oil.capacity_liters ? `${v.oil.spec} · ${v.oil.capacity_liters} L` : "EV — none"}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Tyres</p>
-              <strong>{v.tyres.front}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Battery</p>
-              <strong>12V {v.battery.type}</strong>
-            </div>
-            <div className="as-cockpit-cell">
-              <p>Recalls</p>
-              <strong>{v.recalls.length ? "VIN-specific · check source" : "No active data / check source"}</strong>
-            </div>
+            <CockpitCell
+              label="Typical service interval"
+              value={typical ? serviceIntervalLabel(typical) : "No interval on file"}
+              provenance="Graph interval · no mileage entered"
+            />
+            <CockpitCell
+              label="Oil"
+              value={v.oil.capacity_liters ? `${v.oil.spec} · ${v.oil.capacity_liters} L` : "EV — none"}
+              provenance="Graph specification"
+            />
+            <CockpitCell label="Tyres" value={v.tyres.front} provenance="Graph fitment" />
+            <CockpitCell label="Battery" value={`12V ${v.battery.type}`} provenance="Graph reference" />
+            <CockpitCell
+              label="Recalls"
+              value={v.recalls.length ? "VIN-specific · check source" : "No active data / check source"}
+              provenance="Official portal required"
+            />
           </div>
-          <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-cta mt-8 inline-block">
-            Add to My Garage
+          <p className="as-cockpit-truth">Reference cockpit · no live vehicle connection · unknown values remain unknown.</p>
+          <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-cta as-cta-arrow">
+            Add to My Garage <span aria-hidden>↗</span>
           </Link>
         </div>
         <VehicleStage makeSlug={v.make_slug} generationSlug={v.generation_slug} identity={`${v.make} ${v.variant} ${v.generation}`} />

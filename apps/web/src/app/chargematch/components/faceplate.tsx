@@ -14,8 +14,15 @@ export function Faceplate({
 }) {
   return (
     <CursorCanvas label="Connect" color="#11110f" className="cm-face">
-      <p className="cm-mono text-[10px] uppercase tracking-[0.18em]">{charger.name}</p>
-      <div className="cm-plate" style={{ transform: "rotateX(10deg) rotateY(-8deg)" }}>
+      <div className="cm-face-heading">
+        <div>
+          <span className="cm-field-label cm-mono">Charger face</span>
+          <p>{charger.name}</p>
+        </div>
+        <span className="cm-face-total cm-mono">{charger.total_watts}W</span>
+      </div>
+      <div className="cm-plate">
+        <span className="cm-plate-brand cm-mono">ChargeMatch</span>
         {charger.ports.map((port) => {
           const usbA = /a\b|usb-a|type.a/i.test(port.label);
           return (
@@ -25,12 +32,14 @@ export function Faceplate({
               className={`cm-jack ${usbA ? "is-a" : "is-c"} ${selected === port.id ? "is-on" : ""}`}
               onClick={() => onSelect(port.id)}
               aria-pressed={selected === port.id}
+              aria-label={`Use ${port.label}, rated up to ${port.watts} watts`}
             >
-              <span className="cm-jack-hole" />
+              <span className="cm-jack-hole"><i /></span>
               <span>
                 {port.label}
-                <small className="cm-mono">{port.watts}W</small>
+                <small className="cm-mono">{port.watts}W max</small>
               </span>
+              <em className="cm-mono">{selected === port.id ? "Active" : "Select"}</em>
             </button>
           );
         })}

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ProvenanceRecord } from "@penta/data-provenance";
+import { StateBadge } from "./system-ui";
 
 function humanType(value: string) {
   if (value === "MANUFACTURER") return "Manufacturer";
@@ -28,7 +29,10 @@ export function SourceTrace({
       ) : null}
       <aside className={`fc-drawer ${open ? "open" : ""}`} aria-hidden={!open}>
         <div className="flex items-center justify-between">
-          <p className="fc-kicker">Source trace</p>
+          <div>
+            <p className="fc-kicker">Source trace</p>
+            <p className="mt-2 text-sm text-[var(--fc-mute)]">Evidence attached to this diagnostic record.</p>
+          </div>
           <button type="button" className="fixcode-mono text-xs uppercase tracking-[0.16em]" onClick={onClose}>
             Close
           </button>
@@ -37,9 +41,15 @@ export function SourceTrace({
           <p className="mt-8 text-sm leading-7 text-[var(--fc-mute)]">No provenance rows on this surface.</p>
         ) : (
           <ul className="mt-8 grid gap-8">
-            {rows.map((row) => (
+            {rows.map((row, index) => (
               <li key={row.source_id} className="fc-evidence">
-                <p className="text-xl">{row.source_name ?? "Documented source"}</p>
+                <div className="fc-evidence-heading">
+                  <span className="fc-section-number">{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <p className="text-xl">{row.source_name ?? "Documented source"}</p>
+                    <StateBadge state={row.verified_at ? "ready" : "caution"}>{row.verified_at ? "Locator verified" : "General source"}</StateBadge>
+                  </div>
+                </div>
                 <dl className="mt-4 grid gap-2 text-[11px] uppercase tracking-[0.16em] text-[var(--fc-mute)]">
                   <div>
                     <dt>Source type</dt>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ALL_ERRORS, BRANDS } from "@penta/fixcode";
 import { FooterMeta } from "@/components/footer-meta";
+import { SafetyLegend } from "./system-ui";
 
 export function FixcodeFooter() {
   const index = ALL_ERRORS.slice(0, 8);
@@ -27,6 +28,9 @@ export function FixcodeFooter() {
         <p className="mt-3 text-sm leading-7">
           {BRANDS.map((b) => b.name).join(" · ")}
         </p>
+        <div className="mt-6">
+          <SafetyLegend />
+        </div>
         <p className="mt-6 text-xs uppercase tracking-[0.18em] text-[var(--fc-mute)]">
           Source trace lives with every diagnosis
         </p>

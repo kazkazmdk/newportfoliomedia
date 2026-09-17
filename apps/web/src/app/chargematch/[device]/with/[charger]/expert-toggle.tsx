@@ -14,12 +14,19 @@ export function ExpertToggle({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <section className="mt-8">
-      <button type="button" className="text-sm underline" onClick={() => setOpen((v) => !v)}>
-        {open ? "Hide" : "Expert mode"}
+    <section className="cm-expert">
+      <button
+        type="button"
+        className="cm-expert-toggle"
+        aria-expanded={open}
+        aria-controls="cm-expert-details"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span>Expert mode</span>
+        <span className="cm-mono">{open ? "Close" : "View PDOs"}</span>
       </button>
       {open ? (
-        <div className="cm-box mt-3 p-4 text-sm leading-6">
+        <div id="cm-expert-details" className="cm-expert-details">
           <p>
             {chargerName} · {pd}
           </p>

@@ -31,35 +31,44 @@ export function PowerFlow({
   ];
   const top = Math.max(sourceWatts, 1);
   return (
-    <div className="cm-stack">
+    <div className="cm-stack" aria-label="Power ceiling breakdown">
+      <div className="cm-stack-heading">
+        <span className="cm-mono">Power path</span>
+        <span className="cm-mono">Tap a row for evidence</span>
+      </div>
       {steps.map((step) => (
         <button
           key={step.id}
           type="button"
           className={`cm-step ${step.limit ? "is-limit" : ""}`}
           onClick={() => setOpen(open === step.id ? null : step.id)}
+          aria-expanded={open === step.id}
+          aria-controls={`cm-step-detail-${step.id}`}
         >
-          <p className="cm-mono text-[11px] uppercase">{step.label}</p>
+          <span className="cm-step-label cm-mono">
+            {step.label}
+            {step.limit ? <i>Limit</i> : null}
+          </span>
           <div className="cm-flow-bar">
             <span style={{ width: `${Math.min(100, (step.watts / top) * 100)}%` }} />
           </div>
-          <p className="cm-mono text-lg">
+          <span className="cm-step-value cm-mono">
             <AnimatedNumber value={step.watts} suffix="W" />
-          </p>
+          </span>
           {open === step.id ? (
-            <p className="cm-why">
-              {step.limit ? "LIMIT · " : ""}
+            <span className="cm-why" id={`cm-step-detail-${step.id}`}>
               {WHY[step.id]} Evidence: manufacturer specification / calculated path. Not measured.
-            </p>
+            </span>
           ) : null}
         </button>
       ))}
-      <p className="cm-mono mt-6 text-5xl">
-        <AnimatedNumber value={chain.watts} suffix="W" />
-      </p>
-      <p className="mt-2 text-sm text-[var(--cm-mute)]">
-        {chain.watts}W delivered · limit {chain.limitingComponent} · {chain.powerKind.replaceAll("_", " ")}
-      </p>
+      <div className="cm-stack-result">
+        <div>
+          <span className="cm-field-label cm-mono">Expected ceiling</span>
+          <strong className="cm-mono"><AnimatedNumber value={chain.watts} suffix="W" /></strong>
+        </div>
+        <p>{chain.watts}W calculated · limit {chain.limitingComponent} · {chain.powerKind.replaceAll("_", " ")}</p>
+      </div>
     </div>
   );
 }

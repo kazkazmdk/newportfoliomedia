@@ -2,6 +2,7 @@
 
 export type MachineZone = "inlet" | "pump" | "motor" | "door" | "sensor" | "heater" | "none";
 export type WaterStep = "source" | "hose" | "valve" | "control" | MachineZone;
+const REGISTRATION_CELLS = Array.from({ length: 16 }, (_, index) => index);
 
 export function zoneFromText(value: string): MachineZone {
   const t = value.toLowerCase();
@@ -50,10 +51,13 @@ export function MachineVisual({
   const hot = (id: MachineZone) => (zone === id ? "is-hot" : ready ? "is-ready" : "");
 
   return (
-    <div className="fc-machine" role="img" aria-label={`${appliance} system schematic`}>
+    <div className="fc-machine" role="img" aria-label={`${appliance} documented system schematic`}>
       <p className="fc-plate-mark" aria-hidden>
-        Water path
+        System path / {focus}
       </p>
+      <div className="fc-registration-mark" aria-hidden>
+        {REGISTRATION_CELLS.map((index) => <i key={index} />)}
+      </div>
       <svg viewBox="0 0 420 480" fill="none">
         <g data-system="enclosure">
           <rect className={`fc-part ${hot("door")}`} x="78" y="36" width="248" height="392" rx="14" />
