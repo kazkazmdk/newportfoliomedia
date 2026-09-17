@@ -6,6 +6,9 @@ These references define a visual language and a functional benchmark for each
 product. They are not templates to reproduce. Penta keeps its own data,
 interaction model, identity, accessibility requirements and truth boundaries.
 
+Comparison against the five production homes, and the sequenced plan, live in
+[PENTA_REFERENCE_PLAN.md](./PENTA_REFERENCE_PLAN.md).
+
 | Product | Awwwards (visual) | Live visual site | Practical site |
 | --- | --- | --- | --- |
 | FixCode | [Shinkei Systems — Honorable Mention](https://www.awwwards.com/sites/shinkei-systems) | [shinkei.systems](https://shinkei.systems/) | [Samsung washer error codes](https://www.samsung.com/us/support/troubleshoot/TSG10000997/) |
