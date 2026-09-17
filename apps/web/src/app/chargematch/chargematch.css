@@ -1738,6 +1738,15 @@
     linear-gradient(160deg, #22221e, #10100e 68%);
 }
 
+.cm-bench .cm-hero-intro {
+  margin-bottom: 1rem;
+}
+
+.cm-bench .cm-hero-intro h1 {
+  max-width: 12ch;
+  font-size: clamp(2.6rem, 6vw, 5.4rem);
+}
+
 .cm-bench .cm-hero-intro > p:last-child {
   color: #aaa89f;
 }
@@ -1786,7 +1795,7 @@
 }
 
 .cm-bench .cm-product-stage {
-  min-height: min(42rem, calc(100svh - 16rem));
+  min-height: min(24rem, calc(100svh - 22rem));
   border-color: #34342f;
 }
 
