@@ -122,7 +122,7 @@ Do not reintroduce a CI or script deploy for the same Git SHA that Git integrati
 
 ## Dashboard settings that this repository cannot finish
 
-`ignoreCommand` in `vercel.json` is the repo-side control. Confirm each of the five projects in the Vercel Dashboard:
+`ignoreCommand` in `vercel.json` is the repo-side control. `commandForIgnoringBuildStep` was also PATCHed on the five projects via the Vercel API (no deployment created). Still confirm each project in the Dashboard:
 
 1. **Settings → Git → Ignored Build Step**
    - Command: `node scripts/vercel-should-build.mjs`
