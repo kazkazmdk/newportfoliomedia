@@ -64,15 +64,10 @@ export function CookieConsent() {
     <>
       {consent === null && !settingsOpen ? (
         <section className="cookie-banner" aria-label="Cookie notice">
-          <div>
-            <p className="cookie-eyebrow">Your privacy</p>
-            <p className="cookie-title">Only essential cookies are on by default.</p>
-            <p className="cookie-copy">
-              We use one essential cookie to remember your choice. Optional analytics and preference
-              storage stay off unless you opt in.{" "}
-              <Link href="/cookies">See cookie details</Link>.
-            </p>
-          </div>
+          <p className="cookie-title">
+            Essential cookies only by default.{" "}
+            <Link href="/cookies">Details</Link>
+          </p>
           <div className="cookie-actions">
             <button type="button" className="cookie-button secondary" onClick={() => choose({ analytics: false, preferences: false })}>
               Reject optional

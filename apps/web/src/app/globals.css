@@ -157,16 +157,20 @@ body {
 .cookie-banner {
   position: fixed;
   z-index: 100;
-  right: 1rem;
-  bottom: 1rem;
-  left: 1rem;
-  display: grid;
-  gap: 1.25rem;
-  max-width: 70rem;
-  margin: 0 auto;
-  padding: 1.2rem;
-  border: 1px solid var(--cookie-ink);
-  box-shadow: 0 18px 70px rgb(0 0 0 / 18%);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem 1rem;
+  max-width: none;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 0;
+  border-top: 1px solid var(--cookie-ink);
+  box-shadow: 0 -8px 28px rgb(0 0 0 / 10%);
 }
 
 .cookie-eyebrow {
@@ -178,9 +182,11 @@ body {
 }
 
 .cookie-title {
-  margin: 0.35rem 0 0;
-  font-size: 1.05rem;
+  margin: 0;
+  max-width: 42rem;
+  font-size: 0.78rem;
   font-weight: 650;
+  line-height: 1.35;
 }
 
 .cookie-copy,
@@ -204,15 +210,19 @@ body {
   gap: 0.55rem;
 }
 
+.cookie-banner .cookie-actions {
+  flex-wrap: nowrap;
+}
+
 .cookie-button,
 .cookie-close {
-  min-height: 2.65rem;
+  min-height: 2.2rem;
   border: 1px solid var(--cookie-ink);
-  padding: 0.62rem 0.85rem;
+  padding: 0.35rem 0.7rem;
   color: var(--cookie-ink);
   background: transparent;
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 650;
   cursor: pointer;
 }
@@ -303,9 +313,21 @@ body {
 
 @media (min-width: 760px) {
   .cookie-banner {
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    padding: 1.35rem 1.5rem;
+    padding: 0.5rem 1.25rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .cookie-banner {
+    align-items: stretch;
+  }
+
+  .cookie-banner .cookie-actions {
+    width: 100%;
+  }
+
+  .cookie-banner .cookie-button {
+    flex: 1 1 auto;
   }
 }
 
