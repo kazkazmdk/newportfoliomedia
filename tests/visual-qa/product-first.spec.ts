@@ -125,7 +125,7 @@ test.describe("product-first visual QA", () => {
     await fullyInViewport(page.getByRole("button", { name: /320d/i }).first(), 844, "AutoSpec vehicle hit");
 
     await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
-    await fullyInViewport(page.getByText(/do this first/i).locator("visible=true").first(), 844, "Do this first");
+    await fullyInViewport(page.getByText(/first reversible check/i).locator("visible=true").first(), 844, "First reversible check");
     await fullyInViewport(page.getByRole("link", { name: /start guided check/i }), 844, "Start guided check");
   });
 
