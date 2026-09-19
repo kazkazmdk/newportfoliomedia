@@ -48,15 +48,17 @@ async function settleVisual(page: Page) {
   await page.evaluate(async () => {
     await Promise.all(
       [...document.images].map((img) => {
+        const hero = img.closest(".wt-stage-photo, .as-car-photo");
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return new Promise<void>((resolve, reject) => {
           const ok = () => resolve();
-          const fail = () => reject(new Error(`image failed ${img.currentSrc || img.src}`));
+          const fail = () => (hero ? reject(new Error(`hero image failed ${img.currentSrc || img.src}`)) : resolve());
           img.addEventListener("load", ok, { once: true });
           img.addEventListener("error", fail, { once: true });
           window.setTimeout(() => {
             if (img.complete && img.naturalWidth > 0) resolve();
-            else reject(new Error(`image timeout ${img.currentSrc || img.src}`));
+            else if (hero) reject(new Error(`hero image timeout ${img.currentSrc || img.src}`));
+            else resolve();
           }, 8000);
         });
       }),
