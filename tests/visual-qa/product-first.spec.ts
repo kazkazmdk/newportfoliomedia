@@ -47,14 +47,15 @@ async function settleVisual(page: Page) {
   }
   await page.evaluate(async () => {
     await Promise.all(
-      [...document.images].map((img) =>
-        img.complete
-          ? Promise.resolve()
-          : new Promise<void>((resolve) => {
-              img.addEventListener("load", () => resolve(), { once: true });
-              img.addEventListener("error", () => resolve(), { once: true });
-            }),
-      ),
+      [...document.images].map((img) => {
+        if (img.complete) return Promise.resolve();
+        return new Promise<void>((resolve) => {
+          const done = () => resolve();
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+          window.setTimeout(done, 2500);
+        });
+      }),
     );
   });
 }
