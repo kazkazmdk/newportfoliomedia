@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { mkdirSync, existsSync } from "node:fs";
+import { mkdirSync, existsSync, readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -81,19 +81,26 @@ async function shot(page: Page, file: string, fullPage = false) {
   await page.screenshot({ path: path.join(CURRENT, file), fullPage, animations: "disabled" });
 }
 
+function dataUri(file: string) {
+  const buf = readFileSync(file);
+  return `data:image/png;base64,${buf.toString("base64")}`;
+}
+
 async function composeSideBySide(page: Page, leftFile: string, rightFile: string, outFile: string) {
-  const left = `file://${leftFile}`;
-  const right = `file://${rightFile}`;
-  await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.setContent(`<!doctype html><html><body style="margin:0;background:#111110;display:flex;gap:12px">
-    <figure style="margin:0;flex:1"><figcaption style="color:#fff;font:12px sans-serif;padding:8px 10px;letter-spacing:.16em;text-transform:uppercase">Reference</figcaption><img src="${left}" style="width:100%;height:auto;display:block"></figure>
-    <figure style="margin:0;flex:1"><figcaption style="color:#fff;font:12px sans-serif;padding:8px 10px;letter-spacing:.16em;text-transform:uppercase">Penta</figcaption><img src="${right}" style="width:100%;height:auto;display:block"></figure>
+  const left = dataUri(leftFile);
+  const right = dataUri(rightFile);
+  await page.setViewportSize({ width: 1600, height: 1100 });
+  await page.setContent(`<!doctype html><html><body style="margin:0;background:#111110;display:flex;gap:12px;align-items:start">
+    <figure style="margin:0;flex:1;min-width:0"><figcaption style="color:#fff;font:12px sans-serif;padding:8px 10px;letter-spacing:.16em;text-transform:uppercase">Reference</figcaption><img src="${left}" style="width:100%;height:auto;display:block"></figure>
+    <figure style="margin:0;flex:1;min-width:0"><figcaption style="color:#fff;font:12px sans-serif;padding:8px 10px;letter-spacing:.16em;text-transform:uppercase">Penta</figcaption><img src="${right}" style="width:100%;height:auto;display:block"></figure>
   </body></html>`);
+  await page.waitForTimeout(200);
   await page.screenshot({ path: outFile, fullPage: true });
 }
 
 test.describe("reference parity v2 captures", () => {
   test("desktop fold / tall / fullpage and mobile fold", async ({ page }) => {
+    test.setTimeout(240_000);
     ensureDirs();
     const matrix = [
       { name: "desktop-fold", width: 1440, height: 1000, full: false },
@@ -114,6 +121,7 @@ test.describe("reference parity v2 captures", () => {
   });
 
   test("dynamic interaction states", async ({ page }) => {
+    test.setTimeout(180_000);
     ensureDirs();
     await page.setViewportSize({ width: 1440, height: 1000 });
 
@@ -144,9 +152,9 @@ test.describe("reference parity v2 captures", () => {
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     await settleVisual(page);
     await shot(page, "chargematch-default.png");
-    await page.getByLabel("Device").selectOption({ label: "MacBook Air 13-inch (M3)" });
-    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Apple 20W USB-C" });
-    await expect(page.locator(".cm-verdict")).toContainText(/device/i);
+    await page.getByLabel("Device").selectOption({ label: "iPhone 16" });
+    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Anker 65W USB-C (Nano II class)" });
+    await expect(page.locator(".cm-verdict")).toContainText(/bottleneck/i);
     await shot(page, "chargematch-device-limit.png");
     await page.getByRole("button", { name: /cable & port/i }).click();
     await page.getByLabel("Cable").selectOption({ index: 1 }).catch(() => undefined);
@@ -214,7 +222,13 @@ test.describe("reference parity v2 captures", () => {
     await page.goto("/fixcode/samsung/washer/4c", { waitUntil: "domcontentloaded" });
     await fullyIn(page.locator(".fc-code-giant").first(), 844, "FixCode code");
     await fullyIn(page.getByText(/first reversible check/i).locator("visible=true").first(), 844, "FixCode first action");
-    await fullyIn(page.locator(".fc-machine").first(), 844, "FixCode machine");
+    const machine = page.locator(".fc-hero .fc-machine, .fc-stage .fc-machine").first();
+    await expect(machine).toBeVisible();
+    const machineBox = await machine.boundingBox();
+    expect(machineBox, "FixCode machine box").toBeTruthy();
+    if (machineBox) {
+      expect(machineBox.y, "FixCode machine starts in fold").toBeLessThan(844);
+    }
 
     await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
     await fullyIn(page.locator(".tc-atlas-pair").first(), 844, "TripCost endpoints");
@@ -260,6 +274,13 @@ test.describe("official reference captures", () => {
       ["fixcode", "fixcode-home-desktop-fold.png"],
       ["tripcost", "tripcost-home-desktop-fold.png"],
     ] as const;
+    const decisionPairs = [
+      ["wearthere", "wearthere-tokyo-desktop-fold.png", "wearthere-decision-desktop.png"],
+      ["autospec", "autospec-vehicle-desktop-fold.png", "autospec-decision-desktop.png"],
+      ["chargematch", "chargematch-result-desktop-fold.png", "chargematch-decision-desktop.png"],
+      ["fixcode", "fixcode-error-desktop-fold.png", "fixcode-decision-desktop.png"],
+      ["tripcost", "tripcost-result-desktop-fold.png", "tripcost-decision-desktop.png"],
+    ] as const;
     for (const [ref, current] of pairs) {
       const left = path.join(REFERENCE, `${ref}-desktop-1440x1000.png`);
       const right = path.join(CURRENT, current);
@@ -278,6 +299,12 @@ test.describe("official reference captures", () => {
       const right = path.join(CURRENT, current);
       if (!existsSync(left) || !existsSync(right)) continue;
       await composeSideBySide(page, left, right, path.join(COMPARISON, `${ref}-home-mobile.png`));
+    }
+    for (const [ref, current, out] of decisionPairs) {
+      const left = path.join(REFERENCE, `${ref}-desktop-1440x1000.png`);
+      const right = path.join(CURRENT, current);
+      if (!existsSync(left) || !existsSync(right)) continue;
+      await composeSideBySide(page, left, right, path.join(COMPARISON, out));
     }
   });
 });

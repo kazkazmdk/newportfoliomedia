@@ -1232,6 +1232,12 @@
 }
 
 @media (max-width: 799px) {
+  .tc-result-title { font-size: clamp(2rem, 11vw, 2.8rem); }
+  .tc-result-mode { display: none; }
+  .tc-result-win { display: none; }
+  .tc-verdicts { padding-top: 0.35rem; gap: 0.35rem 0.7rem; }
+  .tc-verdict { padding-top: 0.35rem; }
+  .tc-verdict strong { font-size: 0.95rem; }
   .tc-home-hero,
   .tc-result-hero {
     min-height: 0;

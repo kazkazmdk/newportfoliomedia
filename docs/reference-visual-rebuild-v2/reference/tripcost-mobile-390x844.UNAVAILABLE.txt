@@ -1,0 +1,6 @@
+NOT VERIFIED
+https://www.madeforspainandportugal.com/
+TimeoutError: page.goto: Timeout 25000ms exceeded.
+Call log:
+[2m  - navigating to "https://www.madeforspainandportugal.com/", waiting until "domcontentloaded"[22m
+
