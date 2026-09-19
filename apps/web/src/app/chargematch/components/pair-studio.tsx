@@ -61,7 +61,7 @@ export function PairStudio({
               <p className="cm-node-spec cm-mono">{device.max_watts}W input cap</p>
             </div>
             <div className="cm-cable" aria-hidden>
-              <CablePath watts={chain.watts} limit={chain.limitingComponent !== "charger"} />
+              <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable" || chain.limitingComponent === "device"} />
               <span className="cm-cable-label cm-mono">USB-C {chain.watts}W path</span>
             </div>
             <div className="cm-node">

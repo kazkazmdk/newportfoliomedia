@@ -39,24 +39,8 @@ export function DestinationHero({
   const weather = useMemo(() => typicalWeather(dest, month), [dest, month]);
   const mood = climateMood(weather, dest.slug);
   const media = destinationSeasonMedia(dest.slug, month);
-  const [scene, setScene] = useState(media);
-  const [leaving, setLeaving] = useState<typeof media | null>(null);
   const capsule = useMemo(() => capsuleFor(dest, month, style), [dest, month, style]);
   const { setMood, view, setPlace } = useClimateMood();
-
-  useEffect(() => {
-    if (media.hero === scene.hero) return;
-    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) {
-      setScene(media);
-      setLeaving(null);
-      return;
-    }
-    setLeaving(scene);
-    setScene(media);
-    const timer = window.setTimeout(() => setLeaving(null), 480);
-    return () => window.clearTimeout(timer);
-  }, [media, scene]);
 
   useEffect(() => {
     setMood(mood);
@@ -86,18 +70,10 @@ export function DestinationHero({
   return (
     <section className="wt-stage" data-climate={mood} data-view={view}>
       <div className="wt-stage-photo" data-season={media.hero}>
-        {leaving ? (
-          <Image
-            src={leaving.hero}
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover wt-stage-img is-leave"
-          />
-        ) : null}
         <Image
-          src={scene.hero}
-          alt={scene.heroAlt}
+          key={media.hero}
+          src={media.hero}
+          alt={media.heroAlt}
           fill
           priority
           sizes="100vw"

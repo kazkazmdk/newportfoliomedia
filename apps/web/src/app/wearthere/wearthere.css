@@ -934,10 +934,15 @@
 }
 
 .wt-stage-photo { transition: opacity 480ms ease; }
-.wt-stage-photo.is-leave { opacity: 0; }
-.wt-stage-img { transition: opacity 480ms ease, filter 480ms ease; }
-.wt-stage-img.is-leave { opacity: 0; }
+.wt-stage-img {
+  animation: wt-scene-in 480ms ease;
+  transition: filter 480ms ease;
+}
 .wt-stage-climate dd { transition: opacity 360ms ease; }
+@keyframes wt-scene-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 .wt-stage-pack {
   position: relative;
@@ -1230,5 +1235,6 @@
   .wt-stage-img,
   .wt-stage-climate dd {
     transition: none;
+    animation: none;
   }
 }
