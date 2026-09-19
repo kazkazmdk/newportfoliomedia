@@ -1,0 +1,6 @@
+NOT VERIFIED
+https://zaptec.com/en-gb/products/zaptec-go
+Error: page.goto: net::ERR_TOO_MANY_REDIRECTS at https://zaptec.com/en-gb/products/zaptec-go
+Call log:
+[2m  - navigating to "https://zaptec.com/en-gb/products/zaptec-go", waiting until "domcontentloaded"[22m
+

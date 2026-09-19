@@ -1,0 +1,6 @@
+NOT VERIFIED
+https://www.madeforspainandportugal.com/
+Error: page.goto: Navigation to "https://www.madeforspainandportugal.com/" is interrupted by another navigation to "https://shinkei.systems/"
+Call log:
+[2m  - navigating to "https://www.madeforspainandportugal.com/", waiting until "domcontentloaded"[22m
+

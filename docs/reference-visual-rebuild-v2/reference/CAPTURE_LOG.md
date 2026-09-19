@@ -11,5 +11,5 @@ fixcode desktop-1440x1000: captured https://shinkei.systems/
 fixcode desktop-1440x1600: captured https://shinkei.systems/
 fixcode mobile-390x844: captured https://shinkei.systems/
 tripcost desktop-1440x1000: captured https://www.madeforspainandportugal.com/
-tripcost desktop-1440x1600: NOT VERIFIED
-tripcost mobile-390x844: NOT VERIFIED
+tripcost desktop-1440x1600: captured https://www.madeforspainandportugal.com/
+tripcost mobile-390x844: captured https://www.madeforspainandportugal.com/

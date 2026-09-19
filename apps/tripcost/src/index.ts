@@ -600,6 +600,28 @@ export function getRoute(from: string, to: string) {
   return ROUTES.find((r) => r.from.slug === from && r.to.slug === to);
 }
 
+export function findScenarioByBestMode(
+  mode: ModeId,
+  options: { maxTravellers?: number } = {},
+): { from: string; to: string; travellers: number; routeId: string } | null {
+  const maxTravellers = options.maxTravellers ?? 6;
+  for (const route of ROUTES) {
+    if (route.compare_only) continue;
+    for (let travellers = 1; travellers <= maxTravellers; travellers += 1) {
+      const result = compareRoute(route, travellers, false);
+      if (result.best === mode) {
+        return {
+          from: route.from.slug,
+          to: route.to.slug,
+          travellers,
+          routeId: route.id,
+        };
+      }
+    }
+  }
+  return null;
+}
+
 export function allTripcostPages(): PageRecord[] {
   return ROUTES.flatMap((route) => {
     const comparison = compareRoute(route, 4);

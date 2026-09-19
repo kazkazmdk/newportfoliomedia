@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useId } from "react";
 
 function deviceKind(slug: string) {
@@ -17,69 +18,26 @@ function brickKind(watts: number, ports: number) {
   return "nano";
 }
 
+const PHONE_SRC = "/media/chargematch/phone-class.png";
+const LAPTOP_SRC = "/media/chargematch/laptop-class.png";
+const CHARGER_SMALL_SRC = "/media/chargematch/charger-small.png";
+const CHARGER_GAN_SRC = "/media/chargematch/charger-gan.png";
+
 export function PhoneHardware() {
-  const id = useId();
   return (
-    <svg className="cm-svg is-phone" viewBox="0 0 120 228" aria-hidden>
-      <defs>
-        <linearGradient id={`${id}-shell`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#2c2c2a" />
-          <stop offset="45%" stopColor="#141413" />
-          <stop offset="100%" stopColor="#3a3936" />
-        </linearGradient>
-        <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#f6f3ea" />
-          <stop offset="38%" stopColor="#c9d3dc" />
-          <stop offset="100%" stopColor="#7d8b97" />
-        </linearGradient>
-        <radialGradient id={`${id}-glint`} cx="28%" cy="18%" r="70%">
-          <stop offset="0%" stopColor="#ffffffaa" />
-          <stop offset="42%" stopColor="#ffffff00" />
-        </radialGradient>
-      </defs>
-      <ellipse cx="60" cy="214" rx="28" ry="5" fill="#11111033" />
-      <rect x="18" y="8" width="84" height="196" rx="18" fill={`url(#${id}-shell)`} />
-      <rect x="22" y="12" width="76" height="188" rx="15" fill="#0d0d0c" />
-      <rect x="26" y="28" width="68" height="156" rx="6" fill={`url(#${id}-glass)`} />
-      <rect x="26" y="28" width="68" height="156" rx="6" fill={`url(#${id}-glint)`} />
-      <rect x="46" y="16" width="28" height="7" rx="3.5" fill="#1b1b19" />
-      <circle cx="90" cy="38" r="5.5" fill="#1f2226" />
-      <circle cx="90" cy="38" r="2.2" fill="#6d7c88" />
-      <rect x="14" y="58" width="4" height="22" rx="1" fill="#2a2a28" />
-      <rect x="14" y="86" width="4" height="14" rx="1" fill="#2a2a28" />
-      <rect x="51" y="190" width="18" height="5" rx="1.5" fill="#2c2c2a" />
-      <rect x="55" y="191.5" width="10" height="2" rx="1" fill="#d8d4c8" />
-    </svg>
+    <div className="cm-hw is-phone">
+      <Image src={PHONE_SRC} alt="" className="cm-hw-img" width={480} height={640} />
+      <span className="cm-hw-port is-device" aria-hidden />
+    </div>
   );
 }
 
 export function LaptopHardware() {
-  const id = useId();
   return (
-    <svg className="cm-svg is-laptop" viewBox="0 0 260 168" aria-hidden>
-      <defs>
-        <linearGradient id={`${id}-lid`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#3a3a38" />
-          <stop offset="100%" stopColor="#161615" />
-        </linearGradient>
-        <linearGradient id={`${id}-screen`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#e7eef4" />
-          <stop offset="100%" stopColor="#7f93a4" />
-        </linearGradient>
-        <linearGradient id={`${id}-deck`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#2a2a28" />
-          <stop offset="100%" stopColor="#111110" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="130" cy="156" rx="78" ry="7" fill="#11111028" />
-      <path d="M38 18 H222 C230 18 234 24 234 32 V112 H26 V32 C26 24 30 18 38 18 Z" fill={`url(#${id}-lid)`} />
-      <rect x="40" y="28" width="180" height="76" rx="3" fill={`url(#${id}-screen)`} />
-      <rect x="124" y="21" width="12" height="4" rx="2" fill="#5c5c58" />
-      <path d="M10 118 H250 L236 148 H24 Z" fill={`url(#${id}-deck)`} />
-      <rect x="48" y="124" width="164" height="10" rx="1" fill="#3d3d3a" />
-      <rect x="112" y="138" width="36" height="5" rx="2" fill="#4a4a46" />
-      <rect x="236" y="126" width="8" height="5" rx="1" fill="#d8d4c8" />
-    </svg>
+    <div className="cm-hw is-laptop">
+      <Image src={LAPTOP_SRC} alt="" className="cm-hw-img" width={960} height={540} />
+      <span className="cm-hw-port is-device" aria-hidden />
+    </div>
   );
 }
 
@@ -103,87 +61,61 @@ export function TabletHardware() {
 }
 
 export function ChargerBrick({ watts, ports }: { watts: number; ports: number }) {
-  const id = useId();
   const kind = brickKind(watts, ports);
-  if (kind === "small") {
-    return (
-      <svg className="cm-svg is-brick is-small" viewBox="0 0 120 150" aria-hidden>
-        <defs>
-          <linearGradient id={`${id}-body`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#fbf8f1" />
-            <stop offset="100%" stopColor="#cfc9bb" />
-          </linearGradient>
-        </defs>
-        <ellipse cx="60" cy="140" rx="26" ry="5" fill="#11111022" />
-        <rect x="34" y="10" width="12" height="22" rx="1" fill="#2a2a28" />
-        <rect x="74" y="10" width="12" height="22" rx="1" fill="#2a2a28" />
-        <rect x="26" y="28" width="68" height="96" rx="10" fill={`url(#${id}-body)`} stroke="#111110" strokeWidth="1.2" />
-        <rect x="38" y="40" width="44" height="2" fill="#11111014" />
-        <text x="60" y="82" textAnchor="middle" className="cm-svg-watt">{watts}W</text>
-        <rect x="50" y="104" width="20" height="8" rx="2" fill="#1b1b19" />
-        <rect x="55" y="106" width="10" height="4" rx="1" fill="#efeee8" />
-      </svg>
-    );
-  }
-  if (kind === "multi") {
-    return (
-      <svg className="cm-svg is-brick is-multi" viewBox="0 0 168 150" aria-hidden>
-        <defs>
-          <linearGradient id={`${id}-body`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#f7f4ec" />
-            <stop offset="100%" stopColor="#b8b3a6" />
-          </linearGradient>
-        </defs>
-        <ellipse cx="84" cy="140" rx="40" ry="6" fill="#11111022" />
-        <rect x="18" y="28" width="132" height="96" rx="14" fill={`url(#${id}-body)`} stroke="#111110" strokeWidth="1.2" />
-        <rect x="30" y="40" width="108" height="2" fill="#11111014" />
-        <text x="84" y="78" textAnchor="middle" className="cm-svg-watt">{watts}W</text>
-        {Array.from({ length: Math.min(ports, 3) }, (_, index) => (
-          <g key={index}>
-            <rect x={40 + index * 32} y="98" width="20" height="10" rx="2" fill="#1b1b19" />
-            <rect x={45 + index * 32} y="101" width="10" height="4" rx="1" fill="#efeee8" />
-          </g>
-        ))}
-      </svg>
-    );
-  }
+  const src = kind === "small" ? CHARGER_SMALL_SRC : CHARGER_GAN_SRC;
   return (
-    <svg className="cm-svg is-brick is-nano" viewBox="0 0 136 158" aria-hidden>
-      <defs>
-        <linearGradient id={`${id}-body`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f4f1e8" />
-          <stop offset="100%" stopColor="#c2bdae" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="68" cy="148" rx="30" ry="5" fill="#11111022" />
-      <rect x="48" y="10" width="11" height="20" rx="1" fill="#2a2a28" />
-      <rect x="77" y="10" width="11" height="20" rx="1" fill="#2a2a28" />
-      <rect x="28" y="26" width="80" height="108" rx="12" fill={`url(#${id}-body)`} stroke="#111110" strokeWidth="1.2" />
-      <text x="68" y="80" textAnchor="middle" className="cm-svg-watt">{watts}W</text>
-      <rect x="56" y="112" width="24" height="10" rx="2" fill="#1b1b19" />
-      <rect x="62" y="115" width="12" height="4" rx="1" fill="#efeee8" />
-    </svg>
+    <div className={`cm-hw is-brick is-${kind}`}>
+      <Image src={src} alt="" className="cm-hw-img" width={640} height={640} />
+      <span className="cm-hw-port is-charger" aria-hidden />
+      <span className="cm-hw-watt cm-mono">{watts}W</span>
+    </div>
   );
 }
 
-export function CablePath({ watts, limit = false }: { watts: number; limit?: boolean }) {
+export function CablePath({
+  watts,
+  limit = false,
+  axis = "vertical",
+}: {
+  watts: number;
+  limit?: boolean;
+  axis?: "vertical" | "horizontal";
+}) {
+  const vertical = axis === "vertical";
+  const line = vertical ? "M40 10 C40 36 22 52 40 110" : "M10 40 C36 40 48 22 90 40";
+  const motion = vertical ? "M40 12 C40 36 22 52 40 108" : "M12 40 C36 40 48 22 88 40";
   return (
-    <svg className={`cm-cable-path${limit ? " is-limit" : ""}`} viewBox="0 0 80 120" aria-hidden>
-      <path className="cm-cable-line" d="M40 6 C40 28 18 40 18 62 C18 86 40 90 40 114" />
-      <rect x="32" y="0" width="16" height="12" rx="2" className="cm-cable-head" />
-      <rect x="32" y="108" width="16" height="12" rx="2" className="cm-cable-head" />
-      <circle className="cm-cable-current" r="3.5" cx="40" cy="8">
-        <animateMotion dur="1.6s" repeatCount="indefinite" path="M40 8 C40 28 18 40 18 62 C18 86 40 90 40 112" />
+    <svg
+      className={`cm-cable-path is-${axis}${limit ? " is-limit" : ""}`}
+      viewBox={vertical ? "0 0 80 120" : "0 0 100 80"}
+      aria-hidden
+    >
+      <path className="cm-cable-line" d={line} />
+      {vertical ? (
+        <>
+          <rect x="32" y="0" width="16" height="14" rx="3" className="cm-cable-head" />
+          <rect x="32" y="106" width="16" height="14" rx="3" className="cm-cable-head" />
+        </>
+      ) : (
+        <>
+          <rect x="0" y="32" width="14" height="16" rx="3" className="cm-cable-head" />
+          <rect x="86" y="32" width="14" height="16" rx="3" className="cm-cable-head" />
+        </>
+      )}
+      <circle className="cm-cable-current" r="3.5" cx={vertical ? 40 : 12} cy={vertical ? 12 : 40}>
+        <animateMotion dur="1.6s" repeatCount="indefinite" path={motion} />
       </circle>
-      <text x="58" y="66" className="cm-cable-watt">{watts}W</text>
+      <text x={vertical ? 58 : 50} y={vertical ? 66 : 18} className="cm-cable-watt" textAnchor={vertical ? "start" : "middle"}>
+        {watts}W
+      </text>
     </svg>
   );
 }
 
-export function DeviceObject({ slug, name }: { slug: string; name: string }) {
+export function DeviceObject({ slug, name, limit = false }: { slug: string; name: string; limit?: boolean }) {
   const kind = deviceKind(slug);
   return (
-    <div className={`cm-object is-${kind}`}>
+    <div className={`cm-object is-${kind}${limit ? " is-limit" : ""}`}>
       <div className="cm-object-shadow" />
       {kind === "laptop" ? <LaptopHardware /> : null}
       {kind === "tablet" ? <TabletHardware /> : null}
@@ -208,9 +140,19 @@ export function DeviceObject({ slug, name }: { slug: string; name: string }) {
   );
 }
 
-export function ChargerObject({ watts, ports }: { watts: number; ports: number }) {
+export function ChargerObject({
+  watts,
+  ports,
+  limit = false,
+  limitTarget,
+}: {
+  watts: number;
+  ports: number;
+  limit?: boolean;
+  limitTarget?: "port" | "charger";
+}) {
   return (
-    <div className="cm-object is-brick">
+    <div className={`cm-object is-brick${limit ? " is-limit" : ""}${limitTarget ? ` is-limit-${limitTarget}` : ""}`}>
       <div className="cm-object-shadow" />
       <ChargerBrick watts={watts} ports={ports} />
       <p className="cm-object-name">{ports} {ports === 1 ? "port" : "ports"}</p>

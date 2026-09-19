@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type HTMLAttributes, type ReactNode } from "react";
 import { CursorFollower } from "./cursor-follower";
 
 export function CursorCanvas({
@@ -8,12 +8,13 @@ export function CursorCanvas({
   color,
   children,
   className,
+  ...rest
 }: {
   label: string;
   color?: string;
   children: ReactNode;
   className?: string;
-}) {
+} & HTMLAttributes<HTMLDivElement>) {
   const [hot, setHot] = useState(false);
   return (
     <div
@@ -21,6 +22,7 @@ export function CursorCanvas({
       data-cursor={label}
       onPointerEnter={() => setHot(true)}
       onPointerLeave={() => setHot(false)}
+      {...rest}
     >
       {hot ? <CursorFollower label={label} color={color} /> : null}
       {children}

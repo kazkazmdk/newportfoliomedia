@@ -2,7 +2,7 @@
 
 import { CABLES, CHARGERS, DEVICES, powerChain } from "@penta/chargematch";
 import { useRouter } from "next/navigation";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CablePath, ChargerObject, DeviceObject } from "./hardware";
 
 export function ConnectHero({
@@ -18,6 +18,15 @@ export function ConnectHero({
   const [cable, setCable] = useState(CABLES[0]?.slug ?? "");
   const [port, setPort] = useState(CHARGERS.find((item) => item.slug === chargerSlug)?.ports[0]?.id ?? "c1");
   const [edit, setEdit] = useState<"device" | "charger" | "more" | null>(null);
+  const [cableAxis, setCableAxis] = useState<"vertical" | "horizontal">("vertical");
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 820px)");
+    const apply = () => setCableAxis(mq.matches ? "horizontal" : "vertical");
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
   const d = DEVICES.find((x) => x.slug === device) ?? DEVICES[0];
   const c = CHARGERS.find((x) => x.slug === charger) ?? CHARGERS[0];
   const selectedCable = CABLES.find((x) => x.slug === cable) ?? CABLES[0];
@@ -40,17 +49,22 @@ export function ConnectHero({
   }
 
   return (
-    <section className="cm-bench-scene">
+    <section className="cm-bench-scene" data-limit={chain.limitingComponent} data-watts={String(chain.watts)}>
       <form onSubmit={onSubmit} className="cm-scene-form">
-        <div className="cm-stack">
+        <div className="cm-stack is-bench">
           <div className="cm-pick is-device">
-            <DeviceObject slug={d.slug} name={d.name} />
+            <DeviceObject slug={d.slug} name={d.name} limit={chain.limitingComponent === "device"} />
           </div>
           <div className="cm-watt-flow">
-            <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable" || chain.limitingComponent === "device"} />
+            <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable"} axis={cableAxis} />
           </div>
           <div className="cm-pick is-charger">
-            <ChargerObject watts={c.total_watts} ports={c.ports.length} />
+            <ChargerObject
+              watts={c.total_watts}
+              ports={c.ports.length}
+              limit={chain.limitingComponent === "port" || chain.limitingComponent === "allocation"}
+              limitTarget={chain.limitingComponent === "port" ? "port" : chain.limitingComponent === "allocation" ? "charger" : undefined}
+            />
           </div>
           <div className={`cm-inline-select is-device-field${edit === "device" ? " is-open" : ""}`}>
             <span>
@@ -77,7 +91,7 @@ export function ConnectHero({
         </div>
 
         <aside className="cm-scene-result" aria-live="polite">
-          <div className="cm-verdict">
+          <div className="cm-verdict" data-limit={chain.limitingComponent} data-watts={String(chain.watts)}>
             <p className="cm-result-kicker">Expected</p>
             <div className="cm-verdict-power">
               <strong className="cm-result-watts cm-mono">{chain.watts}<small>W</small></strong>
@@ -89,10 +103,16 @@ export function ConnectHero({
           <details className="cm-why-watts">
             <summary>Why {chain.watts}W?</summary>
             <ol>
-              <li>Charger {c.total_watts}W</li>
-              <li>Port {c.ports.find((item) => item.id === selectedPort)?.watts ?? "—"}W</li>
-              <li>Cable {Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "uncapped"}</li>
-              <li className={chain.limitingComponent === "device" ? "is-limit" : ""}>Device {d.max_watts}W{chain.limitingComponent === "device" ? " ← limit" : ""}</li>
+              {([
+                ["charger", `Charger ${c.total_watts}W`, chain.limitingComponent === "allocation"],
+                ["port", `Port ${c.ports.find((item) => item.id === selectedPort)?.watts ?? "—"}W`, chain.limitingComponent === "port"],
+                ["cable", `Cable ${Number.isFinite(chain.cableCap) ? `${chain.cableCap}W` : "uncapped"}`, chain.limitingComponent === "cable"],
+                ["device", `Device ${d.max_watts}W`, chain.limitingComponent === "device"],
+              ] as const).map(([key, label, isLimit]) => (
+                <li key={key} className={isLimit ? "is-limit" : ""}>
+                  {label}{isLimit ? " ← limit" : ""}
+                </li>
+              ))}
             </ol>
           </details>
           <button type="button" className="cm-ghost" onClick={() => setEdit(edit === "more" ? null : "more")}>

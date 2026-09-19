@@ -129,7 +129,13 @@ export function ErrorHero({
           </div>
           <div className="fc-pin-copy">
             {WATER_STEPS.map((row, i) => (
-              <article key={row.id} data-water-step={i} className={`fc-scene ${step === i ? "is-on" : ""}`}>
+              <article
+                key={row.id}
+                data-water-step={i}
+                data-water-step-id={row.id}
+                className={`fc-scene ${step === i ? "is-on" : ""}`}
+                onClick={() => setStep(i)}
+              >
                 <div className="fc-section-label">
                   <span className="fc-section-number">{String(i + 1).padStart(2, "0")}</span>
                   <p className="fc-kicker">{row.title}</p>

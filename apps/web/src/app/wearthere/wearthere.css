@@ -986,8 +986,17 @@
   width: 6.6rem;
 }
 
-.wt-stage-pack svg { width: 100%; height: auto; }
+.wt-stage-pack svg { width: 100%; height: auto; filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35)) drop-shadow(0 8px 14px rgb(0 0 0 / 0.38)); }
 .wt-stage-pack span { font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; text-align: center; }
+.wt-stage-pack.is-contrast li::before {
+  content: "";
+  position: absolute;
+  inset: 12% 10%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle, rgb(8 8 8 / 0.34), transparent 74%);
+  filter: blur(6px);
+}
 
 .wt-month-rail {
   display: flex;

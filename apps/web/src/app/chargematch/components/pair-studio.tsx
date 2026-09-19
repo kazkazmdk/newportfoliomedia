@@ -57,21 +57,26 @@ export function PairStudio({
           <div className="cm-connect">
             <div className="cm-node">
               <span className="cm-node-label cm-mono">Device</span>
-              <DeviceObject slug={device.slug} name={device.name} />
+              <DeviceObject slug={device.slug} name={device.name} limit={chain.limitingComponent === "device"} />
               <p className="cm-node-spec cm-mono">{device.max_watts}W input cap</p>
             </div>
             <div className="cm-cable" aria-hidden>
-              <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable" || chain.limitingComponent === "device"} />
+              <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable"} axis="horizontal" />
               <span className="cm-cable-label cm-mono">USB-C {chain.watts}W path</span>
             </div>
             <div className="cm-node">
               <span className="cm-node-label cm-mono">Charger</span>
-              <ChargerObject watts={charger.total_watts} ports={charger.ports.length} />
+              <ChargerObject
+                watts={charger.total_watts}
+                ports={charger.ports.length}
+                limit={chain.limitingComponent === "port" || chain.limitingComponent === "allocation"}
+                limitTarget={chain.limitingComponent === "port" ? "port" : chain.limitingComponent === "allocation" ? "charger" : undefined}
+              />
               <p className="cm-node-spec cm-mono">{charger.total_watts}W rated brick</p>
             </div>
           </div>
 
-          <aside className="cm-verdict cm-verdict-sticky" aria-live="polite" aria-label="Compatibility verdict">
+          <aside className="cm-verdict cm-verdict-sticky" aria-live="polite" aria-label="Compatibility verdict" data-limit={chain.limitingComponent} data-watts={String(chain.watts)}>
             <div className="cm-verdict-power">
               <span className="cm-field-label cm-mono">Expected ceiling</span>
               <strong className="cm-mono">{chain.watts}<small>W</small></strong>

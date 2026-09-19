@@ -27,22 +27,25 @@ export function MultiportTree({
           </div>
         ))}
       </div>
-      <svg className="cm-multi-svg" viewBox={`0 0 ${width} 220`}>
-        <text x={width / 2} y="22" textAnchor="middle" className="cm-multi-total">{total}W</text>
-        <circle cx={width / 2} cy={top} r="7" />
-        <line x1={width / 2} y1={top + 7} x2={width / 2} y2={splitY - 8} />
-        {branches.map((branch, index) => {
-          const x = ((index + 1) / (count + 1)) * width;
-          return (
-            <g key={branch.id} className="cm-branch">
-              <path d={`M ${width / 2} ${splitY} C ${width / 2} ${splitY + 18}, ${x} ${splitY + 18}, ${x} ${endY}`} />
-              <circle cx={x} cy={endY} r="5" />
-              <text x={x} y={endY + 22} textAnchor="middle" className="cm-mono text-xl">{branch.watts}W</text>
-              <text x={x} y={endY + 40} textAnchor="middle" className="cm-multi-label">{branch.label}</text>
-            </g>
-          );
-        })}
-      </svg>
+      <details className="cm-allocation-details">
+        <summary>Allocation details</summary>
+        <svg className="cm-multi-svg" viewBox={`0 0 ${width} 220`} aria-hidden>
+          <text x={width / 2} y="22" textAnchor="middle" className="cm-multi-total">{total}W</text>
+          <circle cx={width / 2} cy={top} r="7" />
+          <line x1={width / 2} y1={top + 7} x2={width / 2} y2={splitY - 8} />
+          {branches.map((branch, index) => {
+            const x = ((index + 1) / (count + 1)) * width;
+            return (
+              <g key={branch.id} className="cm-branch">
+                <path d={`M ${width / 2} ${splitY} C ${width / 2} ${splitY + 18}, ${x} ${splitY + 18}, ${x} ${endY}`} />
+                <circle cx={x} cy={endY} r="5" />
+                <text x={x} y={endY + 22} textAnchor="middle" className="cm-mono text-xl">{branch.watts}W</text>
+                <text x={x} y={endY + 40} textAnchor="middle" className="cm-multi-label">{branch.label}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </details>
     </div>
   );
 }

@@ -1,0 +1,6 @@
+NOT VERIFIED
+https://shinkei.systems/
+Error: page.goto: Navigation to "https://shinkei.systems/" is interrupted by another navigation to "chrome-error://chromewebdata/"
+Call log:
+[2m  - navigating to "https://shinkei.systems/", waiting until "domcontentloaded"[22m
+

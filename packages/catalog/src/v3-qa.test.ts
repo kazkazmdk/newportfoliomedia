@@ -31,7 +31,7 @@ import {
   initialState,
   type ErrorProfile,
 } from "@penta/fixcode";
-import { compareRoute, costValue, type RouteRecord } from "@penta/tripcost";
+import { compareRoute, costValue, findScenarioByBestMode, type RouteRecord } from "@penta/tripcost";
 
 describe("WearThere provenance QA", () => {
   it("PRIMARY_DATABASE + local name only is not TRUSTED_DATASET_EXACT", () => {
@@ -359,5 +359,13 @@ describe("TripCost mixed evidence QA", () => {
     const table = breakEvenByTravellers(route);
     expect(table[0].travellers).toBe(1);
     expect(table.length).toBeGreaterThan(1);
+  });
+
+  it("finds only modes that actually win, and does not invent train/car/flight", () => {
+    expect(findScenarioByBestMode("bus")).toEqual(expect.objectContaining({ from: expect.any(String) }));
+    expect(findScenarioByBestMode("ev")).toEqual(expect.objectContaining({ from: expect.any(String) }));
+    expect(findScenarioByBestMode("train")).toBeNull();
+    expect(findScenarioByBestMode("car")).toBeNull();
+    expect(findScenarioByBestMode("flight")).toBeNull();
   });
 });

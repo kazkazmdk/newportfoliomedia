@@ -57,17 +57,22 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
 
   return (
     <div>
-      <section className="tc-hero is-result tc-result-hero">
+      <section className="tc-hero is-result tc-result-hero" data-best-mode={partyBest} data-mode={partyBest}>
         <div className="tc-result-intro">
           <p className="tc-kicker">{route.km} km · modelled corridor</p>
           <h1 className="tc-result-title">{route.from.name}<br />→ {route.to.name}</h1>
           <p className="tc-result-mode">{LABELS[partyBest]}</p>
-          <p className="tc-result-win">{LABELS[partyBest]} wins for {travellers}</p>
-          <p className="tc-result-facts tc-mono">
-            {fmtDoor(fastest.minutes_door)} · €{Math.round(result.modes.find((m) => m.mode === partyBest)?.cash_eur ?? 0)} pp
-          </p>
+          <p className="tc-result-time">{fmtDoor(result.modes.find((m) => m.mode === partyBest)?.minutes_door ?? fastest.minutes_door)}</p>
+          <p className="tc-result-price">€{Math.round(result.modes.find((m) => m.mode === partyBest)?.per_person_cash ?? 0)} PP</p>
+          <p className="tc-result-win">Best for {travellers}</p>
         </div>
-        <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} />
+        <RouteMap
+          from={route.from.slug}
+          to={route.to.slug}
+          mode={result.best}
+          tollsModelled={route.tolls_eur > 0}
+          evChargeModelled={route.ev_charge_stops > 0}
+        />
         <div className="tc-form tc-result-form">
           <div>
             <p className="tc-kicker">Adjust the party</p>

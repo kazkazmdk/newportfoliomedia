@@ -37,10 +37,12 @@
   },
   "dependencies": {
     "@penta/catalog": "workspace:*",
-    "@penta/demand": "workspace:*"
+    "@penta/demand": "workspace:*",
+    "@penta/tripcost": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "image-size": "^1.2.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3",
     "@playwright/test": "^1.55.0",

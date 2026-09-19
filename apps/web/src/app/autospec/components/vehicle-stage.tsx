@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { autospecAssetOf } from "@/lib/autospec-assets";
 import { vehicleMediaOf } from "@/lib/media-catalog";
 
 const ZONES = ["body", "engine", "tyres", "battery", "service"] as const;
@@ -32,9 +33,10 @@ export function VehicleStage({
 }) {
   const [zone, setZone] = useState<VehicleFocus>(focus);
   const media = makeSlug && generationSlug ? vehicleMediaOf(makeSlug, generationSlug) : vehicleMediaOf("bmw", "g20");
+  const assets = makeSlug && generationSlug ? autospecAssetOf(makeSlug, generationSlug) : autospecAssetOf("bmw", "g20");
 
   return (
-    <div className="as-stage" data-zone={zone}>
+    <div className="as-stage" data-zone={zone} data-visual-status={assets?.status ?? "WEAK"}>
       <div className="as-depth">
         <div className="as-plane" aria-hidden />
         {media ? (

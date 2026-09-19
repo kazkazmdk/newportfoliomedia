@@ -11,25 +11,53 @@ function placeName(slug?: string) {
   return ROUTES.flatMap((r) => [r.from, r.to]).find((place) => place.slug === slug)?.name ?? slug.replaceAll("-", " ");
 }
 
+function contextualCorridors(from?: string, to?: string) {
+  if (!from || !to) return [];
+  const a = pointOf(from);
+  const b = pointOf(to);
+  const midX = (a.x + b.x) / 2;
+  const midY = (a.y + b.y) / 2;
+  return ROUTES
+    .filter((r) => !r.compare_only && !(r.from.slug === from && r.to.slug === to))
+    .map((r) => {
+      const p = pointOf(r.from.slug);
+      const q = pointOf(r.to.slug);
+      const related = r.from.slug === from || r.from.slug === to || r.to.slug === from || r.to.slug === to;
+      const dist = Math.hypot((p.x + q.x) / 2 - midX, (p.y + q.y) / 2 - midY);
+      return { r, related, dist };
+    })
+    .sort((left, right) => {
+      if (left.related !== right.related) return left.related ? -1 : 1;
+      return left.dist - right.dist;
+    })
+    .slice(0, 4)
+    .map((row) => row.r);
+}
+
 export function RouteMap({
   from,
   to,
   mode = "train",
   compact = false,
+  tollsModelled = false,
+  evChargeModelled = false,
 }: {
   from?: string;
   to?: string;
   mode?: string;
   compact?: boolean;
+  tollsModelled?: boolean;
+  evChargeModelled?: boolean;
 }) {
-  const nodes = Array.from(new Set(ROUTES.flatMap((r) => [r.from.slug, r.to.slug])));
+  const context = contextualCorridors(from, to);
+  const nodes = Array.from(new Set([...MAJOR, ...(from ? [from] : []), ...(to ? [to] : [])]));
   const a = from ? pointOf(from) : null;
   const b = to ? pointOf(to) : null;
   const fromName = placeName(from);
   const toName = placeName(to);
   const lift = mode === "flight" ? 108 : mode === "train" ? 22 : 40;
   return (
-    <CursorCanvas label="Route" color="#0a1628" className={`tc-map${compact ? " is-compact" : ""}`}>
+    <CursorCanvas label="Route" color="#0a1628" className={`tc-map${compact ? " is-compact" : ""}`} data-mode={mode} data-best-mode={mode}>
       <div className="tc-map-meta" aria-hidden="true">
         <span>Western Europe / atlas</span>
         <span className="tc-mono">{mode}</span>
@@ -50,18 +78,17 @@ export function RouteMap({
         ) : null}
         <text className="tc-country-label" x="430" y="310">France</text>
         <text className="tc-country-label" x="210" y="430">Iberia</text>
-        {ROUTES.map((r) => {
+        {context.map((r) => {
           const p = pointOf(r.from.slug);
           const q = pointOf(r.to.slug);
-          const on = from && to && r.from.slug === from && r.to.slug === to;
           return (
             <path
               key={r.id}
-              d={geodesic(p, q, 24)}
-              className={on ? undefined : "tc-path-draw"}
-              stroke={on ? "transparent" : "#0a1628"}
-              strokeWidth={on ? 0 : 1}
-              opacity={on ? 0 : 0.04}
+              d={geodesic(p, q, 18)}
+              className="tc-path-context"
+              stroke="#0a1628"
+              strokeWidth={1}
+              opacity={0.12}
             />
           );
         })}
@@ -73,20 +100,10 @@ export function RouteMap({
               <>
                 <circle className="tc-station" cx={a.x} cy={a.y} r="7" />
                 <circle className="tc-station" cx={b.x} cy={b.y} r="7" />
-                <circle className="tc-station" cx={(a.x + b.x) / 2} cy={(a.y + b.y) / 2 - lift * 0.45} r="3.5" />
               </>
             ) : null}
             {mode === "car" || mode === "bus" ? (
-              <>
-                <circle className="tc-toll" cx={(a.x * 2 + b.x) / 3} cy={(a.y * 2 + b.y) / 3 - 12} r="4" />
-                <circle className="tc-station" cx={b.x + 14} cy={b.y + 12} r="5" />
-              </>
-            ) : null}
-            {mode === "ev" ? (
-              <>
-                <circle className="tc-charge" cx={(a.x + b.x) / 2} cy={(a.y + b.y) / 2 - 18} r="5" />
-                <circle className="tc-charge" cx={(a.x * 3 + b.x) / 4} cy={(a.y * 3 + b.y) / 4 - 8} r="4" />
-              </>
+              <circle className="tc-station" cx={b.x + 14} cy={b.y + 12} r="5" />
             ) : null}
             {mode === "flight" ? (
               <>
@@ -112,7 +129,7 @@ export function RouteMap({
                 </text>
               ) : null}
               {hot || MAJOR.includes(slug) ? (
-                <text x={p.x + 10} y={p.y - (hot ? 16 : 8)} className={`tc-city-label ${rank}`}>
+                <text x={p.x + 10} y={p.y - (hot ? 18 : 8)} className={`tc-city-label ${rank}`}>
                   {label}
                 </text>
               ) : null}
@@ -126,7 +143,9 @@ export function RouteMap({
         </p>
         <p className="tc-map-legend" aria-hidden="true">
           <span><i /> Selected corridor</span>
-          <span><i /> Available studies</span>
+          {context.length ? <span><i /> Nearby studies</span> : null}
+          {mode === "car" && tollsModelled ? <span className="is-schematic">TOLL COST MODELLED</span> : null}
+          {mode === "ev" && evChargeModelled ? <span className="is-schematic">CHARGE STOPS MODELLED · schematic</span> : null}
         </p>
       </div>
     </CursorCanvas>

@@ -1,3 +1,6 @@
+import { DESTINATIONS, climateModelOf } from "@penta/wearthere";
+import type { ClimateSeasonModel } from "@penta/demand";
+
 export type DestinationMedia = {
   hero: string;
   detail: string;
@@ -120,8 +123,44 @@ export function destinationMedia(slug: string): DestinationMedia {
 }
 
 export type SeasonId = "winter" | "spring" | "summer" | "autumn";
+export type SeasonProfile = "northern-temperate" | "southern-temperate" | "tropical" | "desert";
+export type SeasonKey = SeasonId | "wet" | "dry" | "hot" | "mild" | "humid";
+export type Hemisphere = "north" | "south" | "tropical";
 
-export function seasonOfMonth(month: number): SeasonId {
+export function seasonProfileFromModel(model: ClimateSeasonModel): SeasonProfile {
+  if (model === "SOUTHERN_TEMPERATE") return "southern-temperate";
+  if (model === "HOT_DESERT") return "desert";
+  if (model === "EQUATORIAL" || model === "TROPICAL_WET_DRY" || model === "MONSOON") return "tropical";
+  return "northern-temperate";
+}
+
+export function seasonProfileOf(slug: string): SeasonProfile {
+  const dest = DESTINATIONS.find((item) => item.slug === slug);
+  if (!dest) return "northern-temperate";
+  return seasonProfileFromModel(climateModelOf(dest));
+}
+
+export function hemisphereOf(slug: string): Hemisphere {
+  const dest = DESTINATIONS.find((item) => item.slug === slug);
+  const profile = seasonProfileOf(slug);
+  if (profile === "tropical") return "tropical";
+  if ((dest?.lat ?? 1) < 0) return "south";
+  return "north";
+}
+
+export function seasonOfMonth(month: number, profile: SeasonProfile = "northern-temperate"): SeasonKey {
+  if (profile === "southern-temperate") {
+    if (month === 12 || month <= 2) return "summer";
+    if (month <= 5) return "autumn";
+    if (month <= 8) return "winter";
+    return "spring";
+  }
+  if (profile === "tropical") {
+    return [11, 12, 1, 2, 3].includes(month) ? "dry" : "wet";
+  }
+  if (profile === "desert") {
+    return [6, 7, 8, 9].includes(month) ? "hot" : "mild";
+  }
   if (month === 12 || month <= 2) return "winter";
   if (month <= 5) return "spring";
   if (month <= 8) return "summer";
@@ -228,8 +267,32 @@ const SEASONAL_MEDIA: Partial<Record<string, Partial<Record<SeasonId, Destinatio
 };
 
 export function destinationSeasonMedia(slug: string, month: number): DestinationMedia {
-  const season = seasonOfMonth(month);
-  return SEASONAL_MEDIA[slug]?.[season] ?? destinationMedia(slug);
+  const profile = seasonProfileOf(slug);
+  const season = seasonOfMonth(month, profile);
+  const temperate = season === "winter" || season === "spring" || season === "summer" || season === "autumn"
+    ? season
+    : undefined;
+  return (temperate ? SEASONAL_MEDIA[slug]?.[temperate] : undefined) ?? destinationMedia(slug);
+}
+
+export function seasonalMediaCoverage(): Array<{
+  destination: string;
+  seasonProfile: SeasonProfile;
+  hemisphere: Hemisphere;
+  seasonalMediaCount: number;
+  fallbackUsed: boolean;
+}> {
+  return DESTINATIONS.map((dest) => {
+    const seasonProfile = seasonProfileOf(dest.slug);
+    const seasonalMediaCount = Object.keys(SEASONAL_MEDIA[dest.slug] ?? {}).length;
+    return {
+      destination: dest.slug,
+      seasonProfile,
+      hemisphere: hemisphereOf(dest.slug),
+      seasonalMediaCount,
+      fallbackUsed: seasonalMediaCount === 0,
+    };
+  });
 }
 
 export type VehicleMedia = {

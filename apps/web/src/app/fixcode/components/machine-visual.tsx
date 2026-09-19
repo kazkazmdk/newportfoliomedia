@@ -1,19 +1,10 @@
 "use client";
 
-export type MachineZone = "inlet" | "pump" | "motor" | "door" | "sensor" | "heater" | "none";
-export type WaterStep = "source" | "hose" | "valve" | "control" | MachineZone;
-const REGISTRATION_CELLS = Array.from({ length: 16 }, (_, index) => index);
+import { diagnosticPath, waterStepId, type MachineZone, type WaterStep, zoneFromText } from "./machine-path";
 
-export function zoneFromText(value: string): MachineZone {
-  const t = value.toLowerCase();
-  if (/(water|hose|inlet|tap|supply|valve|fill|4c|4e)/.test(t)) return "inlet";
-  if (/(pump|drain|filter)/.test(t)) return "pump";
-  if (/(motor|drum|spin|belt)/.test(t)) return "motor";
-  if (/(door|latch|lock)/.test(t)) return "door";
-  if (/(sensor|therm|ntc|control)/.test(t)) return "sensor";
-  if (/(heat|element|boiler)/.test(t)) return "heater";
-  return "none";
-}
+export type { MachineZone, WaterStep };
+export { zoneFromText };
+const REGISTRATION_CELLS = Array.from({ length: 16 }, (_, index) => index);
 
 function cls(active: boolean, dim: boolean) {
   if (dim && !active) return "fc-part is-dim";
@@ -47,11 +38,23 @@ export function MachineVisual({
     if (focus === "inlet" && (id === "water" || id === "hose" || id === "valve")) return true;
     return false;
   };
-  const dim = (id: string) => dimSystems.includes(id) && !on(id);
+  const dim = (id: string) => {
+    if (focus === "control" && (id === "water" || id === "hose" || id === "valve" || id === "source")) return true;
+    if (focus === "source" && (id === "valve" || id === "control" || id === "sensor")) return true;
+    if (focus === "hose" && (id === "valve" || id === "control" || id === "sensor")) return true;
+    return dimSystems.includes(id) && !on(id);
+  };
   const hot = (id: MachineZone) => (zone === id ? "is-hot" : ready ? "is-ready" : "");
+  const path = diagnosticPath(focus);
+  const activeWater = waterStepId(focus);
 
   return (
-    <div className="fc-machine" role="img" aria-label={`${appliance} documented system schematic`}>
+    <div
+      className="fc-machine"
+      role="img"
+      aria-label={`${appliance} documented system schematic`}
+      data-water-step-active={activeWater || undefined}
+    >
       <p className="fc-plate-mark" aria-hidden>
         System path / {focus}
       </p>
@@ -125,8 +128,8 @@ export function MachineVisual({
 
         <g data-system="diagnostic" opacity={ready || focus !== "none" ? 1 : 0.35}>
           <path
-            className="fc-diag-path"
-            d="M12 72 C36 72 36 110 110 113 C148 113 176 113 176 148 C176 200 210 232 260 252"
+            className={`fc-diag-path${path.kind === "signal" ? " is-signal" : ""}`}
+            d={path.d}
           />
         </g>
       </svg>

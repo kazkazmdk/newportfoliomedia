@@ -4,7 +4,7 @@ import { DESTINATIONS, capsuleFor, typicalWeather, type StyleId } from "@penta/w
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { destinationSeasonMedia } from "@/lib/media-catalog";
+import { destinationSeasonMedia, seasonProfileOf } from "@/lib/media-catalog";
 import { GarmentSvg, garmentKind } from "./garment-svg";
 import { useClimateMood } from "./climate-context";
 import { climateCopy, climateMood } from "./climate-theme";
@@ -68,7 +68,7 @@ export function DestinationHero({
   }
 
   return (
-    <section className="wt-stage" data-climate={mood} data-view={view}>
+    <section className="wt-stage" data-climate={mood} data-view={view} data-season-profile={seasonProfileOf(dest.slug)}>
       <div className="wt-stage-photo" data-season={media.hero}>
         <Image
           key={media.hero}
@@ -105,7 +105,7 @@ export function DestinationHero({
             </div>
           </dl>
         ) : (
-          <ul className="wt-stage-pack" aria-live="polite">
+          <ul className="wt-stage-pack is-contrast" aria-live="polite">
             {look.map((piece, index) => (
               <li key={piece.id} className={`is-${garmentKind(piece)} ${index === 0 ? "is-hero" : ""}`}>
                 <GarmentSvg kind={garmentKind(piece)} />
