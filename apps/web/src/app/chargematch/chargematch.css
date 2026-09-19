@@ -89,6 +89,19 @@
   gap: 0.6rem;
 }
 
+@media (max-width: 820px) {
+  .cm-stack {
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 0.35rem 0.5rem;
+  }
+  .cm-pick.is-device { grid-column: 1; grid-row: 1; }
+  .cm-watt-flow { grid-column: 2; grid-row: 1; }
+  .cm-pick.is-charger { grid-column: 3; grid-row: 1; }
+  .cm-inline-select.is-device-field { grid-column: 1; grid-row: 2; justify-self: stretch; }
+  .cm-inline-select.is-charger-field { grid-column: 3; grid-row: 2; justify-self: stretch; }
+}
+
 .cm-pick {
   border: 0;
   background: transparent;
@@ -531,9 +544,13 @@
 }
 
 @media (max-width: 820px) {
-  .cm-bench-scene { min-height: calc(100svh - 3.2rem); padding: 0.6rem 0.9rem 1rem; align-content: start; }
-  .cm-svg { width: min(5.6rem, 26vw); }
-  .cm-result-watts { font-size: 3.6rem; }
+  .cm-bench-scene { min-height: calc(100svh - 3.2rem); padding: 0.4rem 0.8rem 0.6rem; align-content: start; }
+  .cm-svg { width: min(4.8rem, 22vw); }
+  .cm-result-watts { font-size: 2.6rem; }
+  .cm-scene-result { text-align: left; }
+  .cm-verdict { padding: 0; }
+  .cm-ghost, .cm-result-note { display: none; }
+  .cm-scene-meta { margin-top: 0.45rem; }
   .cm-watt-flow i { height: 0.7rem; }
   .cm-object-name { font-size: 0.62rem; }
   .cm-mast { grid-template-columns: 1fr auto; }

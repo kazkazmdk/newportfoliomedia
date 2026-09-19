@@ -42,10 +42,18 @@ export function ConnectHero({
     <section className="cm-bench-scene">
       <form onSubmit={onSubmit} className="cm-scene-form">
         <div className="cm-stack">
-          <div className="cm-pick">
+          <div className="cm-pick is-device">
             <DeviceObject slug={d.slug} name={d.name} />
           </div>
-          <label className="cm-inline-select">
+          <div className="cm-watt-flow" aria-hidden>
+            <i />
+            <span className="cm-mono">{chain.watts}W</span>
+            <i />
+          </div>
+          <div className="cm-pick is-charger">
+            <ChargerObject watts={c.total_watts} ports={c.ports.length} />
+          </div>
+          <label className="cm-inline-select is-device-field">
             Device
             <select aria-label="Device" value={device} onChange={(e) => setDevice(e.target.value)}>
               {DEVICES.map((item) => (
@@ -53,17 +61,7 @@ export function ConnectHero({
               ))}
             </select>
           </label>
-
-          <div className="cm-watt-flow" aria-hidden>
-            <i />
-            <span className="cm-mono">{chain.watts}W</span>
-            <i />
-          </div>
-
-          <div className="cm-pick">
-            <ChargerObject watts={c.total_watts} ports={c.ports.length} />
-          </div>
-          <label className="cm-inline-select">
+          <label className="cm-inline-select is-charger-field">
             Charger
             <select aria-label="Charger" value={charger} onChange={(e) => setCharger(e.target.value)}>
               {CHARGERS.map((item) => (
@@ -73,14 +71,16 @@ export function ConnectHero({
           </label>
         </div>
 
-        <aside className="cm-scene-result cm-verdict" aria-live="polite">
-          <p className="cm-result-kicker">Expected</p>
-          <div className="cm-verdict-power">
-            <strong className="cm-result-watts cm-mono">{chain.watts}<small>W</small></strong>
+        <aside className="cm-scene-result" aria-live="polite">
+          <div className="cm-verdict">
+            <p className="cm-result-kicker">Expected</p>
+            <div className="cm-verdict-power">
+              <strong className="cm-result-watts cm-mono">{chain.watts}<small>W</small></strong>
+            </div>
+            <p className="cm-field-meta">Accepts up to {d.max_watts}W</p>
+            <p className="cm-result-limit">Limit · {chain.limitingComponent} bottleneck</p>
+            <p className="cm-result-proto cm-mono">{chain.protocol.replaceAll("_", " ")}</p>
           </div>
-          <p className="cm-field-meta">Accepts up to {d.max_watts}W</p>
-          <p className="cm-result-limit">Limit · {chain.limitingComponent} bottleneck</p>
-          <p className="cm-result-proto cm-mono">{chain.protocol.replaceAll("_", " ")}</p>
           <div className="cm-scene-meta">
             <label>
               Cable
