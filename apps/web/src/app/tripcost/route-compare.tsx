@@ -59,16 +59,18 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
     <div>
       <section className="tc-hero is-result tc-result-hero">
         <div className="tc-result-intro">
-          <p className="tc-kicker">Corridor comparison · {route.km} km</p>
-          <p>One journey, measured across cash, total time and group size.</p>
+          <p className="tc-kicker">{route.km} km · modelled corridor</p>
+          <h1 className="tc-result-title">{route.from.name} → {route.to.name}</h1>
+          <p className="tc-result-win">{LABELS[partyBest]} wins for {travellers}</p>
+          <p className="tc-result-facts tc-mono">
+            {fmtDoor(fastest.minutes_door)} · €{Math.round(result.modes.find((m) => m.mode === partyBest)?.cash_eur ?? 0)} pp
+          </p>
         </div>
         <RouteMap from={route.from.slug} to={route.to.slug} mode={result.best} />
         <div className="tc-form tc-result-form">
           <div>
-            <p className="tc-kicker">A → B · this corridor</p>
-            <h1 className="mt-1 text-3xl md:text-4xl">
-              {route.from.name} → {route.to.name}
-            </h1>
+            <p className="tc-kicker">Adjust the party</p>
+            <p className="mt-1 text-lg">{route.from.name} → {route.to.name}</p>
           </div>
           <label>
             People · {travellers}
@@ -112,21 +114,9 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
             </div>
           ) : null}
         </div>
-        <div className="tc-source-strip">
-          <p>
-            <span>Model</span>
-            <strong>{costLabel("HEURISTIC")}</strong>
-          </p>
-          <p>
-            <span>Fare status</span>
-            <strong>Typical estimates · not live tickets</strong>
-          </p>
-          <p>
-            <span>Map status</span>
-            <strong>Geodesic diagram · not road routing</strong>
-          </p>
-          <a href="#assumptions">Inspect assumptions ↓</a>
-        </div>
+        <p className="tc-source-once">
+          Modelled prices · not live fares · <a href="#assumptions">Method & sources</a>
+        </p>
       </section>
       <section className="tc-scene">
         <p className="tc-section-index tc-mono">01 / Decision</p>

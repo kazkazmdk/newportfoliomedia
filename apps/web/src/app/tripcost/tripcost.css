@@ -23,11 +23,184 @@
   font-family: var(--font-tc-mono), "IBM Plex Mono", ui-monospace, monospace;
 }
 
-.tc-header {
+.tc-mast {
   position: sticky;
   top: 0;
   z-index: 40;
   display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0.75rem 1.2rem;
+  background: color-mix(in srgb, #eef2f1 86%, transparent);
+  border-bottom: 1px solid var(--tc-ink);
+}
+
+.tc-mast-mark {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tc-mast-route {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  font-size: 1.05rem;
+  text-transform: capitalize;
+}
+
+.tc-mast-route i {
+  width: 2.4rem;
+  height: 1px;
+  background: var(--tc-route);
+}
+
+.tc-mast-people {
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tc-result-title {
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  font-size: clamp(2.4rem, 7vw, 5.2rem);
+  line-height: 0.9;
+}
+
+.tc-result-win {
+  margin-top: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tc-result-facts { margin-top: 0.4rem; font-size: 1rem; }
+
+.tc-mast-menu { display: none; min-height: 40px; background: none; border: 1px solid var(--tc-ink); font: inherit; letter-spacing: 0.14em; text-transform: uppercase; padding: 0 0.6rem; }
+.tc-mast-drawer { display: none; }
+.tc-mast-drawer.is-open {
+  display: flex;
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  background: var(--tc-paper);
+  border: 1px solid var(--tc-ink);
+}
+
+.tc-atlas {
+  position: relative;
+  min-height: calc(100svh - 3.4rem);
+}
+
+.tc-atlas .tc-map,
+.tc-atlas .tc-map svg {
+  min-height: calc(100svh - 3.4rem);
+  height: calc(100svh - 3.4rem);
+}
+
+.tc-atlas-ui {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  z-index: 3;
+}
+
+.tc-atlas-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.6rem;
+}
+
+.tc-atlas-pair button {
+  display: grid;
+  gap: 0.15rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.tc-atlas-pair span {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
+}
+
+.tc-atlas-pair strong {
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 500;
+}
+
+.tc-atlas-decisions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tc-atlas-decisions span {
+  display: block;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
+}
+
+.tc-atlas-decisions b {
+  display: block;
+  font-family: var(--font-tc-mono), monospace;
+  font-size: 1.15rem;
+}
+
+.tc-atlas-note {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
+}
+
+.tc-people-edit {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
+}
+
+.tc-people-edit.is-compact input { max-width: 10rem; }
+.tc-source-once {
+  margin: 0.8rem 1rem 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tc-mute);
+}
+.tc-source-once a { color: inherit; }
+.tc-map-grid { opacity: 0.18; }
+
+.tc-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: none;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   padding: 0.85rem 1.2rem;
@@ -309,6 +482,15 @@
 .tc-menu { display: none; min-height: 44px; align-items: center; }
 
 @media (max-width: 820px) {
+  .tc-mast { grid-template-columns: auto 1fr auto; }
+  .tc-mast-people { display: none; }
+  .tc-mast-menu { display: inline-flex; }
+  .tc-atlas-ui {
+    background: color-mix(in srgb, var(--tc-paper) 90%, transparent);
+    padding: 0.85rem;
+    border: 1px solid var(--tc-ink);
+  }
+  .tc-atlas-decisions { grid-template-columns: 1fr 1fr 1fr; }
   .tc-header { grid-template-columns: 1fr auto; }
   .tc-nav, .tc-live { display: none; }
   .tc-menu { display: inline-flex; }

@@ -7,7 +7,7 @@ import { CursorCanvas } from "@/components/creative";
 import { CheckDiagram, checkKindFromText } from "./machine-diagrams";
 import { MachineVisual, type WaterStep, zoneFromText } from "./machine-visual";
 import { SourceTrace } from "./source-trace";
-import { ProcessRail, StateBadge, type FixcodeState } from "./system-ui";
+import { StateBadge, type FixcodeState } from "./system-ui";
 
 const WATER_STEPS: Array<{ id: WaterStep; title: string; copy: string }> = [
   { id: "source", title: "Water source", copy: "Confirm the tap is open and the house supply is live." },
@@ -79,7 +79,6 @@ export function ErrorHero({
               <div><dt>Appliance</dt><dd>{profile.appliance}</dd></div>
               <div><dt>Record</dt><dd>{isError ? profile.code : "Symptom path"}</dd></div>
             </dl>
-            <ProcessRail active={2} />
             {first ? (
               <div className="fc-do-first mt-6">
                 <div className="fc-first-heading">

@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { VEHICLES, allAutospecPages, getVehicle, serviceIntervalLabel, typicalServiceInterval, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
-import { CockpitCell } from "../../../../components/cockpit-cell";
 import { IdentityStrip } from "../../../../components/identity-strip";
 import { OwnershipTimeline } from "../../../../components/ownership-timeline";
 import { VehicleStage } from "../../../../components/vehicle-stage";
@@ -47,44 +46,37 @@ export default async function VehicleHub({
   const typical = typicalServiceInterval(v);
   return (
     <main>
-      <section className="as-hero">
-        <div className="as-hero-copy">
-          <p className="as-eyebrow">
-            {v.make} · {v.generation} · {v.engine_code}
-          </p>
-          <h1>
-            {v.make} {v.model}
-            <br />
-            {v.variant}
-          </h1>
-          <p className="as-hero-index">
-            {v.generation} · {v.engine_code} · {v.years[0]}–{v.years.at(-1)}
-          </p>
-          <div className="as-cockpit">
-            <CockpitCell
-              label="Typical service interval"
-              value={typical ? serviceIntervalLabel(typical) : "No interval on file"}
-              provenance="Graph interval · no mileage entered"
-            />
-            <CockpitCell
-              label="Oil"
-              value={v.oil.capacity_liters ? `${v.oil.spec} · ${v.oil.capacity_liters} L` : "EV — none"}
-              provenance="Graph specification"
-            />
-            <CockpitCell label="Tyres" value={v.tyres.front} provenance="Graph fitment" />
-            <CockpitCell label="Battery" value={`12V ${v.battery.type}`} provenance="Graph reference" />
-            <CockpitCell
-              label="Recalls"
-              value={v.recalls.length ? "VIN-specific · check source" : "No active data / check source"}
-              provenance="Official portal required"
-            />
-          </div>
-          <p className="as-cockpit-truth">Reference cockpit · no live vehicle connection · unknown values remain unknown.</p>
+      <section className="as-cinema">
+        <VehicleStage makeSlug={v.make_slug} generationSlug={v.generation_slug} identity={`${v.make} ${v.variant} ${v.generation}`} />
+        <div className="as-cinema-copy">
+          <p className="as-eyebrow">{v.generation} · {v.engine_code} · {v.years[0]}–{v.years.at(-1)}</p>
+          <h1>{v.make} {v.variant}</h1>
+          <ul className="as-layers">
+            <li>
+              <span>Oil</span>
+              <strong>{v.oil.capacity_liters ? `${v.oil.capacity_liters} L` : "EV"}</strong>
+              <small>{v.oil.spec || "None"}</small>
+            </li>
+            <li>
+              <span>Tyres</span>
+              <strong>{v.tyres.front}</strong>
+              <small>{v.tyres.rear !== v.tyres.front ? v.tyres.rear : "Graph fitment"}</small>
+            </li>
+            <li>
+              <span>Service</span>
+              <strong>{typical ? serviceIntervalLabel(typical) : "Unknown"}</strong>
+              <small>No mileage entered</small>
+            </li>
+            <li>
+              <span>Battery</span>
+              <strong>12V {v.battery.type}</strong>
+              <small>Graph reference</small>
+            </li>
+          </ul>
           <Link href={`/autospec/garage?make=${v.make_slug}&model=${v.model_slug}&gen=${v.generation_slug}&var=${v.variant_slug}`} className="as-cta as-cta-arrow">
-            Add to My Garage <span aria-hidden>↗</span>
+            Add to my garage <span aria-hidden>↗</span>
           </Link>
         </div>
-        <VehicleStage makeSlug={v.make_slug} generationSlug={v.generation_slug} identity={`${v.make} ${v.variant} ${v.generation}`} />
       </section>
       <IdentityStrip vehicle={v} />
       <section className="as-scene grid gap-10 lg:grid-cols-2">
@@ -103,7 +95,7 @@ export default async function VehicleHub({
           <p className="as-display mt-3 text-5xl">{v.battery.type}</p>
         </div>
         <div>
-          <p className="text-[11px] uppercase tracking-[0.2em]">Service interval</p>
+          <p className="text-[11px] uppercase tracking-[0.2em]">Typical service interval</p>
           <div className="mt-4">
             <OwnershipTimeline items={v.services} mode="interval" />
           </div>

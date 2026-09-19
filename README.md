@@ -55,6 +55,8 @@ packages/catalog                                      graphe assemblé + rapport
 
 Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe, la provenance, le quality gate, l’analytics et l’observabilité le sont.
 
+La passe visual rebuild (composition, headers, scènes) est documentée dans `docs/reference-visual-rebuild/`.
+
 ## Indexation (Truth Gate V2.1)
 
 A positive boolean is not proof. Each gate returns `{ gate, status, evidence, reason }`.

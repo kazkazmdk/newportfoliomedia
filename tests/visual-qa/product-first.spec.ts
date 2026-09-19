@@ -2,19 +2,19 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
-const SHOT_DIR = path.join(process.cwd(), "docs/visual-product-qa");
+const SHOT_DIR = path.join(process.cwd(), "docs/reference-visual-rebuild");
 
 const ROUTES = [
-  { name: "tripcost-home", path: "/tripcost", main: ".tc-hero" },
+  { name: "tripcost-home", path: "/tripcost", main: ".tc-atlas" },
   { name: "tripcost-result", path: "/tripcost/paris/to/lyon?travellers=2", main: ".tc-verdicts" },
   { name: "chargematch-home", path: "/chargematch", main: ".cm-verdict" },
   { name: "chargematch-result", path: "/chargematch/iphone-16/with/apple-20w", main: ".cm-verdict" },
   { name: "chargematch-multiport", path: "/chargematch/macbook-air-13-m3/with/anker-100w-2c", main: ".cm-verdict" },
-  { name: "wearthere-home", path: "/wearthere", main: ".wt-hero" },
-  { name: "wearthere-tokyo", path: "/wearthere/tokyo", main: ".wt-hero" },
-  { name: "autospec-home", path: "/autospec", main: ".as-hero" },
-  { name: "autospec-vehicle", path: "/autospec/bmw/3-series/g20/320d-b47", main: ".as-cockpit" },
-  { name: "fixcode-home", path: "/fixcode", main: ".fc-hero" },
+  { name: "wearthere-home", path: "/wearthere", main: ".wt-stage" },
+  { name: "wearthere-tokyo", path: "/wearthere/tokyo", main: ".wt-stage" },
+  { name: "autospec-home", path: "/autospec", main: ".as-cinema" },
+  { name: "autospec-vehicle", path: "/autospec/bmw/3-series/g20/320d-b47", main: ".as-cinema" },
+  { name: "fixcode-home", path: "/fixcode", main: ".fc-anatomy" },
   { name: "fixcode-error", path: "/fixcode/samsung/washer/4c", main: ".fc-code-giant" },
 ];
 
@@ -113,12 +113,12 @@ test.describe("product-first visual QA", () => {
     await fullyInViewport(page.getByRole("button", { name: /check this path/i }), 844, "ChargeMatch Check path");
 
     await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
-    await fullyInViewport(page.getByText(/the packing edit/i).locator("visible=true").first(), 844, "Packing edit");
-    const plan = page.getByRole("button", { name: /build my capsule/i });
+    await fullyInViewport(page.locator(".wt-city").first(), 844, "Destination city");
+    await fullyInViewport(page.locator(".wt-stage-climate").first(), 844, "Climate read");
+    const plan = page.getByRole("button", { name: /build capsule/i });
     await expect(plan).toBeVisible();
     const planBox = await plan.boundingBox();
-    expect(planBox, "Plan this trip exists").toBeTruthy();
-    // Honest fold: Wear this is required in-fold. Plan CTA may sit just below.
+    expect(planBox, "Build capsule exists").toBeTruthy();
 
     await page.goto("/autospec", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByLabel("Search make and model"), 844, "AutoSpec search");

@@ -2,17 +2,16 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { CursorCanvas } from "@/components/creative";
 import { vehicleMediaOf } from "@/lib/media-catalog";
 
 const ZONES = ["body", "engine", "tyres", "battery", "service"] as const;
 export type VehicleFocus = (typeof ZONES)[number];
 
 const CALLOUTS: Record<Exclude<VehicleFocus, "body">, { label: string; x: string; y: string; note: string }> = {
-  engine: { label: "Engine", x: "18%", y: "42%", note: "Front system · graph identity, not an X-ray of this photo" },
-  tyres: { label: "Tyres", x: "22%", y: "78%", note: "Approximate wheel region on this body" },
-  battery: { label: "Battery", x: "78%", y: "36%", note: "Adjacent panel — exact location is not drawn from this photo" },
-  service: { label: "Service", x: "70%", y: "18%", note: "Ownership interval, not a body marker" },
+  engine: { label: "Engine", x: "22%", y: "40%", note: "Front system · graph identity" },
+  tyres: { label: "Tyres", x: "18%", y: "74%", note: "Wheel region on this still" },
+  battery: { label: "Battery", x: "76%", y: "38%", note: "Adjacent panel · not an X-ray" },
+  service: { label: "Service", x: "68%", y: "16%", note: "Ownership interval" },
 };
 
 export function VehicleStage({
@@ -31,11 +30,7 @@ export function VehicleStage({
   const call = zone === "body" ? null : CALLOUTS[zone];
 
   return (
-    <CursorCanvas label="Inspect" color="#101418" className="as-stage">
-      <div className="as-stage-hud" aria-hidden>
-        <span>Object / vehicle</span>
-        <span>View / reference still</span>
-      </div>
+    <div className="as-stage" data-zone={zone}>
       <div className="as-depth">
         <div className="as-plane" aria-hidden />
         {media ? (
@@ -43,9 +38,9 @@ export function VehicleStage({
             <Image
               src={media.src}
               alt={media.alt}
-              width={1600}
-              height={780}
-              sizes="(max-width: 800px) 100vw, 68vw"
+              width={1800}
+              height={860}
+              sizes="(max-width: 800px) 100vw, 80vw"
               className="as-car-img"
               priority
             />
@@ -64,28 +59,22 @@ export function VehicleStage({
           <p className="text-sm text-[var(--as-mute)]">No licensed vehicle still for this identity. Silhouette withheld.</p>
         )}
       </div>
-      <div className="as-stage-footer">
-        <div>
-          <p className="as-credit">
-            {identity ?? "BMW 320d G20"}
-            {media ? ` · ${media.note}` : ""}
-          </p>
-          <p className="as-stage-truth">Static licensed image · inspection markers are contextual, not component locations or live telemetry.</p>
-        </div>
-        <div className="as-zone-controls" aria-label="Inspect vehicle reference areas">
-          {ZONES.filter((z) => z !== "body").map((z) => (
-            <button
-              key={z}
-              type="button"
-              aria-pressed={zone === z}
-              onClick={() => setZone(z)}
-            >
-              <span aria-hidden>{String(ZONES.indexOf(z)).padStart(2, "0")}</span>
-              {z}
-            </button>
-          ))}
-        </div>
+      <div className="as-zone-rail" aria-label="Inspect vehicle systems">
+        {ZONES.filter((z) => z !== "body").map((z) => (
+          <button key={z} type="button" aria-pressed={zone === z} onClick={() => setZone(z)}>
+            {z}
+          </button>
+        ))}
       </div>
-    </CursorCanvas>
+      <details className="as-source as-stage-truth">
+        <summary>Data & source</summary>
+        <p>
+          {identity ?? "BMW 320d G20"}
+          {media ? ` · ${media.note}` : ""}
+          {" · "}
+          Static licensed image. Markers are contextual, not live telemetry.
+        </p>
+      </details>
+    </div>
   );
 }

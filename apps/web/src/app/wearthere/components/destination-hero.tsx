@@ -1,17 +1,20 @@
 "use client";
 
-import { DESTINATIONS, capsuleFor, destinationSurfaces, typicalWeather, type StyleId } from "@penta/wearthere";
+import { DESTINATIONS, capsuleFor, typicalWeather, type StyleId } from "@penta/wearthere";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CursorCanvas } from "@/components/creative";
 import { destinationMedia } from "@/lib/media-catalog";
+import { GarmentSvg, garmentKind } from "./garment-svg";
 import { useClimateMood } from "./climate-context";
 import { climateCopy, climateMood } from "./climate-theme";
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const STYLES: StyleId[] = ["minimal", "streetwear", "classic", "business", "outdoor", "luxury", "casual"];
+
 function monthLabel(iso: string) {
   const d = new Date(`${iso}T12:00:00`);
-  return d.toLocaleDateString("en-GB", { month: "short", day: "numeric" });
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }).toUpperCase();
 }
 
 export function DestinationHero({
@@ -30,23 +33,27 @@ export function DestinationHero({
   const [start, setStart] = useState(initialStart);
   const [end, setEnd] = useState(initialEnd);
   const [style, setStyle] = useState<StyleId>(initialStyle);
-  const [view, setView] = useState<"climate" | "capsule">("climate");
+  const [edit, setEdit] = useState<"city" | "dates" | "style" | null>(null);
   const dest = DESTINATIONS.find((d) => d.slug === city) ?? DESTINATIONS[0];
   const month = Number(start.slice(5, 7)) || 11;
   const weather = useMemo(() => typicalWeather(dest, month), [dest, month]);
   const mood = climateMood(weather, dest.slug);
   const media = destinationMedia(dest.slug);
   const capsule = useMemo(() => capsuleFor(dest, month, style), [dest, month, style]);
-  const { setMood } = useClimateMood();
+  const { setMood, view, setPlace } = useClimateMood();
+
   useEffect(() => {
     setMood(mood);
   }, [mood, setMood]);
 
-  const essentialPieces = capsule.pieces
-    .filter((p) => p.layer === "shell" || p.layer === "mid" || p.layer === "shoes" || /coat|knit|rain|boot|sneaker/i.test(p.name))
-    .slice(0, 3);
-  const essential = essentialPieces.map((p) => p.name).join(" + ");
-  const surfaces = destinationSurfaces(dest);
+  useEffect(() => {
+    setPlace({ city: dest.city, country: dest.country, slug: dest.slug, month: MONTHS[month - 1] });
+  }, [dest.city, dest.country, dest.slug, month, setPlace]);
+
+  const look = capsule.pieces.filter((p) => {
+    const kind = garmentKind(p);
+    return kind === "coat" || kind === "knit" || kind === "trousers" || kind === "boots";
+  }).slice(0, 4);
 
   function setMonth(nextMonth: number) {
     const padded = String(nextMonth).padStart(2, "0");
@@ -61,165 +68,112 @@ export function DestinationHero({
   }
 
   return (
-    <section className="wt-hero" data-climate={mood}>
-      <div className="wt-hero-grid">
-        <div className="wt-hero-type">
-          <p className="wt-kicker">{dest.country} · destination guide</p>
+    <section className="wt-stage" data-climate={mood} data-view={view}>
+      <div className="wt-stage-photo" key={`${media.hero}-${month}`}>
+        <Image
+          src={media.hero}
+          alt={media.heroAlt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="wt-stage-veil" aria-hidden />
+      </div>
+
+      <div className="wt-stage-body">
+        <div className="wt-stage-copy">
+          <p className="wt-kicker">{dest.country}</p>
           <h1 className="wt-city">{dest.city}</h1>
           <p className="wt-city-deck">{climateCopy(mood)}</p>
-          <div className="wt-view-switch" role="group" aria-label="Guide view">
-            <button
-              type="button"
-              id="wt-tab-climate"
-              aria-controls="wt-panel-climate"
-              aria-pressed={view === "climate"}
-              onClick={() => setView("climate")}
-            >
-              Climate
-            </button>
-            <button
-              type="button"
-              id="wt-tab-capsule"
-              aria-controls="wt-panel-capsule"
-              aria-pressed={view === "capsule"}
-              onClick={() => setView("capsule")}
-            >
-              Capsule
-            </button>
-          </div>
-          <div
-            className="wt-hero-facts"
-            id="wt-panel-climate"
-            role="region"
-            aria-labelledby="wt-tab-climate"
-            hidden={view !== "climate"}
-          >
-            <div>
-              <span>Typical range</span>
-              <strong>{weather.tmin_c}–{weather.tmax_c}°C</strong>
-            </div>
-            <div>
-              <span>Rain pattern</span>
-              <strong>{weather.rain_days} days · {weather.rain_mm} mm</strong>
-            </div>
-            <div>
-              <span>Humidity</span>
-              <strong>{weather.humidity}%</strong>
-            </div>
-          </div>
-          <div
-            className="wt-hero-facts"
-            id="wt-panel-capsule"
-            role="region"
-            aria-labelledby="wt-tab-capsule"
-            hidden={view !== "capsule"}
-          >
-            <div>
-              <span>Recommended</span>
-              <strong>{capsule.pieces.length} pieces</strong>
-            </div>
-            <div>
-              <span>Combinations</span>
-              <strong>{capsule.outfits} outfits</strong>
-            </div>
-            <div>
-              <span>Core layers</span>
-              <strong>{essential || capsule.pieces[0]?.name}</strong>
-            </div>
-          </div>
-          <p className="wt-normal-note">
-            <span aria-hidden="true">○</span>
-            Typical monthly climate, not a live forecast
-          </p>
-          {surfaces.length ? (
-            <div className="wt-hero-months" role="group" aria-label={`${dest.city} climate periods`}>
-              {surfaces.map((surface) => {
-                const representative = surface.months[Math.floor(surface.months.length / 2)] ?? surface.months[0];
-                const current = representative === month || surface.months.includes(month);
-                return (
-                  <button
-                    key={surface.slug}
-                    type="button"
-                    aria-pressed={current}
-                    onClick={() => representative && setMonth(representative)}
-                  >
-                    {surface.label}
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
         </div>
-        <div className="wt-answer">
-          <p className="wt-kicker">The packing edit</p>
-          <p className="wt-serif mt-3 text-2xl leading-tight md:text-3xl">{essential || capsule.pieces[0]?.name}</p>
-          <p className="mt-3 text-sm leading-6 opacity-75">
-            Selected for this month&apos;s typical range, rain pattern and your {style} style. Not a live forecast.
-          </p>
-        </div>
-        <CursorCanvas label="Explore" color="#f4eadf" className="wt-hero-frame">
-          <div className="wt-photo" data-climate={mood} key={media.hero}>
-            <Image
-              src={media.hero}
-              alt={media.heroAlt}
-              fill
-              priority
-              sizes="(max-width: 800px) 100vw, 58vw"
-              className="object-cover"
-            />
-            <div className="wt-weather-veil" aria-hidden />
-            <div className="wt-photo-caption">
-              <span>{dest.city}</span>
-              <span>Typical {new Date(`${start}T12:00:00`).toLocaleDateString("en-GB", { month: "long" })}</span>
-            </div>
-          </div>
-        </CursorCanvas>
-        <form id="plan" onSubmit={onSubmit} className="wt-planner">
-          <div className="wt-planner-intro">
+
+        {view === "climate" ? (
+          <dl className="wt-stage-climate" aria-live="polite">
             <div>
-              <p className="wt-kicker">Build your edit</p>
-              <h2 className="wt-serif mt-2 text-3xl">Where, when, how?</h2>
+              <dt>Typical range</dt>
+              <dd>{weather.tmin_c}–{weather.tmax_c}<small>°C</small></dd>
             </div>
-            <p>
-              Planning dates: {monthLabel(start)}–{monthLabel(end)}
-            </p>
+            <div>
+              <dt>Rain</dt>
+              <dd>{weather.rain_days}<small>days</small></dd>
+            </div>
+            <div>
+              <dt>Humidity</dt>
+              <dd>{weather.humidity}<small>%</small></dd>
+            </div>
+          </dl>
+        ) : (
+          <ul className="wt-stage-pack" aria-live="polite">
+            {look.map((piece) => (
+              <li key={piece.id}>
+                <GarmentSvg kind={garmentKind(piece)} />
+                <span>{piece.name}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <ol className="wt-month-rail" aria-label={`${dest.city} months`}>
+          {MONTHS.map((label, index) => {
+            const value = index + 1;
+            return (
+              <li key={label}>
+                <button type="button" aria-pressed={month === value} onClick={() => setMonth(value)}>
+                  {label}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+
+        <form id="plan" onSubmit={onSubmit} className="wt-inline-plan">
+          <div className="wt-inline-values">
+            <button type="button" aria-expanded={edit === "city"} onClick={() => setEdit(edit === "city" ? null : "city")}>
+              <span>Where</span>
+              <strong>{dest.city}</strong>
+            </button>
+            <button type="button" aria-expanded={edit === "dates"} onClick={() => setEdit(edit === "dates" ? null : "dates")}>
+              <span>When</span>
+              <strong>{monthLabel(start)} — {monthLabel(end)}</strong>
+            </button>
+            <button type="button" aria-expanded={edit === "style"} onClick={() => setEdit(edit === "style" ? null : "style")}>
+              <span>How</span>
+              <strong>{style}</strong>
+            </button>
           </div>
-          <div className="wt-planner-row">
-            <label>
+          {edit === "city" ? (
+            <label className="wt-inline-control">
               Destination
               <select aria-label="Destination city" value={city} onChange={(e) => setCity(e.target.value)}>
                 {DESTINATIONS.map((d) => (
-                  <option key={d.slug} value={d.slug}>
-                    {d.city}
-                  </option>
+                  <option key={d.slug} value={d.slug}>{d.city}</option>
                 ))}
               </select>
             </label>
-            <label>
+          ) : null}
+          {edit === "dates" ? (
+            <div className="wt-inline-dates">
+              <label>
+                From
+                <input required type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+              </label>
+              <label>
+                To
+                <input required type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} />
+              </label>
+            </div>
+          ) : null}
+          {edit === "style" ? (
+            <label className="wt-inline-control">
               Style
               <select aria-label="Packing style" value={style} onChange={(e) => setStyle(e.target.value as StyleId)}>
-                {["minimal", "streetwear", "classic", "business", "outdoor", "luxury", "casual"].map((s) => (
-                  <option key={s}>{s}</option>
-                ))}
+                {STYLES.map((s) => <option key={s}>{s}</option>)}
               </select>
             </label>
-          </div>
-          <div className="wt-dates">
-            <label>
-              From
-              <input required type="date" value={start} onChange={(e) => setStart(e.target.value)} />
-            </label>
-            <label>
-              To
-              <input required type="date" min={start} value={end} onChange={(e) => setEnd(e.target.value)} />
-            </label>
-          </div>
-          <div className="wt-planner-action">
-            <button className="wt-cta" type="submit">
-              Build my capsule
-            </button>
-            <span>This preview uses typical climate. No live forecast is loaded.</span>
-          </div>
+          ) : null}
+          <button className="wt-cta" type="submit">Build capsule</button>
+          <p className="wt-inline-note">Typical monthly climate, not a live forecast.</p>
         </form>
       </div>
     </section>

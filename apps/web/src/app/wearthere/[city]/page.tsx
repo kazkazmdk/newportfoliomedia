@@ -2,9 +2,7 @@ import { notFound } from "next/navigation";
 import { DESTINATIONS, capsuleFor, climateModelOf, typicalWeather } from "@penta/wearthere";
 import { pageMeta } from "@/lib/seo";
 import { ViewportScene } from "@/components/creative";
-import { ClimateRibbon } from "../components/climate-ribbon";
 import { DestinationHero } from "../components/destination-hero";
-import { SeasonRail } from "../components/season-rail";
 import { WardrobeBoard } from "../components/wardrobe-board";
 import { climateCopy, climateMood } from "../components/climate-theme";
 
@@ -34,16 +32,12 @@ export default async function CityHub({ params }: { params: Promise<{ city: stri
   return (
     <main>
       <DestinationHero initialCity={dest.slug} />
-      <ClimateRibbon weather={weather} />
       <ViewportScene className="wt-scene wt-editorial-intro">
         <p className="wt-kicker">Reading {dest.city}</p>
         <p className="wt-serif mt-4 max-w-3xl text-5xl leading-none md:text-7xl">{climateCopy(mood)}</p>
         <p className="mt-5 max-w-lg leading-7 opacity-80">
           {dest.country}. Climate model: {model.replaceAll("_", " ").toLowerCase()}. Compiled monthly normals — not a forecast.
         </p>
-      </ViewportScene>
-      <ViewportScene className="wt-scene wt-season-section">
-        <SeasonRail dest={dest} />
       </ViewportScene>
       <ViewportScene className="wt-scene wt-capsule-section" id="capsule">
         <p className="wt-kicker">First-period capsule</p>

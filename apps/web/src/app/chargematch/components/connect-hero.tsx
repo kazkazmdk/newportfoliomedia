@@ -3,7 +3,6 @@
 import { CABLES, CHARGERS, DEVICES, powerChain } from "@penta/chargematch";
 import { useRouter } from "next/navigation";
 import { FormEvent, useMemo, useState } from "react";
-import { SpringButton } from "@/components/creative";
 import { ChargerObject, DeviceObject } from "./hardware";
 
 export function ConnectHero({
@@ -40,151 +39,72 @@ export function ConnectHero({
   }
 
   return (
-    <section className="cm-hero cm-home-hero cm-bench">
-      <div className="cm-hero-intro">
-        <p className="cm-kicker cm-mono">Rated path · not measured</p>
-        <h1>Build the right<br />power path.</h1>
-        <p>Match the device, brick, cable, and port. ChargeMatch shows the expected ceiling and the component that sets it.</p>
-      </div>
+    <section className="cm-bench-scene">
+      <form onSubmit={onSubmit} className="cm-scene-form">
+        <div className="cm-stack">
+          <div className="cm-pick">
+            <DeviceObject slug={d.slug} name={d.name} />
+          </div>
+          <label className="cm-inline-select">
+            Device
+            <select aria-label="Device" value={device} onChange={(e) => setDevice(e.target.value)}>
+              {DEVICES.map((item) => (
+                <option key={item.slug} value={item.slug}>{item.name}</option>
+              ))}
+            </select>
+          </label>
 
-      <form onSubmit={onSubmit} className="cm-builder">
-        <aside className="cm-verdict cm-builder-verdict" aria-live="polite" aria-label="Current power path verdict">
+          <div className="cm-watt-flow" aria-hidden>
+            <i />
+            <span className="cm-mono">{chain.watts}W</span>
+            <i />
+          </div>
+
+          <div className="cm-pick">
+            <ChargerObject watts={c.total_watts} ports={c.ports.length} />
+          </div>
+          <label className="cm-inline-select">
+            Charger
+            <select aria-label="Charger" value={charger} onChange={(e) => setCharger(e.target.value)}>
+              {CHARGERS.map((item) => (
+                <option key={item.slug} value={item.slug}>{item.name}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <aside className="cm-scene-result cm-verdict" aria-live="polite">
+          <p className="cm-result-kicker">Expected</p>
           <div className="cm-verdict-power">
-            <span className="cm-field-label cm-mono">Expected ceiling</span>
-            <strong className="cm-mono">{chain.watts}<small>W</small></strong>
+            <strong className="cm-result-watts cm-mono">{chain.watts}<small>W</small></strong>
           </div>
-          <dl className="cm-verdict-facts">
-            <div><dt className="cm-mono">Protocol</dt><dd>{chain.protocol.replaceAll("_", " ")}</dd></div>
-            <div><dt className="cm-mono">Bottleneck</dt><dd>{chain.limitingComponent}</dd></div>
-            <div><dt className="cm-mono">Evidence</dt><dd>Published specs</dd></div>
-          </dl>
-          <p className="cm-verdict-note">Calculated from the rated device, charger, cable, and selected port. Not a measured wall draw.</p>
+          <p className="cm-field-meta">Accepts up to {d.max_watts}W</p>
+          <p className="cm-result-limit">Limit · {chain.limitingComponent} bottleneck</p>
+          <p className="cm-result-proto cm-mono">{chain.protocol.replaceAll("_", " ")}</p>
+          <div className="cm-scene-meta">
+            <label>
+              Cable
+              <select aria-label="Cable" value={cable} onChange={(e) => setCable(e.target.value)}>
+                {CABLES.map((item) => (
+                  <option key={item.slug} value={item.slug}>{item.name}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Port
+              <select aria-label="Charger port" value={selectedPort} onChange={(e) => setPort(e.target.value)}>
+                {c.ports.map((item) => (
+                  <option key={item.id} value={item.id}>{item.label} · {item.watts}W</option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <button className="cm-cta" type="submit">Check this path</button>
+          <button type="button" className="cm-ghost" onClick={() => router.push("/chargematch/macbook-air-13-m3/with/anker-100w-2c")}>
+            Multiport split
+          </button>
+          <p className="cm-result-note">Published specs · not a measured wall draw.</p>
         </aside>
-
-        <div className="cm-product-stage">
-          <div className="cm-stage-topline cm-mono">
-            <span>Selected hardware</span>
-            <span className="cm-signal"><i /> Path active</span>
-          </div>
-          <div className="cm-connect">
-            <div className="cm-node">
-              <span className="cm-node-label cm-mono">Input</span>
-              <DeviceObject slug={d.slug} name={d.name} />
-              <p className="cm-node-spec cm-mono">{d.min_watts}–{d.max_watts}W acceptance</p>
-            </div>
-            <div className="cm-cable" aria-hidden>
-              <span className="cm-connector cm-connector-left" />
-              <svg viewBox="0 0 220 48">
-                <path d="M4 24 H216" stroke="currentColor" strokeWidth="2" />
-                <circle className="cm-flow-dot" r="4" fill="currentColor" />
-              </svg>
-              <span className="cm-connector cm-connector-right" />
-              <span className="cm-cable-label cm-mono">{selectedCable.connector}</span>
-            </div>
-            <div className="cm-node">
-              <span className="cm-node-label cm-mono">Source</span>
-              <ChargerObject watts={c.total_watts} ports={c.ports.length} />
-              <p className="cm-node-spec cm-mono">{c.total_watts}W rated brick</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="cm-builder-panel">
-          <div className="cm-builder-heading">
-            <p className="cm-mono">Configuration</p>
-            <span className="cm-mono">01—03</span>
-          </div>
-
-          <label className="cm-builder-step">
-            <span className="cm-step-index cm-mono">01</span>
-            <span className="cm-field">
-              <span className="cm-field-label cm-mono">Device</span>
-              <select
-                className="cm-select"
-                aria-label="Device"
-                value={device}
-                onChange={(event) => setDevice(event.target.value)}
-              >
-                {DEVICES.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <span className="cm-field-meta cm-mono">{d.connector} · accepts up to {d.max_watts}W</span>
-            </span>
-          </label>
-
-          <label className="cm-builder-step">
-            <span className="cm-step-index cm-mono">02</span>
-            <span className="cm-field">
-              <span className="cm-field-label cm-mono">Charger</span>
-              <select
-                className="cm-select"
-                aria-label="Charger"
-                value={charger}
-                onChange={(event) => setCharger(event.target.value)}
-              >
-                {CHARGERS.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <span className="cm-field-meta cm-mono">{c.total_watts}W total · {c.ports.length} {c.ports.length === 1 ? "port" : "ports"}</span>
-            </span>
-          </label>
-
-          <div className="cm-quick-actions">
-            <SpringButton className="cm-cta" type="submit">
-              Check this path
-            </SpringButton>
-            <button
-              type="button"
-              className="cm-ghost"
-              onClick={() => router.push("/chargematch/macbook-air-13-m3/with/anker-100w-2c")}
-            >
-              Explore a multiport split
-            </button>
-          </div>
-
-          <div className="cm-builder-step">
-            <span className="cm-step-index cm-mono">03</span>
-            <div className="cm-field-pair">
-              <label className="cm-field">
-                <span className="cm-field-label cm-mono">Cable</span>
-                <select
-                  className="cm-select"
-                  aria-label="Cable"
-                  value={cable}
-                  onChange={(event) => setCable(event.target.value)}
-                >
-                  {CABLES.map((item) => (
-                    <option key={item.slug} value={item.slug}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="cm-field">
-                <span className="cm-field-label cm-mono">Port</span>
-                <select
-                  className="cm-select"
-                  aria-label="Charger port"
-                  value={selectedPort}
-                  onChange={(event) => setPort(event.target.value)}
-                >
-                  {c.ports.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label} · {item.watts}W
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <span className="cm-field-meta cm-mono">{selectedCable.max_watts}W cable ceiling · selected {selectedPort.toUpperCase()}</span>
-            </div>
-          </div>
-        </div>
       </form>
     </section>
   );

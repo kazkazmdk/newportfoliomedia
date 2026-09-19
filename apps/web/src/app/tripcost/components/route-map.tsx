@@ -32,12 +32,12 @@ export function RouteMap({
         <desc id="tc-map-desc">
           Schematic geographic representation using a geodesic line between cities. It is not a road route or turn-by-turn itinerary.
         </desc>
-        <rect width="1000" height="720" fill="#b7c4d0" />
+        <rect width="1000" height="720" fill="#e7e1d4" />
         <g className="tc-map-grid" aria-hidden="true">
           <path d="M 0 180 H 1000 M 0 360 H 1000 M 0 540 H 1000" />
           <path d="M 250 0 V 720 M 500 0 V 720 M 750 0 V 720" />
         </g>
-        <path d={EUROPE_LAND} fill="#d4dce4" stroke="#0a1628" strokeWidth="1.4" />
+        <path d={EUROPE_LAND} fill="#c5d0d8" stroke="#1a2a3c" strokeWidth="1.1" />
         {ROUTES.map((r) => {
           const p = pointOf(r.from.slug);
           const q = pointOf(r.to.slug);

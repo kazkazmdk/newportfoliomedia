@@ -13,36 +13,28 @@ export function ChargematchHeader({
   power?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const live = Boolean(power || protocol || port);
   return (
-    <header className="cm-header">
-      <Link href="/chargematch" className="cm-brand cm-mono">
-        <span className="cm-brand-mark">CM</span>
-        <span>ChargeMatch</span>
+    <header className="cm-mast">
+      <Link href="/chargematch" className="cm-mast-mark">
+        ChargeMatch
       </Link>
-      <nav id="chargematch-navigation" aria-label="ChargeMatch" className={`cm-nav ${open ? "is-open" : ""}`}>
-        <Link href="/chargematch" onClick={() => setOpen(false)}>Check</Link>
+      <nav id="chargematch-navigation" aria-label="ChargeMatch" className={`cm-mast-nav ${open ? "is-open" : ""}`}>
         <Link href="/chargematch/iphone-16" onClick={() => setOpen(false)}>Devices</Link>
-        <Link href="/chargematch/iphone-16/with/apple-20w" onClick={() => setOpen(false)}>Chargers</Link>
-        <Link href="/chargematch/kit" onClick={() => setOpen(false)}>Power kit</Link>
+        <Link href="/chargematch/kit" onClick={() => setOpen(false)}>Kits</Link>
+        <Link href="/chargematch" onClick={() => setOpen(false)}>Check</Link>
       </nav>
-      <p className="cm-live cm-mono">
-        Rated model <span className="cm-dot" />
-      </p>
-      <button
-        type="button"
-        className="cm-menu"
-        aria-expanded={open}
-        aria-controls="chargematch-navigation"
-        onClick={() => setOpen((value) => !value)}
-      >
-        Panel
+      {live ? (
+        <p className="cm-mast-live">
+          <span className="cm-mono">{power ?? "—"}</span>
+          <span>{protocol?.replaceAll("_", " ") ?? "Rated"}</span>
+        </p>
+      ) : (
+        <p className="cm-mast-live">Rated path</p>
+      )}
+      <button type="button" className="cm-mast-menu" aria-expanded={open} aria-controls="chargematch-navigation" onClick={() => setOpen((v) => !v)}>
+        Menu
       </button>
-      <div className="cm-strip" style={{ gridColumn: "1 / -1" }}>
-        <span>Port {port ?? "—"}</span>
-        <span>Protocol {protocol ?? "—"}</span>
-        <span>Power {power ?? "—"}</span>
-        <span>Evidence: published specs · not measured</span>
-      </div>
     </header>
   );
 }

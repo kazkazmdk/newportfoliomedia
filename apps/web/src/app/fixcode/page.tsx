@@ -3,7 +3,6 @@ import { APPLIANCES, ALL_ERRORS, BRANDS } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { ViewportScene } from "@/components/creative";
 import { HomeScanner } from "./components/home-scanner";
-import { SafetyLegend, SectionLabel, StateBadge } from "./components/system-ui";
 
 export const metadata = pageMeta({
   title: "FixCode — What's wrong?",
@@ -12,78 +11,52 @@ export const metadata = pageMeta({
 });
 
 export default function FixcodeHome() {
-  const popular = [...ALL_ERRORS].sort((a, b) => b.search_demand - a.search_demand).slice(0, 8);
+  const popular = [...ALL_ERRORS].sort((a, b) => b.search_demand - a.search_demand).slice(0, 10);
   return (
     <main>
       <HomeScanner />
       <ViewportScene className="fc-scene fc-index-scene" id="code-index">
-        <div className="fc-section-heading">
-          <div>
-            <SectionLabel number="02">Search verified error trees</SectionLabel>
-            <h2 className="mt-5 max-w-2xl text-4xl leading-none">Start from a code already on file.</h2>
-          </div>
-          <p className="fc-section-note">
-            Ranked by current catalog demand. Every row stays scoped to a brand and appliance.
-          </p>
-        </div>
-        <ol className="fc-code-grid mt-10">
-          {popular.map((item, i) => (
+        <p className="fc-kicker">Diagnostic atlas</p>
+        <h2 className="mt-5 max-w-2xl text-4xl leading-none">Codes already on file.</h2>
+        <ol className="fc-atlas">
+          {popular.map((item) => (
             <li key={item.id}>
-              <Link
-                href={`/fixcode/${item.brand_slug}/${item.appliance_slug}/${item.code_slug}`}
-                className="fc-hypo"
-              >
-                <span className="fixcode-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
-                <span>
-                  <strong>{item.brand} {item.appliance}</strong>
-                  <small>{item.meaning}</small>
-                </span>
-                <span className="fc-code-token">{item.code}</span>
+              <Link href={`/fixcode/${item.brand_slug}/${item.appliance_slug}/${item.code_slug}`}>
+                <b className="fixcode-mono">{item.code}</b>
+                <span>{item.brand} {item.appliance}</span>
+                <small>{item.meaning}</small>
               </Link>
             </li>
           ))}
         </ol>
       </ViewportScene>
       <ViewportScene className="fc-scene" id="appliance-index">
-        <div className="fc-section-heading">
-          <div>
-            <SectionLabel number="03">Browse the hierarchy</SectionLabel>
-            <h2 className="mt-5 max-w-2xl text-4xl leading-none">Identify before interpreting.</h2>
-          </div>
-          <SafetyLegend />
-        </div>
-        <div className="fc-appliance-grid mt-10">
-          {APPLIANCES.map((item, index) => {
+        <p className="fc-kicker">Equipment families</p>
+        <ul className="fc-family-list">
+          {APPLIANCES.map((item) => {
             const entry = ALL_ERRORS.find((error) => error.appliance_slug === item.slug);
             return (
-              <article key={item.slug} className="fc-appliance-card">
-                <span className="fc-card-index">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="text-2xl">{item.name}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[var(--fc-mute)]">{item.blurb}</p>
-                </div>
+              <li key={item.slug}>
                 {entry ? (
-                  <Link className="fc-inline-link" href={`/fixcode/${entry.brand_slug}/${entry.appliance_slug}`}>
-                    Browse covered codes <span aria-hidden>↗</span>
+                  <Link href={`/fixcode/${entry.brand_slug}/${entry.appliance_slug}`}>
+                    <strong>{item.name}</strong>
+                    <span>{item.blurb}</span>
                   </Link>
                 ) : (
-                  <StateBadge state="idle">No published tree</StateBadge>
+                  <span>
+                    <strong>{item.name}</strong>
+                    <em>No published tree</em>
+                  </span>
                 )}
-              </article>
+              </li>
             );
           })}
-        </div>
-        <div className="fc-coverage-strip">
-          <div>
-            <p className="fc-kicker">Brand paths</p>
-            <p className="mt-2 text-sm text-[var(--fc-mute)]">{BRANDS.length} brands with verified catalog records. Missing brands are not invented.</p>
-          </div>
-          <ul className="fc-brand-links" aria-label="Covered brands">
-            {BRANDS.map((brand) => (
-              <li key={brand.slug}><Link href={`/fixcode/${brand.slug}`}>{brand.name}</Link></li>
-            ))}
-          </ul>
-        </div>
+        </ul>
+        <ul className="fc-brand-links" aria-label="Covered brands">
+          {BRANDS.map((brand) => (
+            <li key={brand.slug}><Link href={`/fixcode/${brand.slug}`}>{brand.name}</Link></li>
+          ))}
+        </ul>
       </ViewportScene>
     </main>
   );

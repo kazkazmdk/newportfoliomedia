@@ -41,7 +41,10 @@ export function GarageEntry() {
           </li>
         ))}
       </ul>
-      <p className="as-vin-status">VIN identification unavailable · {VIN_SUPPORT}</p>
+      <details className="as-vin">
+        <summary>VIN identification unavailable · stub</summary>
+        <p>VIN {VIN_SUPPORT}. No decode field is offered on this surface.</p>
+      </details>
     </div>
   );
 }
