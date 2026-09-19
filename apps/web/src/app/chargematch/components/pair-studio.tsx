@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
 import { ExpertToggle } from "../[device]/with/[charger]/expert-toggle";
 import { Faceplate } from "./faceplate";
-import { ChargerObject, DeviceObject } from "./hardware";
+import { CablePath, ChargerObject, DeviceObject } from "./hardware";
 import { MultiportTree } from "./multiport";
 import { PowerFlow } from "./power-flow";
 
@@ -61,13 +61,8 @@ export function PairStudio({
               <p className="cm-node-spec cm-mono">{device.max_watts}W input cap</p>
             </div>
             <div className="cm-cable" aria-hidden>
-              <span className="cm-connector cm-connector-left" />
-              <svg viewBox="0 0 220 48">
-                <path d="M4 24 H216" stroke="currentColor" strokeWidth="2" />
-                <circle className="cm-flow-dot" r="4" fill="currentColor" />
-              </svg>
-              <span className="cm-connector cm-connector-right" />
-              <span className="cm-cable-label cm-mono">USB-C power path</span>
+              <CablePath watts={chain.watts} limit={chain.limitingComponent !== "charger"} />
+              <span className="cm-cable-label cm-mono">USB-C {chain.watts}W path</span>
             </div>
             <div className="cm-node">
               <span className="cm-node-label cm-mono">Charger</span>
@@ -151,10 +146,11 @@ export function PairStudio({
                 <div className="cm-multi-visual">
                   <MultiportTree
                     total={charger.total_watts}
-                    branches={multi.ports.map((p) => ({
+                    branches={multi.ports.map((p, index) => ({
                       id: p,
                       label: `${labels[p] ?? p} · ${charger.ports.find((x) => x.id === p)?.label ?? p}`,
                       watts: multi.byPort?.[p] ?? 0,
+                      slug: index === 0 ? device.slug : laptop.slug,
                     }))}
                   />
                 </div>

@@ -47,7 +47,20 @@ export default async function VehicleHub({
   return (
     <main>
       <section className="as-cinema">
-        <VehicleStage makeSlug={v.make_slug} generationSlug={v.generation_slug} identity={`${v.make} ${v.variant} ${v.generation}`} />
+        <VehicleStage
+          makeSlug={v.make_slug}
+          generationSlug={v.generation_slug}
+          identity={`${v.make} ${v.variant} ${v.generation}`}
+          spec={{
+            engineCode: v.engine_code,
+            oilLiters: v.oil.capacity_liters,
+            oilSpec: v.oil.spec,
+            tyreFront: v.tyres.front,
+            tyreRear: v.tyres.rear,
+            batteryType: v.battery.type,
+            serviceLabel: typical ? serviceIntervalLabel(typical) : "Unknown",
+          }}
+        />
         <div className="as-cinema-copy">
           <p className="as-eyebrow">{v.generation} · {v.engine_code} · {v.years[0]}–{v.years.at(-1)}</p>
           <h1>{v.make} {v.variant}</h1>

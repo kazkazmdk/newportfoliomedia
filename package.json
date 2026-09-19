@@ -28,6 +28,7 @@
     "demand:audit": "tsx scripts/demand-audit.ts",
     "seo:audit": "tsx scripts/seo-audit.ts",
     "sitemap:audit": "tsx scripts/sitemap-audit.ts",
+    "asset:inspect": "tsx scripts/asset-inspect.ts",
     "release:manifest": "tsx scripts/generate-release-manifest.ts",
     "state": "tsx scripts/penta-state.ts",
     "state:check": "tsx scripts/penta-state.ts --check",

@@ -85,10 +85,11 @@ export function ErrorHero({
                   <span className="fc-panel-index">01</span>
                   <div>
                     <p className="fc-kicker">First reversible check</p>
-                    <StateBadge state="ready">Start here</StateBadge>
+                    <p className="fc-do-title">{water ? "Water source" : zone}</p>
                   </div>
                 </div>
-                <p className="mt-2 text-xl leading-snug">{first.text}</p>
+                <p className="fc-do-action text-xl leading-snug">{first.text}</p>
+                <p className="fc-do-meta">2 min · safe · reversible</p>
                 <p className="mt-2 text-sm text-[var(--fc-mute)]">{first.why}</p>
                 <div className="mt-4">
                   <CheckDiagram kind={checkKindFromText(`${first.text} ${first.why}`)} />

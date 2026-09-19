@@ -21,6 +21,12 @@ export function BreakEvenChart({ rows }: { rows: Row[] }) {
   const cross = rows.find((r, i) => i > 0 && rows[i - 1].cheaper !== r.cheaper);
   return (
     <div className="tc-be">
+      {cross ? (
+        <p className="tc-be-event">
+          <span>{cross.travellers} {cross.travellers === 1 ? "person" : "people"}</span>
+          <strong>{cross.cheaper === "car" ? "Car becomes cheaper" : "Train stays cheaper"}</strong>
+        </p>
+      ) : null}
       <svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Break-even cost by traveller count">
         <path d={line("carCash")} className="tc-be-car" />
         <path d={line("trainCash")} className="tc-be-train" />

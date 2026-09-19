@@ -58,78 +58,75 @@ export function MachineVisual({
       <div className="fc-registration-mark" aria-hidden>
         {REGISTRATION_CELLS.map((index) => <i key={index} />)}
       </div>
-      <svg viewBox="0 0 420 480" fill="none">
+      <svg viewBox="0 0 520 620" fill="none">
         <g data-system="enclosure">
-          <rect className={`fc-part ${hot("door")}`} x="78" y="36" width="248" height="392" rx="14" />
-          <rect className="fc-part" x="96" y="52" width="212" height="36" rx="4" />
-          <rect className="fc-fill" x="112" y="60" width="36" height="10" rx="2" />
-          <rect className="fc-fill" x="156" y="60" width="36" height="10" rx="2" />
-          <rect className="fc-fill" x="200" y="60" width="36" height="10" rx="2" />
+          <rect className={`fc-part ${hot("door")}`} x="110" y="48" width="300" height="500" rx="18" />
+          <rect className="fc-part" x="132" y="68" width="256" height="44" rx="4" />
+          <rect className="fc-fill" x="150" y="78" width="42" height="12" rx="2" />
+          <rect className="fc-fill" x="202" y="78" width="42" height="12" rx="2" />
+          <rect className="fc-fill" x="254" y="78" width="42" height="12" rx="2" />
+          <rect className={cls(on("control") || zone === "sensor", dim("control"))} x="338" y="74" width="38" height="28" />
         </g>
 
         <g data-system="door">
-          <rect className={`fc-part ${hot("door")}`} x="108" y="108" width="188" height="188" rx="94" />
-          <circle className="fc-part" cx="202" cy="202" r="68" />
+          <rect className={`fc-part ${hot("door")}`} x="148" y="140" width="224" height="224" rx="112" />
+          <circle className="fc-part" cx="260" cy="252" r="82" />
+          <rect className={cls(zone === "door", false)} x="368" y="248" width="18" height="14" rx="2" />
+          <text className={`fc-callout ${zone === "door" ? "is-hot" : ""}`} x="390" y="246">lock</text>
         </g>
 
         <g data-system="motor" className={dim("motor") ? "is-dim" : ""}>
-          <circle className={cls(on("motor") || zone === "motor", dim("motor"))} cx="202" cy="202" r="38" />
-          <circle className={cls(on("motor") || zone === "motor", dim("motor"))} cx="202" cy="202" r="14" />
-          <path className={cls(on("motor") || zone === "motor", dim("motor"))} d="M202 164 V148 M202 240 V256 M164 202 H148 M240 202 H256" />
+          <circle className={cls(on("motor") || zone === "motor", dim("motor"))} cx="260" cy="252" r="46" />
+          <circle className={cls(on("motor") || zone === "motor", dim("motor"))} cx="260" cy="252" r="16" />
+          <path className={cls(on("motor") || zone === "motor", dim("motor"))} d="M260 206 V186 M260 298 V318 M214 252 H194 M306 252 H326" />
+          <text className={`fc-callout ${on("motor") || zone === "motor" ? "is-hot" : ""}`} x="318" y="330">drum / motor</text>
         </g>
 
         <g data-system="water">
-          <path className={cls(on("water") || on("source"), dim("water"))} d="M78 92 H28 V58 H8" />
-          <circle className={cls(on("source") || on("water"), dim("water"))} cx="8" cy="58" r="7" />
-          <text className={`fc-callout ${on("source") || on("water") ? "is-hot" : ""}`} x="16" y="42">
-            tap
-          </text>
+          <path className={cls(on("water") || on("source"), dim("water"))} d="M110 118 H36 V72 H12" />
+          <circle className={cls(on("source") || on("water"), dim("water"))} cx="12" cy="72" r="8" />
+          <text className={`fc-callout ${on("source") || on("water") ? "is-hot" : ""}`} x="20" y="54">tap</text>
         </g>
 
         <g data-system="hose">
-          <path className={cls(on("hose") || on("water"), dim("hose"))} d="M28 58 C28 78 48 86 78 86" />
-          <rect className={cls(on("hose"), dim("hose"))} x="34" y="68" width="22" height="10" rx="2" />
-          <text className={`fc-callout ${on("hose") ? "is-hot" : ""}`} x="8" y="92">
-            hose / mesh
-          </text>
+          <path className={cls(on("hose") || on("water"), dim("hose"))} d="M36 72 C36 98 68 110 110 110" />
+          <rect className={cls(on("hose"), dim("hose"))} x="48" y="88" width="28" height="12" rx="2" />
+          <text className={`fc-callout ${on("hose") ? "is-hot" : ""}`} x="16" y="118">hose / mesh</text>
         </g>
 
         <g data-system="valve">
-          <rect className={cls(on("valve") || zone === "inlet", dim("valve"))} x="78" y="80" width="28" height="22" rx="3" />
-          <path className={cls(on("valve") || zone === "inlet", dim("valve"))} d="M106 91 H132 V118" />
-          <text className={`fc-callout ${on("valve") || zone === "inlet" ? "is-hot" : ""}`} x="112" y="76">
-            valve
-          </text>
+          <rect className={cls(on("valve") || zone === "inlet", dim("valve"))} x="110" y="100" width="34" height="26" rx="3" />
+          <path className={cls(on("valve") || zone === "inlet", dim("valve"))} d="M144 113 H176 V148" />
+          <text className={`fc-callout ${on("valve") || zone === "inlet" ? "is-hot" : ""}`} x="150" y="92">valve</text>
         </g>
 
         <g data-system="drain">
-          <path className={cls(on("pump") || zone === "pump", dim("drain"))} d="M202 310 V352 H118 V328 H154 V310" />
-          <circle className={cls(on("pump") || zone === "pump", dim("drain"))} cx="118" cy="340" r="12" />
-          <text className={`fc-callout ${on("pump") || zone === "pump" ? "is-hot" : ""}`} x="78" y="372">
-            pump / drain
-          </text>
+          <path className={cls(on("pump") || zone === "pump", dim("drain"))} d="M260 400 V452 H156 V420 H198 V400" />
+          <circle className={cls(on("pump") || zone === "pump", dim("drain"))} cx="156" cy="436" r="14" />
+          <text className={`fc-callout ${on("pump") || zone === "pump" ? "is-hot" : ""}`} x="108" y="478">pump / drain</text>
         </g>
 
         <g data-system="heater">
-          <rect className={cls(zone === "heater", dim("heater"))} x="236" y="318" width="72" height="16" />
-          <text className={`fc-callout ${zone === "heater" ? "is-hot" : ""}`} x="236" y="348">
-            heater
-          </text>
+          <rect className={cls(zone === "heater", dim("heater"))} x="300" y="408" width="88" height="18" />
+          <path className={cls(zone === "heater", dim("heater"))} d="M308 408 V426 M322 408 V426 M336 408 V426 M350 408 V426 M364 408 V426" />
+          <text className={`fc-callout ${zone === "heater" ? "is-hot" : ""}`} x="300" y="446">heater</text>
+        </g>
+
+        <g data-system="tub">
+          <ellipse className="fc-part" cx="260" cy="252" rx="70" ry="74" opacity="0.45" />
         </g>
 
         <g data-system="sensor">
-          <circle className={cls(on("sensor") || on("control") || zone === "sensor", dim("sensor"))} cx="286" cy="156" r="8" />
-          <path className={cls(on("control") || zone === "sensor", dim("sensor"))} d="M286 148 V70 H248" />
-          <rect className={cls(on("control") || zone === "sensor", dim("control"))} x="228" y="52" width="36" height="22" />
-          <text className={`fc-callout ${on("sensor") || on("control") || zone === "sensor" ? "is-hot" : ""}`} x="300" y="160">
-            sensor
-          </text>
+          <circle className={cls(on("sensor") || on("control") || zone === "sensor", dim("sensor"))} cx="368" cy="188" r="9" />
+          <path className={cls(on("control") || zone === "sensor", dim("sensor"))} d="M368 179 V96 H356" />
+          <text className={`fc-callout ${on("sensor") || on("control") || zone === "sensor" ? "is-hot" : ""}`} x="384" y="192">sensor</text>
+          <text className={`fc-callout ${on("control") ? "is-hot" : ""}`} x="380" y="70">control</text>
         </g>
 
         <g data-system="diagnostic" opacity={ready || focus !== "none" ? 1 : 0.35}>
           <path
             className="fc-diag-path"
-            d="M8 58 C28 58 28 86 78 91 C110 91 132 91 132 118 C132 160 148 186 202 202"
+            d="M12 72 C36 72 36 110 110 113 C148 113 176 113 176 148 C176 200 210 232 260 252"
           />
         </g>
       </svg>

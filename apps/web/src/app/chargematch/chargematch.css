@@ -189,12 +189,9 @@
 .cm-multi-svg .cm-mono { fill: currentColor; stroke: none; font-size: 16px; }
 
 .cm-svg {
-  width: min(11rem, 42vw);
+  width: min(13.5rem, 46vw);
   height: auto;
   display: block;
-  fill: none;
-  stroke: var(--cm-ink);
-  stroke-width: 1.6;
 }
 
 .cm-svg-fill { fill: color-mix(in srgb, var(--cm-ink) 8%, transparent); }
@@ -857,17 +854,10 @@
   isolation: isolate;
 }
 
+.cm-bench-scene .cm-product-stage::before,
+.cm-detail-stage::before,
 .cm-product-stage::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.15) 1px, transparent 1px);
-  background-size: 4rem 4rem;
-  mask-image: linear-gradient(to bottom, black, transparent 80%);
+  display: none;
 }
 
 .cm-stage-topline {
@@ -2031,4 +2021,96 @@
   .cm-bench .cm-builder-panel {
     order: 1;
   }
+}
+
+/* v2 hardware material + power path */
+.cm-object {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  filter: drop-shadow(0 18px 22px rgb(17 17 16 / 0.16));
+}
+.cm-object .cm-svg {
+  overflow: visible;
+}
+.cm-object-name {
+  margin-top: 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.cm-object.is-phone .cm-svg { width: min(7.4rem, 28vw); }
+.cm-object.is-laptop .cm-svg { width: min(15rem, 52vw); }
+.cm-object.is-tablet .cm-svg { width: min(8.4rem, 32vw); }
+.cm-object.is-brick .cm-svg { width: min(8.8rem, 34vw); }
+.cm-cable-path {
+  width: 4.6rem;
+  height: 7.2rem;
+  overflow: visible;
+}
+.cm-cable-line {
+  fill: none;
+  stroke: #2a2a28;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+.cm-cable-path.is-limit .cm-cable-line { stroke: var(--cm-led); }
+.cm-cable-head { fill: #1b1b19; }
+.cm-cable-current { fill: var(--cm-led); }
+.cm-cable-watt {
+  fill: var(--cm-led);
+  stroke: none;
+  font-size: 11px;
+  font-family: var(--font-cm-mono), monospace;
+}
+.cm-why-watts {
+  margin: 0.9rem auto 0;
+  max-width: 22rem;
+  text-align: left;
+  font-size: 0.78rem;
+}
+.cm-why-watts summary {
+  cursor: pointer;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+}
+.cm-why-watts ol {
+  margin: 0.6rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.cm-why-watts .is-limit { color: var(--cm-led); }
+.cm-inline-select button {
+  margin-left: 0.6rem;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.58rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cm-scene-meta:not(.is-open) {
+  display: none;
+}
+.cm-multi.is-physical {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+}
+.cm-multi-physical {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 0.4rem 0.8rem;
+  width: min(100%, 34rem);
+}
+.cm-multi-physical .cm-object { justify-self: center; }
+@media (prefers-reduced-motion: reduce) {
+  .cm-cable-current,
+  .cm-flow-dot { animation: none; display: none; }
 }

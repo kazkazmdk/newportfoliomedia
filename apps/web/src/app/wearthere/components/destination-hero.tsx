@@ -4,7 +4,7 @@ import { DESTINATIONS, capsuleFor, typicalWeather, type StyleId } from "@penta/w
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { destinationMedia } from "@/lib/media-catalog";
+import { destinationSeasonMedia } from "@/lib/media-catalog";
 import { GarmentSvg, garmentKind } from "./garment-svg";
 import { useClimateMood } from "./climate-context";
 import { climateCopy, climateMood } from "./climate-theme";
@@ -38,9 +38,25 @@ export function DestinationHero({
   const month = Number(start.slice(5, 7)) || 11;
   const weather = useMemo(() => typicalWeather(dest, month), [dest, month]);
   const mood = climateMood(weather, dest.slug);
-  const media = destinationMedia(dest.slug);
+  const media = destinationSeasonMedia(dest.slug, month);
+  const [scene, setScene] = useState(media);
+  const [leaving, setLeaving] = useState<typeof media | null>(null);
   const capsule = useMemo(() => capsuleFor(dest, month, style), [dest, month, style]);
   const { setMood, view, setPlace } = useClimateMood();
+
+  useEffect(() => {
+    if (media.hero === scene.hero) return;
+    const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      setScene(media);
+      setLeaving(null);
+      return;
+    }
+    setLeaving(scene);
+    setScene(media);
+    const timer = window.setTimeout(() => setLeaving(null), 480);
+    return () => window.clearTimeout(timer);
+  }, [media, scene]);
 
   useEffect(() => {
     setMood(mood);
@@ -69,14 +85,23 @@ export function DestinationHero({
 
   return (
     <section className="wt-stage" data-climate={mood} data-view={view}>
-      <div className="wt-stage-photo" key={`${media.hero}-${month}`}>
+      <div className="wt-stage-photo" data-season={media.hero}>
+        {leaving ? (
+          <Image
+            src={leaving.hero}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover wt-stage-img is-leave"
+          />
+        ) : null}
         <Image
-          src={media.hero}
-          alt={media.heroAlt}
+          src={scene.hero}
+          alt={scene.heroAlt}
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover wt-stage-img"
         />
         <div className="wt-stage-veil" aria-hidden />
       </div>
@@ -105,8 +130,8 @@ export function DestinationHero({
           </dl>
         ) : (
           <ul className="wt-stage-pack" aria-live="polite">
-            {look.map((piece) => (
-              <li key={piece.id}>
+            {look.map((piece, index) => (
+              <li key={piece.id} className={`is-${garmentKind(piece)} ${index === 0 ? "is-hero" : ""}`}>
                 <GarmentSvg kind={garmentKind(piece)} />
                 <span>{piece.name}</span>
               </li>

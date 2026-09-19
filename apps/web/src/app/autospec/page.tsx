@@ -19,6 +19,15 @@ export default function AutospecHome() {
           makeSlug={featured?.make_slug}
           generationSlug={featured?.generation_slug}
           identity={featured ? `${featured.make} ${featured.variant} ${featured.generation}` : undefined}
+          spec={featured ? {
+            engineCode: featured.engine_code,
+            oilLiters: featured.oil.capacity_liters,
+            oilSpec: featured.oil.spec,
+            tyreFront: featured.tyres.front,
+            tyreRear: featured.tyres.rear,
+            batteryType: featured.battery.type,
+            serviceLabel: "Interval on file",
+          } : undefined}
         />
         <div className="as-cinema-copy">
           <p className="as-eyebrow">Identify</p>
@@ -34,29 +43,40 @@ export default function AutospecHome() {
         </div>
       </section>
       <section className="as-scene as-layer-scene">
-        <p className="as-eyebrow">Physical layers</p>
-        <ul className="as-layers">
-          <li>
-            <span>Oil</span>
-            <strong>{featured?.oil.capacity_liters ? `${featured.oil.capacity_liters} L` : "—"}</strong>
-            <small>{featured?.oil.spec ?? "Graph specification"}</small>
-          </li>
-          <li>
-            <span>Tyres</span>
-            <strong>{featured?.tyres.front ?? "—"}</strong>
-            <small>{featured?.tyres.rear && featured.tyres.rear !== featured.tyres.front ? featured.tyres.rear : "Graph fitment"}</small>
-          </li>
-          <li>
-            <span>Service</span>
-            <strong>Interval on file</strong>
-            <small>Unknown until mileage is entered</small>
-          </li>
-          <li>
-            <span>Battery</span>
-            <strong>{featured ? `12V ${featured.battery.type}` : "—"}</strong>
-            <small>Graph reference</small>
-          </li>
-        </ul>
+        <div className="as-own-split">
+          <div>
+            <p className="as-eyebrow">Ownership interval</p>
+            <p className="as-display">Service is a timeline, not a tile.</p>
+            <ul className="as-layers">
+              <li>
+                <span>Now</span>
+                <strong>Interval on file</strong>
+                <small>Unknown until mileage is entered</small>
+              </li>
+              <li>
+                <span>Oil</span>
+                <strong>{featured?.oil.capacity_liters ? `${featured.oil.capacity_liters} L` : "—"}</strong>
+                <small>{featured?.oil.spec ?? "Graph specification"}</small>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="as-eyebrow">Maintenance system</p>
+            <p className="as-display">Fitment and 12V</p>
+            <ul className="as-layers">
+              <li>
+                <span>Tyres</span>
+                <strong>{featured?.tyres.front ?? "—"}</strong>
+                <small>{featured?.tyres.rear && featured.tyres.rear !== featured.tyres.front ? featured.tyres.rear : "Graph fitment"}</small>
+              </li>
+              <li>
+                <span>Battery</span>
+                <strong>{featured ? `12V ${featured.battery.type}` : "—"}</strong>
+                <small>Graph reference</small>
+              </li>
+            </ul>
+          </div>
+        </div>
         {featured ? (
           <Link className="as-cta as-cta-arrow" href={vehicleUrl(featured)}>
             Open the vehicle <span aria-hidden>↗</span>

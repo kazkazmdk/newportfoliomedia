@@ -60,7 +60,8 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
       <section className="tc-hero is-result tc-result-hero">
         <div className="tc-result-intro">
           <p className="tc-kicker">{route.km} km · modelled corridor</p>
-          <h1 className="tc-result-title">{route.from.name} → {route.to.name}</h1>
+          <h1 className="tc-result-title">{route.from.name}<br />→ {route.to.name}</h1>
+          <p className="tc-result-mode">{LABELS[partyBest]}</p>
           <p className="tc-result-win">{LABELS[partyBest]} wins for {travellers}</p>
           <p className="tc-result-facts tc-mono">
             {fmtDoor(fastest.minutes_door)} · €{Math.round(result.modes.find((m) => m.mode === partyBest)?.cash_eur ?? 0)} pp

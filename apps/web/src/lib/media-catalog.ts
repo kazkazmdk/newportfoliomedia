@@ -119,6 +119,119 @@ export function destinationMedia(slug: string): DestinationMedia {
   return DESTINATION_MEDIA[slug] ?? FALLBACK;
 }
 
+export type SeasonId = "winter" | "spring" | "summer" | "autumn";
+
+export function seasonOfMonth(month: number): SeasonId {
+  if (month === 12 || month <= 2) return "winter";
+  if (month <= 5) return "spring";
+  if (month <= 8) return "summer";
+  return "autumn";
+}
+
+const SEASONAL_MEDIA: Partial<Record<string, Partial<Record<SeasonId, DestinationMedia>>>> = {
+  tokyo: {
+    winter: DESTINATION_MEDIA.tokyo,
+    spring: {
+      hero: "/media/wearthere/tokyo-alt.webp",
+      detail: "/media/wearthere/tokyo-street.webp",
+      heroAlt: "Tokyo street in clearer spring light",
+      detailAlt: "Tokyo street scale",
+      credit: "Unsplash License",
+    },
+    summer: {
+      hero: "/media/wearthere/tokyo-street.webp",
+      detail: "/media/wearthere/tokyo-hero.webp",
+      heroAlt: "Tokyo street humidity and night light",
+      detailAlt: "Tokyo crossing atmosphere",
+      credit: "Unsplash License",
+    },
+    autumn: {
+      hero: "/media/wearthere/tokyo-hero.webp",
+      detail: "/media/wearthere/tokyo-rain-commons.jpg",
+      heroAlt: "Tokyo autumn night street",
+      detailAlt: "Wet Tokyo sidewalk",
+      credit: "Unsplash License / Wikimedia Commons CC0",
+    },
+  },
+  paris: {
+    winter: DESTINATION_MEDIA.paris,
+    autumn: DESTINATION_MEDIA.paris,
+    spring: {
+      hero: "/media/wearthere/paris-street-commons.jpg",
+      detail: "/media/wearthere/paris-street.webp",
+      heroAlt: "Paris street after rain",
+      detailAlt: "Paris street atmosphere",
+      credit: "Wikimedia Commons · CC BY 2.0",
+    },
+    summer: {
+      hero: "/media/wearthere/paris-street.webp",
+      detail: "/media/wearthere/paris-alt.webp",
+      heroAlt: "Paris summer street light",
+      detailAlt: "Paris street warmth",
+      credit: "Unsplash License",
+    },
+  },
+  london: {
+    winter: DESTINATION_MEDIA.london,
+    autumn: DESTINATION_MEDIA.london,
+    spring: {
+      hero: "/media/wearthere/london-hero.webp",
+      detail: "/media/wearthere/london-rain-commons.jpg",
+      heroAlt: "London street in clearer light",
+      detailAlt: "London rain street",
+      credit: "Unsplash License / Wikimedia Commons CC BY 2.0",
+    },
+    summer: {
+      hero: "/media/wearthere/london-hero.webp",
+      detail: "/media/wearthere/london-hero.webp",
+      heroAlt: "London summer street",
+      detailAlt: "London street",
+      credit: "Unsplash License",
+    },
+  },
+  lisbon: {
+    summer: DESTINATION_MEDIA.lisbon,
+    autumn: DESTINATION_MEDIA.lisbon,
+    spring: {
+      hero: "/media/wearthere/lisbon-alt.webp",
+      detail: "/media/wearthere/lisbon-gold-commons.jpg",
+      heroAlt: "Lisbon street in cooler light",
+      detailAlt: "Lisbon gold hour",
+      credit: "Unsplash License / Wikimedia Commons CC0",
+    },
+    winter: {
+      hero: "/media/wearthere/lisbon-alt.webp",
+      detail: "/media/wearthere/lisbon-alt.webp",
+      heroAlt: "Lisbon winter street",
+      detailAlt: "Lisbon street",
+      credit: "Unsplash License",
+    },
+  },
+  "new-york": {
+    winter: DESTINATION_MEDIA["new-york"],
+    autumn: DESTINATION_MEDIA["new-york"],
+    summer: {
+      hero: "/media/wearthere/new-york-hero.webp",
+      detail: "/media/wearthere/nyc-rain-commons.jpg",
+      heroAlt: "New York in clearer evening light",
+      detailAlt: "New York rain night",
+      credit: "Unsplash License / Wikimedia Commons CC BY-SA 2.0",
+    },
+    spring: {
+      hero: "/media/wearthere/new-york-hero.webp",
+      detail: "/media/wearthere/new-york-hero.webp",
+      heroAlt: "New York spring street",
+      detailAlt: "New York street",
+      credit: "Unsplash License",
+    },
+  },
+};
+
+export function destinationSeasonMedia(slug: string, month: number): DestinationMedia {
+  const season = seasonOfMonth(month);
+  return SEASONAL_MEDIA[slug]?.[season] ?? destinationMedia(slug);
+}
+
 export type VehicleMedia = {
   src: string;
   alt: string;

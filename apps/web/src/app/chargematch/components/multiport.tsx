@@ -1,13 +1,14 @@
 "use client";
 
 import type { Allocation } from "@penta/chargematch";
+import { CablePath, ChargerObject, DeviceObject } from "./hardware";
 
 export function MultiportTree({
   total,
   branches,
 }: {
   total: number;
-  branches: Array<{ id: string; label: string; watts: number }>;
+  branches: Array<{ id: string; label: string; watts: number; slug?: string }>;
 }) {
   const count = Math.max(branches.length, 1);
   const width = 360;
@@ -15,7 +16,17 @@ export function MultiportTree({
   const splitY = 88;
   const endY = 168;
   return (
-    <div className="cm-multi" role="img" aria-label="Port allocation">
+    <div className="cm-multi is-physical" role="img" aria-label="Port allocation">
+      <ChargerObject watts={total} ports={Math.max(branches.length, 2)} />
+      <div className="cm-multi-physical">
+        {branches.map((branch) => (
+          <div key={`obj-${branch.id}`} className="cm-branch">
+            <CablePath watts={branch.watts} />
+            <DeviceObject slug={branch.slug ?? "iphone-16"} name={branch.label} />
+            <p className="cm-mono text-xl">{branch.watts}W</p>
+          </div>
+        ))}
+      </div>
       <svg className="cm-multi-svg" viewBox={`0 0 ${width} 220`}>
         <text x={width / 2} y="22" textAnchor="middle" className="cm-multi-total">{total}W</text>
         <circle cx={width / 2} cy={top} r="7" />

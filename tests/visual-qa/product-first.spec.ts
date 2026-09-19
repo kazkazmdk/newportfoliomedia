@@ -48,12 +48,16 @@ async function settleVisual(page: Page) {
   await page.evaluate(async () => {
     await Promise.all(
       [...document.images].map((img) => {
-        if (img.complete) return Promise.resolve();
-        return new Promise<void>((resolve) => {
-          const done = () => resolve();
-          img.addEventListener("load", done, { once: true });
-          img.addEventListener("error", done, { once: true });
-          window.setTimeout(done, 2500);
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise<void>((resolve, reject) => {
+          const ok = () => resolve();
+          const fail = () => reject(new Error(`image failed ${img.currentSrc || img.src}`));
+          img.addEventListener("load", ok, { once: true });
+          img.addEventListener("error", fail, { once: true });
+          window.setTimeout(() => {
+            if (img.complete && img.naturalWidth > 0) resolve();
+            else reject(new Error(`image timeout ${img.currentSrc || img.src}`));
+          }, 8000);
         });
       }),
     );
@@ -136,10 +140,7 @@ test.describe("product-first visual QA", () => {
     await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.locator(".wt-city").first(), 844, "Destination city");
     await fullyInViewport(page.locator(".wt-stage-climate").first(), 844, "Climate read");
-    const plan = page.getByRole("button", { name: /build capsule/i });
-    await expect(plan).toBeVisible();
-    const planBox = await plan.boundingBox();
-    expect(planBox, "Build capsule exists").toBeTruthy();
+    await fullyInViewport(page.getByRole("button", { name: /build capsule/i }), 844, "Build capsule");
 
     await page.goto("/autospec", { waitUntil: "domcontentloaded" });
     await fullyInViewport(page.getByLabel("Search make and model"), 844, "AutoSpec search");

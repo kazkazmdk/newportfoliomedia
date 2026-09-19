@@ -104,11 +104,11 @@
 }
 
 .as-layers strong {
-  font-family: var(--font-as-display), "Oswald", sans-serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-as-sans), "Source Sans 3", sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
 }
 
 .as-identity-list {
@@ -245,12 +245,8 @@
   inset: 18% 4% 8%;
   background: radial-gradient(60% 50% at 50% 70%, #2a241c, transparent 70%);
 }
-.as-car-photo { position: relative; width: min(96vw, 1180px); margin-inline: auto; transition: filter 400ms ease, opacity 400ms ease, transform 500ms ease; }
-.as-stage[data-zone="engine"] .as-car-photo { transform: scale(1.08) translate(-6%, 2%); }
-.as-stage[data-zone="tyres"] .as-car-photo { transform: scale(1.12) translate(-4%, 8%); }
-.as-stage[data-zone="battery"] .as-car-photo { transform: scale(1.08) translate(6%, 0); }
-.as-stage[data-zone="service"] .as-car-photo { transform: scale(1.04) translate(0, -4%); }
-.as-car-photo.is-inspect { filter: saturate(0.7) brightness(0.86); }
+.as-car-photo { position: relative; width: min(96vw, 1180px); margin-inline: auto; transition: filter 420ms ease, opacity 420ms ease; }
+.as-car-photo.is-inspect { filter: saturate(0.45) brightness(0.42); opacity: 0.55; }
 .as-car-img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; filter: contrast(1.08) saturate(0.92); }
 .as-shadow { height: 1.2rem; margin-top: -0.4rem; background: radial-gradient(50% 80% at 50% 50%, #10141855, transparent 70%); }
 .as-callout {
@@ -1700,9 +1696,57 @@
 
 @media (prefers-reduced-motion: reduce) {
   .as-car-photo,
+  .as-plate,
   .as-nav a::after,
   .as-tile-img,
   .as-add {
     transition: none;
   }
+}
+
+.as-plate {
+  position: absolute;
+  left: 6%;
+  bottom: 8%;
+  width: min(28rem, 86%);
+  padding: 1.1rem 1.2rem 1rem;
+  background: color-mix(in srgb, #0d1014 86%, transparent);
+  border-left: 2px solid var(--as-metal);
+  color: var(--as-ink);
+  animation: as-plate-in 420ms ease;
+}
+.as-plate p {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--as-mute);
+}
+.as-plate strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--font-as-display), "Oswald", sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.as-plate small { display: block; margin-top: 0.35rem; color: var(--as-mute); }
+.as-plate-diagram {
+  width: min(100%, 16rem);
+  margin-top: 0.8rem;
+  fill: none;
+  stroke: var(--as-metal);
+  stroke-width: 1.4;
+}
+.as-plate-diagram text { fill: var(--as-mute); stroke: none; font-size: 9px; letter-spacing: 0.12em; }
+.as-own-split {
+  display: grid;
+  gap: 2.4rem;
+}
+@media (min-width: 900px) {
+  .as-own-split { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
+}
+.as-own-split .as-layers { grid-template-columns: 1fr; }
+@keyframes as-plate-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }

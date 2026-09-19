@@ -194,7 +194,7 @@
   color: var(--tc-mute);
 }
 .tc-source-once a { color: inherit; }
-.tc-map-grid { opacity: 0.18; }
+.tc-map-grid { display: none; }
 
 .tc-header {
   position: sticky;
@@ -1299,3 +1299,73 @@
   .tc-path { animation: none; }
   .tc-cta { transition: none; }
 }
+
+.tc-map {
+  background:
+    radial-gradient(120% 80% at 50% 100%, #c9d4d2 0%, #dce3e1 46%, #e7ebe8 100%);
+}
+.tc-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgb(9 26 39 / 0.04) 4px);
+  mix-blend-mode: multiply;
+}
+.tc-water { fill: #c5d2cf; }
+.tc-land { fill: #d8ddd4; stroke: #6d7a74; stroke-width: 1.1; }
+.tc-region { fill: #cfc6b4; stroke: none; opacity: 0.55; }
+.tc-city-label {
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  fill: #091a27;
+  stroke: none;
+  letter-spacing: -0.03em;
+}
+.tc-city-label.is-end { font-size: 28px; font-weight: 600; }
+.tc-city-label.is-major { font-size: 16px; }
+.tc-city-label.is-secondary { font-size: 11px; opacity: 0.7; }
+.tc-country-label {
+  fill: #50616b;
+  stroke: none;
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+.tc-path.is-train { stroke-width: 5; stroke-dasharray: none; }
+.tc-path.is-car { stroke-width: 3.2; stroke-dasharray: 14 8; }
+.tc-path.is-ev { stroke-width: 3.2; stroke-dasharray: 6 10; }
+.tc-path.is-flight { stroke-width: 2.2; stroke-dasharray: 1 12; }
+.tc-path.is-bus { stroke-width: 7; stroke: color-mix(in srgb, var(--tc-route) 55%, #091a27); opacity: 0.7; }
+.tc-station { fill: #091a27; }
+.tc-airport { fill: none; stroke: #091a27; stroke-width: 1.4; }
+.tc-toll, .tc-charge { fill: var(--tc-route); }
+.tc-atlas-decisions {
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+}
+.tc-atlas-decisions li:nth-child(1) { justify-self: start; }
+.tc-atlas-decisions li:nth-child(2) { justify-self: center; text-align: center; }
+.tc-atlas-decisions li:nth-child(3) { justify-self: end; text-align: right; }
+.tc-result-title {
+  font-size: clamp(3rem, 9vw, 7.2rem);
+}
+.tc-result-mode {
+  margin-top: 0.8rem;
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tc-be-event {
+  margin-bottom: 1rem;
+}
+.tc-be-event strong {
+  display: block;
+  font-family: var(--font-tc-display), "Fraunces", serif;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 0.9;
+}
+.tc-time { display: grid; gap: 1.1rem; }
+.tc-time .is-win .tc-seg { outline: 2px solid var(--tc-route); }
