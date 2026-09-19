@@ -251,7 +251,7 @@
 .as-stage[data-zone="battery"] .as-car-photo { transform: scale(1.08) translate(6%, 0); }
 .as-stage[data-zone="service"] .as-car-photo { transform: scale(1.04) translate(0, -4%); }
 .as-car-photo.is-inspect { filter: saturate(0.7) brightness(0.86); }
-.as-car-img { width: 100%; height: auto; display: block; }
+.as-car-img { width: 100%; height: auto; display: block; mix-blend-mode: multiply; filter: contrast(1.08) saturate(0.92); }
 .as-shadow { height: 1.2rem; margin-top: -0.4rem; background: radial-gradient(50% 80% at 50% 50%, #10141855, transparent 70%); }
 .as-callout {
   position: absolute;
@@ -472,18 +472,18 @@
   }
 }
 
-/* Ownership cockpit system */
+/* Ownership cockpit system — keep the cinematic dark scene */
 .autospec {
-  --as-paper: #f0eee8;
-  --as-ink: #171914;
-  --as-mute: #6c7068;
-  --as-line: #c9cbc4;
-  --as-panel: #e4e5df;
-  --as-metal: #d94d2a;
-  --as-night: #0b0d0b;
-  --as-night-panel: #151814;
-  --as-night-line: #343832;
-  --as-night-mute: #a8ada4;
+  --as-paper: #0b0c0e;
+  --as-ink: #efe8de;
+  --as-mute: #9a9388;
+  --as-line: #2a2c30;
+  --as-panel: #14161a;
+  --as-metal: #ff4d1a;
+  --as-night: #0b0c0e;
+  --as-night-panel: #14161a;
+  --as-night-line: #2a2c30;
+  --as-night-mute: #9a9388;
   --as-soon: #d6a333;
   background: var(--as-paper);
 }
@@ -772,7 +772,7 @@
   min-height: auto;
   padding-bottom: 0;
   background: var(--as-night);
-  color: var(--as-paper);
+  color: var(--as-ink);
 }
 
 .as-hero-onboard::before {
@@ -868,8 +868,8 @@
 }
 
 .as-hero-onboard .as-field input {
-  border-bottom-color: var(--as-paper);
-  color: var(--as-paper);
+  border-bottom-color: var(--as-ink);
+  color: var(--as-ink);
   font-size: 1.15rem;
 }
 
@@ -899,9 +899,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.8rem 1rem;
-  border: 1px solid var(--as-night-line);
+  border: 1px solid var(--as-line);
   background: transparent;
-  color: var(--as-paper);
+  color: var(--as-ink);
   cursor: pointer;
   text-align: left;
   transition: border-color 160ms ease, background 160ms ease;

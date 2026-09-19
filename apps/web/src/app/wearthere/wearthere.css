@@ -890,8 +890,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--wt-paper) 72%, transparent) 0%, transparent 48%),
-    linear-gradient(0deg, color-mix(in srgb, var(--wt-paper) 88%, transparent) 0%, transparent 42%);
+    linear-gradient(90deg, color-mix(in srgb, var(--wt-paper) 42%, transparent) 0%, transparent 38%),
+    linear-gradient(0deg, color-mix(in srgb, var(--wt-paper) 70%, transparent) 0%, transparent 36%);
 }
 
 .wt-stage-body {

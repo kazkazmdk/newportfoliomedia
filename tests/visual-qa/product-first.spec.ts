@@ -40,6 +40,25 @@ async function noHorizontalOverflow(page: Page) {
   );
 }
 
+async function settleVisual(page: Page) {
+  const notice = page.getByRole("region", { name: "Cookie notice" });
+  if (await notice.isVisible().catch(() => false)) {
+    await page.getByRole("button", { name: "Reject optional" }).click().catch(() => undefined);
+  }
+  await page.evaluate(async () => {
+    await Promise.all(
+      [...document.images].map((img) =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve(), { once: true });
+              img.addEventListener("error", () => resolve(), { once: true });
+            }),
+      ),
+    );
+  });
+}
+
 async function setRange(locator: Locator, value: number) {
   await locator.evaluate((el, v) => {
     const input = el as HTMLInputElement;
@@ -77,6 +96,7 @@ test.describe("product-first visual QA", () => {
         const done = await noPageError(page);
         await page.goto(route.path, { waitUntil: "domcontentloaded" });
         await expect(page.locator(route.main).first()).toBeVisible();
+        await settleVisual(page);
         await noHorizontalOverflow(page);
         await page.screenshot({
           path: path.join(SHOT_DIR, `${route.name}-${vp.file}.png`),

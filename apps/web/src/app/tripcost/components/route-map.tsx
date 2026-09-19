@@ -49,7 +49,7 @@ export function RouteMap({
               className={on ? undefined : "tc-path-draw"}
               stroke={on ? "transparent" : "#0a1628"}
               strokeWidth={on ? 0 : 1}
-              opacity={on ? 0 : 0.16}
+              opacity={on ? 0 : 0.05}
             />
           );
         })}
