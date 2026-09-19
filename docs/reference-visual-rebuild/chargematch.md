@@ -32,7 +32,7 @@ Verified live on `/chargematch`, `/chargematch/iphone-16/with/apple-20w`, `/char
 
 ## REMAINING GAP
 
-Hardware is illustrated, not photographed. Cable geometry is a vertical watt stem, not a physical USB-C cable. Proof-mode grid is reduced but pair-studio still has more technical rows than Zaptec’s product pages.
+Hardware is illustrated SVG, not photographed products. On the captured home the phone/brick still read as silhouettes more than staged objects. Cable geometry is a watt stem. Pair-studio still has more technical rows than a Zaptec product page.
 
 ## Rubric
 
