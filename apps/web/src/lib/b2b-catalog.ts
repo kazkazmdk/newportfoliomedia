@@ -62,7 +62,7 @@ export function b2bPage(site: SiteId, surface: B2BSurface): B2BPage {
         },
         {
           title: "What you cannot buy here",
-          body: "No hosted quota, no invoice, no partner marketplace. Issue a local key from /api/v1/keys. The secret is shown once and stored as a hash.",
+          body: "No hosted invoice and no partner marketplace. Issue a key from the local /platform/keys dashboard. Public POST /api/v1/keys is closed outside local dev. The secret is shown once and stored as a hash.",
         },
       ],
     };
@@ -73,10 +73,10 @@ export function b2bPage(site: SiteId, surface: B2BSurface): B2BPage {
       ...common,
       title: `${name} API`,
       kicker: "v1 · local metering",
-      lede: `Authenticated calls increment a local daily counter. Soft cap 200. Exceeding it is recorded as meter_exceeded. It does not mint a bill.`,
+      lede: `Authenticated calls consume an org+site monthly entitlement. Over quota returns 429 quota_exceeded. A key from another product is 403 wrong_product_key. Nothing here mints a bill.`,
       sections: [
-        { title: "Contract", body: "GET /api/v1/contract returns engines, platform routes, billing: null, rateCard: null." },
-        { title: "Auth", body: "Authorization: Bearer penta_local_<site>_<token>. Unknown format is 401. Missing scope is 403." },
+        { title: "Contract", body: "GET /api/v1/contract returns engines, error codes, quota model, billing: null, rateCard: null, sla: null." },
+        { title: "Auth", body: "Authorization: Bearer penta_local_<site>_<token>. Unknown format is 401. Missing scope is 403. Wrong product is 403 wrong_product_key." },
         { title: "First-party routes", body: `The unversioned /api/${site}/* handlers remain for the product UI and do not require a key.` },
       ],
     };
@@ -86,13 +86,13 @@ export function b2bPage(site: SiteId, surface: B2BSurface): B2BPage {
     return {
       ...common,
       title: `${name} widget`,
-      kicker: "Same-origin embed",
-      lede: `An iframe loads /embed/${site}. It runs the real engine on entities that already exist. Empty catalogs stay empty.`,
+      kicker: "Installation + origin allowlist",
+      lede: `Create a WidgetInstallation, then load /widgets/v1/${site}.js?installation=<id>. The backend checks origin, revocation, and widget quota. Empty catalogs stay empty.`,
       sections: [
         {
           title: "Snippet",
           body: "Host the script from this origin. There is no third-party widget CDN.",
-          code: `<script src="/widgets/${site}" data-site="${site}"></script>`,
+          code: `<script src="/widgets/v1/${site}.js?installation=wgt_…"></script>`,
         },
         { title: "Honesty", body: commerce.body },
       ],
@@ -134,7 +134,7 @@ export function b2bPage(site: SiteId, surface: B2BSurface): B2BPage {
       sections: [
         { title: "Product engine", body: engine },
         { title: "Truth", body: "opportunityScore is an internal queue. It cannot flip a page to INDEXABLE." },
-        { title: "Local store", body: "Events, leads, keys, and meter live in data/platform on this machine." },
+        { title: "Local store", body: "The repository interface persists through Postgres when DATABASE_URL is set, otherwise a local DEV fallback file." },
       ],
     };
   }

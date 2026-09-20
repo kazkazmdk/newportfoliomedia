@@ -20,6 +20,7 @@
     "@penta/graph-core": "workspace:*",
     "@penta/monetization": "workspace:*",
     "@penta/platform-api": "workspace:*",
+    "@penta/platform-data": "workspace:*",
     "@penta/publishing-core": "workspace:*",
     "@penta/quality-gate": "workspace:*",
     "@penta/tripcost": "workspace:*",

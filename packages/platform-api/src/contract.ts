@@ -1,6 +1,9 @@
 import { SITES, type SiteId } from "@penta/monetization";
+import { API_ERROR_CODES } from "./errors";
+import { KEY_SCOPES } from "./scopes";
 
 export const API_VERSION = "v1";
+export const WIDGET_SCRIPT_VERSION = "v1";
 
 export const ENGINE_ROUTES: Record<SiteId, { method: "POST"; path: string; purpose: string }> = {
   fixcode: {
@@ -30,25 +33,47 @@ export const ENGINE_ROUTES: Record<SiteId, { method: "POST"; path: string; purpo
   },
 };
 
-export const PLATFORM_ROUTES = [
-  { method: "POST", path: "/api/v1/events", auth: "optional", purpose: "Persist a classified product event locally." },
-  { method: "POST", path: "/api/v1/leads", auth: "optional", purpose: "Store an unassigned local lead." },
-  { method: "POST", path: "/api/v1/observations", auth: "optional", purpose: "Store USER_REPORTED / USER_OBSERVED feedback." },
-  { method: "POST", path: "/api/v1/keys", auth: "none", purpose: "Issue a local key. Token shown once." },
-  { method: "GET", path: "/api/v1/keys", auth: "bearer", purpose: "List prefixes for the calling key's site." },
-  { method: "GET", path: "/api/v1/meter", auth: "bearer", purpose: "Local call counts. No price." },
-  { method: "GET", path: "/api/v1/ops/readiness", auth: "none", purpose: "Internal winner signal from in-repo metrics." },
-] as const;
-
 export function contractManifest() {
   return {
     version: API_VERSION,
+    deprecation: {
+      policy: "A version is supported until a successor is documented. No sunset date is published.",
+      previous: [] as string[],
+    },
     sites: [...SITES],
     engines: ENGINE_ROUTES,
-    platform: PLATFORM_ROUTES,
+    auth: {
+      modes: ["bearer_api_key", "local_dev_session"],
+      keyPrefix: "penta_local_|penta_prod_",
+      defaultScopes: ["engine:read", "usage:read"],
+      scopes: [...KEY_SCOPES],
+    },
+    errors: {
+      envelope: "{ error: { code, message, request_id, details? } }",
+      codes: [...API_ERROR_CODES],
+    },
+    quota: {
+      model: "entitlement_per_org_site_feature",
+      exceeded: "429 quota_exceeded",
+      publishedPrices: false,
+    },
+    widgets: {
+      version: WIDGET_SCRIPT_VERSION,
+      script: "/widgets/v1/{site}.js",
+      requiresInstallation: true,
+      originAllowlist: true,
+    },
+    features: {
+      billing: false,
+      stripe: false,
+      publicKeyCreate: false,
+      partnerNetwork: false,
+      affiliatePrograms: false,
+    },
+    sla: null,
     billing: null,
     rateCard: null,
-    hosted: "local_only",
-    note: "Keys and meter live in data/platform on this machine. Nothing is billed.",
+    hosted: process.env.DATABASE_URL ? "postgres_when_configured" : "dev_fallback",
+    note: "No SLA. No public rate card. Keys are hashed. A key is bound to one product.",
   };
 }

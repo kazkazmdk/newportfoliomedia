@@ -21,6 +21,7 @@ export default defineConfig({
       { find: "@penta/analytics", replacement: path.resolve("packages/analytics/src/index.ts") },
       { find: "@penta/monetization", replacement: path.resolve("packages/monetization/src/index.ts") },
       { find: "@penta/platform-api", replacement: path.resolve("packages/platform-api/src/index.ts") },
+      { find: "@penta/platform-data", replacement: path.resolve("packages/platform-data/src/index.ts") },
       { find: "@penta/ui-primitives", replacement: path.resolve("packages/ui-primitives/src/index.ts") },
       { find: "@penta/catalog", replacement: path.resolve("packages/catalog/src/index.ts") },
       { find: "@penta/fixcode", replacement: path.resolve("apps/fixcode/src/index.ts") },

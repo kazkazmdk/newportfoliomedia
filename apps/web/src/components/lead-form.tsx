@@ -22,13 +22,16 @@ export function LeadForm({ site, kind }: { site: SiteId; kind: LeadKind }) {
             kind,
             contact: String(data.get("contact") ?? ""),
             message: String(data.get("message") ?? ""),
+            company: String(data.get("company") ?? ""),
+            consent: data.get("consent") === "on",
+            sourcePage: window.location.pathname,
             entityId: String(data.get("entity") ?? "") || undefined,
           }),
         });
-        const json = (await response.json()) as { message?: string; error?: string };
+        const json = (await response.json()) as { message?: string; error?: { message?: string } | string };
         if (!response.ok) {
           setState("error");
-          setMessage(json.error ?? "Could not store the request.");
+          setMessage(typeof json.error === "string" ? json.error : json.error?.message ?? "Could not store the request.");
           return;
         }
         setState("saved");
@@ -40,9 +43,16 @@ export function LeadForm({ site, kind }: { site: SiteId; kind: LeadKind }) {
         Contact
         <input name="contact" type="email" required placeholder="you@example.test" />
       </label>
+      <label className="sr-only">
+        Company
+        <input name="company" tabIndex={-1} autoComplete="off" />
+      </label>
       <label>
         What do you need?
-        <textarea name="message" required rows={4} />
+        <textarea name="message" required rows={4} maxLength={2000} />
+      </label>
+      <label>
+        <input name="consent" type="checkbox" required /> I understand this is stored locally, not sent to a partner.
       </label>
       <button type="submit" disabled={state === "saving"}>
         {state === "saving" ? "Storing locally…" : "Store locally"}

@@ -150,6 +150,9 @@ importers:
       '@penta/platform-api':
         specifier: workspace:*
         version: link:../../packages/platform-api
+      '@penta/platform-data':
+        specifier: workspace:*
+        version: link:../../packages/platform-data
       '@penta/publishing-core':
         specifier: workspace:*
         version: link:../../packages/publishing-core
@@ -275,6 +278,15 @@ importers:
       '@penta/monetization':
         specifier: workspace:*
         version: link:../monetization
+
+  packages/platform-data:
+    dependencies:
+      '@penta/monetization':
+        specifier: workspace:*
+        version: link:../monetization
+      '@penta/platform-api':
+        specifier: workspace:*
+        version: link:../platform-api
 
   packages/publishing-core:
     dependencies:

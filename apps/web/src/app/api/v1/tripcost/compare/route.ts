@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
 import { compareRoute, getRoute } from "@penta/tripcost";
 import { readJsonBody } from "@/lib/read-json";
-import { limited, recordEvent, requireKey } from "@/lib/v1";
+import { fail, limited, logRequest, ok, recordEvent, requireEngine } from "@/lib/v1";
 
 export async function POST(request: Request) {
+  const started = Date.now();
   const blocked = limited(request, "v1-tripcost", 40);
   if (blocked) return blocked;
-  const auth = requireKey(request, "read:engine");
+  const auth = await requireEngine(request, "tripcost");
   if (!auth.ok) return auth.response;
   const parsed = await readJsonBody<{
     origin?: string;
@@ -14,16 +14,14 @@ export async function POST(request: Request) {
     travellers?: number;
     true_cost?: boolean;
   }>(request);
-  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+  if (!parsed.ok) return fail("invalid_request", parsed.error, auth.requestId);
   const route = getRoute(parsed.value.origin ?? "", parsed.value.destination ?? "");
-  if (!route) return NextResponse.json({ error: "unknown_route" }, { status: 404 });
+  if (!route) {
+    await logRequest({ request, site: "tripcost", status: 404, started, keyId: auth.key.id, organizationId: auth.key.organizationId, errorCode: "unknown_entity" });
+    return fail("unknown_entity", "Unknown corridor.", auth.requestId);
+  }
   const result = compareRoute(route, parsed.value.travellers ?? 1, parsed.value.true_cost ?? false);
-  recordEvent({
-    name: "api_called",
-    site: "tripcost",
-    entityId: route.id,
-    path: "/api/v1/tripcost/compare",
-    properties: { keyId: auth.key.id },
-  });
-  return NextResponse.json({ ...result, meter: { calls: auth.meter.calls, price: null } });
+  await recordEvent({ name: "api_called", site: "tripcost", entityId: route.id, path: "/api/v1/tripcost/compare", properties: { keyId: auth.key.id } });
+  await logRequest({ request, site: "tripcost", status: 200, started, keyId: auth.key.id, organizationId: auth.key.organizationId, entityId: route.id });
+  return ok(request, { ...result, usage: { remaining: auth.remaining, limit: auth.limit, site: "tripcost", price: null } });
 }

@@ -17,6 +17,7 @@
       "@penta/graph-core": ["./packages/graph-core/src/index.ts"],
       "@penta/monetization": ["./packages/monetization/src/index.ts"],
       "@penta/platform-api": ["./packages/platform-api/src/index.ts"],
+      "@penta/platform-data": ["./packages/platform-data/src/index.ts"],
       "@penta/publishing-core": ["./packages/publishing-core/src/index.ts"],
       "@penta/quality-gate": ["./packages/quality-gate/src/index.ts"],
       "@penta/tripcost": ["./apps/tripcost/src/index.ts"],

@@ -32,6 +32,7 @@
     "release:manifest": "tsx scripts/generate-release-manifest.ts",
     "state": "tsx scripts/penta-state.ts",
     "state:check": "tsx scripts/penta-state.ts --check",
+    "platform:flow": "PENTA_PLATFORM_MEMORY=1 tsx scripts/platform-dev-flow.ts",
     "vercel:should-build": "node scripts/vercel-should-build.mjs",
     "vercel:configure": "node scripts/create-penta-vercel-projects.mjs"
   },

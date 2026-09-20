@@ -50,8 +50,9 @@ packages/demand                                       DemandEvidence V2 / pre-la
 packages/publishing-core                              sitemaps, canonical, batches
 packages/ai-core                                      tools-first, audit, routing
 packages/analytics                                    PostHog-ready events
-packages/monetization                                 intent, leads, outbound, flywheel
-packages/platform-api                                 clés locales, meter, contrat v1
+packages/monetization                                 intent v2, leads, outbound, flywheel, routing
+packages/platform-api                                 clés, tenancy, quota, erreurs, contrat v1
+packages/platform-data                                repository (Postgres / memory / file DEV)
 packages/catalog                                      graphe assemblé + rapport
 ```
 
@@ -122,17 +123,25 @@ First-party (UI, rate-limited, no key):
 
 B2B local (`Authorization: Bearer penta_local_<site>_…`, no rate card):
 
-- `POST /api/v1/{fixcode,autospec,wearthere,chargematch,tripcost}/…`
-- `POST /api/v1/events` · `leads` · `observations` · `keys`
+- `POST /api/v1/{fixcode,autospec,wearthere,chargematch,tripcost}/…` via `requireProductKey`
+- `POST /api/v1/events` · `leads` · `observations`
+- `GET|POST /api/v1/keys` (création = session locale uniquement)
 - `GET /api/v1/contract` · `meter` · `ops/readiness`
+- Widgets : `POST /api/v1/widgets`, `GET /api/v1/widgets/check`, `/widgets/v1/{site}.js`
+
+Dashboard local noindex : `/platform` (keys, usage, widgets, leads, data, settings).
 
 Surfaces opérateur par produit : `/{produit}/developers|api|widgets|data|business|docs|contact-sales`.
 
-Widgets : `/widgets/{produit}` → iframe `/embed/{produit}`.
+Aucune boutique, aucun partenaire affilié, aucun tarif public. Voir `docs/MONETIZATION_READINESS.md`, `docs/SECURITY_READINESS.md`, `docs/PLATFORM_ARCHITECTURE.md`.
 
-Aucune boutique, aucun partenaire affilié, aucun tarif public. Voir `docs/MONETIZATION_READINESS.md`.
+Le fallback `data/platform/store.json` est DEV only et gitignoré. Source de vérité future = Postgres (`DATABASE_URL`).
 
-Le store local `data/platform/*.json` est gitignoré. Rien n’est publié sur Vercel depuis cette passe.
+```bash
+PENTA_PLATFORM_MEMORY=1 pnpm exec tsx scripts/platform-dev-flow.ts
+```
+
+Rien n’est publié sur Vercel depuis cette passe. `git.deploymentEnabled` reste `false`.
 
 ## Tests
 

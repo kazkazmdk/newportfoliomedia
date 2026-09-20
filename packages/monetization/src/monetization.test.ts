@@ -4,9 +4,14 @@ import {
   affiliateAllowed,
   assertLeadCannotAssign,
   assertNoPublicRateCard,
+  assertMergedIsNotOfficial,
   assertObservationNotPromoted,
   classifyIntent,
+  classifyIntentV2,
   COMMERCE_SURFACE,
+  offerIsLive,
+  resolveMonetizationSurface,
+  routeLead,
   createLeadDraft,
   createObservation,
   EMPTY_NETWORK_COPY,
@@ -60,6 +65,7 @@ describe("honesty", () => {
     expect(row.sourceType).toBe("USER_OBSERVED");
     expect(() => assertObservationNotPromoted(row, "TESTED")).toThrow();
     expect(() => assertInferenceCannotBecomeOfficial("USER_REPORTED", "MANUFACTURER")).toThrow();
+    expect(() => assertMergedIsNotOfficial("MERGED_AS_SIGNAL")).toThrow(/not OFFICIAL/);
   });
 
   it("marks official outbound as non-affiliate", () => {
@@ -79,6 +85,59 @@ describe("honesty", () => {
       label: "relative",
       sourceName: "none",
     })).toThrow(/absolute/i);
+  });
+});
+
+describe("intent v2 + orchestrator + routing", () => {
+  it("uses evidence states, not numeric scores", () => {
+    const fix = classifyIntentV2({ path: "/fixcode/samsung/washer/4c" });
+    expect(fix.class).toBe("DECISION");
+    expect(fix.leadSuitability).toBe("HIGH");
+    const cm = classifyIntentV2({ path: "/chargematch/iphone-16/with/apple-20w" });
+    expect(cm.affiliateSuitability).toBe("HIGH_WHEN_OFFERS_EXIST");
+    const resolved = resolveMonetizationSurface({
+      path: "/chargematch/iphone-16/with/apple-20w",
+      site: "chargematch",
+      official: { href: "https://support.apple.com/en-us/121029", label: "Specs", sourceName: "Apple" },
+      offers: [],
+      partners: [],
+    });
+    expect(resolved.surfaces.some((row) => row.kind === "official_outbound")).toBe(true);
+    expect(resolved.surfaces.some((row) => row.kind === "affiliate_offer")).toBe(false);
+    expect(offerIsLive({ checkedAt: "2010-01-01T00:00:00.000Z" })).toBe(false);
+    expect(routeLead({ site: "fixcode", kind: "service_request", partners: [] }).state).toBe("UNASSIGNED");
+    expect(
+      routeLead({
+        site: "fixcode",
+        kind: "service_request",
+        partners: [{
+          id: "fixture-1",
+          name: "Fixture garage",
+          type: "workshop",
+          capabilities: ["appliance"],
+          countries: ["FR"],
+          regions: [],
+          sites: ["fixcode"],
+          status: "fixture",
+        }],
+      }).state,
+    ).toBe("UNASSIGNED");
+    expect(
+      routeLead({
+        site: "fixcode",
+        kind: "service_request",
+        partners: [{
+          id: "live-1",
+          name: "Contracted",
+          type: "workshop",
+          capabilities: ["appliance"],
+          countries: [],
+          regions: [],
+          sites: ["fixcode"],
+          status: "active",
+        }],
+      }).partnerId,
+    ).toBe("live-1");
   });
 });
 

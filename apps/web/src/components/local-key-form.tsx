@@ -16,7 +16,7 @@ export function LocalKeyForm({ site }: { site: SiteId }) {
         const data = new FormData(event.currentTarget);
         const response = await fetch("/api/v1/keys", {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { "content-type": "application/json", "x-penta-dev-actor": "local" },
           body: JSON.stringify({ site, label: String(data.get("label") ?? "") }),
         });
         const json = (await response.json()) as { token?: string; error?: string; message?: string };

@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
 import { checkFitment, getVehicle, nextService } from "@penta/autospec";
 import { readJsonBody } from "@/lib/read-json";
-import { limited, recordEvent, requireKey } from "@/lib/v1";
+import { fail, limited, logRequest, ok, recordEvent, requireEngine } from "@/lib/v1";
 
 export async function POST(request: Request) {
+  const started = Date.now();
   const blocked = limited(request, "v1-autospec", 40);
   if (blocked) return blocked;
-  const auth = requireKey(request, "read:engine");
+  const auth = await requireEngine(request, "autospec");
   if (!auth.ok) return auth.response;
   const parsed = await readJsonBody<{
     make?: string;
@@ -16,25 +16,22 @@ export async function POST(request: Request) {
     km?: number;
     part?: string;
   }>(request);
-  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+  if (!parsed.ok) return fail("invalid_request", parsed.error, auth.requestId);
   const vehicle = getVehicle(
     parsed.value.make ?? "",
     parsed.value.model ?? "",
     parsed.value.generation ?? "",
     parsed.value.variant ?? "",
   );
-  if (!vehicle) return NextResponse.json({ error: "unknown_vehicle" }, { status: 404 });
-  recordEvent({
-    name: "api_called",
-    site: "autospec",
-    entityId: vehicle.id,
-    path: "/api/v1/autospec/vehicle",
-    properties: { keyId: auth.key.id },
-  });
-  if (parsed.value.part) {
-    return NextResponse.json({ fitment: checkFitment(vehicle, parsed.value.part), meter: { calls: auth.meter.calls, price: null } });
+  if (!vehicle) {
+    await logRequest({ request, site: "autospec", status: 404, started, keyId: auth.key.id, organizationId: auth.key.organizationId, errorCode: "unknown_entity" });
+    return fail("unknown_entity", "Unknown vehicle identity.", auth.requestId);
   }
-  return NextResponse.json({
+  await recordEvent({ name: "api_called", site: "autospec", entityId: vehicle.id, path: "/api/v1/autospec/vehicle", properties: { keyId: auth.key.id } });
+  await logRequest({ request, site: "autospec", status: 200, started, keyId: auth.key.id, organizationId: auth.key.organizationId, entityId: vehicle.id });
+  const usage = { remaining: auth.remaining, limit: auth.limit, site: "autospec" as const, price: null };
+  if (parsed.value.part) return ok(request, { fitment: checkFitment(vehicle, parsed.value.part), usage });
+  return ok(request, {
     vehicle: vehicle.id,
     engine: vehicle.engine_code,
     market: vehicle.market,
@@ -42,6 +39,6 @@ export async function POST(request: Request) {
       parsed.value.km != null
         ? nextService(vehicle, parsed.value.km)
         : vehicle.services.map((item) => ({ ...item, km_left: null, months_left: null })),
-    meter: { calls: auth.meter.calls, price: null },
+    usage,
   });
 }
