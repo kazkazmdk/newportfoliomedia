@@ -183,7 +183,7 @@ test.describe("reference visual rebuild v4", () => {
     await page.goto("/wearthere", { waitUntil: "domcontentloaded" });
     await settleVisual(page);
     for (const month of ["Jan", "Jul", "Nov"] as const) {
-      await page.getByRole("button", { name: new RegExp(`^${month}$`) }).click();
+      await page.getByRole("button", { name: new RegExp(`^${month}$`) }).click({ force: true });
       await expect(page.getByRole("button", { name: new RegExp(`^${month}$`) })).toHaveAttribute("aria-pressed", "true");
       await settleVisual(page);
       await shot(page, `wearthere-${month.toLowerCase()}.png`);
@@ -206,21 +206,22 @@ test.describe("reference visual rebuild v4", () => {
 
     await page.goto("/chargematch", { waitUntil: "domcontentloaded" });
     await settleVisual(page);
-    await page.getByLabel("Device", { exact: true }).selectOption({ label: "iPhone 16" });
-    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Anker 65W USB-C (Nano II class)" });
+    const bench = page.locator(".cm-bench-scene");
+    await bench.getByLabel("Device", { exact: true }).selectOption({ label: "iPhone 16" });
+    await bench.getByLabel("Charger", { exact: true }).selectOption({ label: "Anker 65W USB-C (Nano II class)" });
     await expect(page.locator(".cm-verdict")).toHaveAttribute("data-limit", "device");
     await expect(page.locator(".cm-object.is-limit")).toContainText(/DEVICE/i);
     await shot(page, "chargematch-device-limited.png");
 
-    await page.getByLabel("Device", { exact: true }).selectOption({ label: "MacBook Pro 14-inch (M3)" });
-    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Apple 70W USB-C" });
+    await bench.getByLabel("Device", { exact: true }).selectOption({ label: "MacBook Pro 14-inch (M3)" });
+    await bench.getByLabel("Charger", { exact: true }).selectOption({ label: "Apple 70W USB-C" });
     await page.getByRole("button", { name: /cable & port/i }).click();
-    await page.getByLabel("Cable").selectOption({ label: "Apple USB-C 60W" });
+    await bench.getByLabel("Cable").selectOption({ label: "Apple USB-C 60W" });
     await expect(page.locator(".cm-verdict")).toHaveAttribute("data-limit", "cable");
     await shot(page, "chargematch-cable-limited.png");
 
-    await page.getByLabel("Device", { exact: true }).selectOption({ label: "iPhone 16" });
-    await page.getByLabel("Charger", { exact: true }).selectOption({ label: "Apple 20W USB-C" });
+    await bench.getByLabel("Device", { exact: true }).selectOption({ label: "iPhone 16" });
+    await bench.getByLabel("Charger", { exact: true }).selectOption({ label: "Apple 20W USB-C" });
     await expect(page.locator(".cm-verdict")).toHaveAttribute("data-limit", "port");
     await shot(page, "chargematch-charger-limited.png");
 

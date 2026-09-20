@@ -1,0 +1,7 @@
+NOT_VERIFIED
+FUNCTIONAL
+https://www.rome2rio.com/map/Paris/Lyon
+Error: page.goto: Navigation to "https://www.rome2rio.com/map/Paris/Lyon" is interrupted by another navigation to "https://www.madeforspainandportugal.com/"
+Call log:
+[2m  - navigating to "https://www.rome2rio.com/map/Paris/Lyon", waiting until "domcontentloaded"[22m
+

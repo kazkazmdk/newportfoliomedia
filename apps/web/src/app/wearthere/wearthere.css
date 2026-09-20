@@ -876,6 +876,7 @@
 .wt-stage-photo {
   position: absolute;
   inset: 0;
+  pointer-events: none;
 }
 
 .wt-stage-photo img {
@@ -999,6 +1000,8 @@
 }
 
 .wt-month-rail {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 0.15rem;
   overflow-x: auto;

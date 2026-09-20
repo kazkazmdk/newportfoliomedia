@@ -119,7 +119,10 @@ export const DESTINATION_MEDIA: Record<string, DestinationMedia> = {
 };
 
 export function destinationMedia(slug: string): DestinationMedia {
-  return DESTINATION_MEDIA[slug] ?? FALLBACK;
+  if (DESTINATION_MEDIA[slug]) return DESTINATION_MEDIA[slug];
+  const profile = seasonProfileOf(slug);
+  const season = seasonOfMonth(11, profile);
+  return climateSceneOf(profile, season) ?? FALLBACK;
 }
 
 export type SeasonId = "winter" | "spring" | "summer" | "autumn";

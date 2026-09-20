@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { pageMeta } from "@/lib/seo";
 import { HomeMap } from "./components/home-map";
 
@@ -10,7 +11,9 @@ export const metadata = pageMeta({
 export default function TripcostHome() {
   return (
     <main>
-      <HomeMap />
+      <Suspense fallback={<section className="tc-atlas"><p className="tc-realmap-state">Loading world map</p></section>}>
+        <HomeMap />
+      </Suspense>
     </main>
   );
 }

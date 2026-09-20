@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  destinationMedia,
   destinationSeasonMedia,
   seasonOfMonth,
   seasonProfileOf,
@@ -30,5 +31,10 @@ describe("WearThere seasonal architecture", () => {
     expect(destinationSeasonMedia("singapore", 7).hero).not.toContain("tokyo-rain");
     expect(destinationSeasonMedia("dubai", 7).hero).toContain("dubai");
     expect(destinationSeasonMedia("sydney", 1).hero).toContain("sydney");
+  });
+
+  it("maps unlisted temperate cities to a climate class scene, not Tokyo rain", () => {
+    expect(destinationMedia("berlin").hero).not.toContain("tokyo-rain");
+    expect(destinationMedia("berlin").credit).toMatch(/illustrative|class|scene/i);
   });
 });
