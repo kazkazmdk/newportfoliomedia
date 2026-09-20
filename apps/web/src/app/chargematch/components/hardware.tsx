@@ -12,8 +12,8 @@ export function DeviceObject({ slug, name, limit = false, watts }: { slug: strin
   const media = deviceMediaOf(slug);
   return (
     <figure className={`cm-object is-${media.classId}${limit ? " is-limit" : ""}`} data-representation={media.representation}>
-      <div className="cm-hw is-device">
-        <Image src={media.hero} alt="" className="cm-hw-img" width={media.classId === "laptop" ? 960 : 480} height={media.classId === "laptop" ? 540 : 640} />
+      <div className={`cm-hw is-device is-${media.classId}`}>
+        <Image src={media.hero} alt={`${name} · ${hardwareHonesty(media.representation)}`} className="cm-hw-img" width={media.classId === "laptop" ? 960 : 480} height={media.classId === "laptop" ? 540 : 640} />
         <span className="cm-hw-port is-device" aria-hidden />
       </div>
       <figcaption>
@@ -43,7 +43,7 @@ export function ChargerObject({
   return (
     <figure className={`cm-object is-brick is-${media.classId}${limit ? " is-limit" : ""}${limitTarget ? ` is-limit-${limitTarget}` : ""}`} data-representation={media.representation}>
       <div className={`cm-hw is-brick is-${media.classId}`}>
-        <Image src={media.hero} alt="" className="cm-hw-img" width={640} height={640} />
+        <Image src={media.hero} alt={`${name ?? "Charger"} · ${hardwareHonesty(media.representation)}`} className="cm-hw-img" width={640} height={640} />
         <span className="cm-hw-port is-charger" aria-hidden />
         <span className="cm-hw-watt cm-mono">{watts}W</span>
       </div>
@@ -72,7 +72,7 @@ export function CablePath({
   return (
     <figure className={`cm-cable-object is-${axis}${limit ? " is-limit" : ""}`} data-representation={media.representation}>
       <div className="cm-cable-photo">
-        <Image src={media.hero} alt="" className="cm-hw-img" width={1280} height={720} />
+        <Image src={media.hero} alt={`${name ?? media.cableType} · ${hardwareHonesty(media.representation)}`} className="cm-hw-img" width={1280} height={720} />
         <span className="cm-cable-current" aria-hidden />
       </div>
       <svg className={`cm-cable-path is-${axis}${limit ? " is-limit" : ""}`} viewBox={axis === "vertical" ? "0 0 80 120" : "0 0 100 80"} aria-hidden>

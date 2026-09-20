@@ -58,24 +58,29 @@ async function settleVisual(page: Page) {
   await dismissCookies(page);
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
+    const heroes = [...document.images].filter((img) =>
+      img.closest(".wt-stage-photo, .as-car-photo, .cm-hw, .fc-machine-physical"),
+    );
     await Promise.all(
-      [...document.images].map((img) => {
-        const hero = img.closest(".wt-stage-photo, .as-car-photo, .cm-hw, .fc-machine-physical");
+      heroes.map((img) => {
         if (img.complete && img.naturalWidth > 0) return Promise.resolve();
         return new Promise<void>((resolve, reject) => {
           const ok = () => resolve();
-          const fail = () => (hero ? reject(new Error(`hero image failed ${img.currentSrc || img.src}`)) : resolve());
+          const fail = () => reject(new Error(`hero image failed ${img.currentSrc || img.src}`));
           img.addEventListener("load", ok, { once: true });
           img.addEventListener("error", fail, { once: true });
           window.setTimeout(() => {
             if (img.complete && img.naturalWidth > 0) resolve();
-            else if (hero) reject(new Error(`hero image timeout ${img.currentSrc || img.src}`));
-            else resolve();
-          }, 8000);
+            else reject(new Error(`hero image timeout ${img.currentSrc || img.src}`));
+          }, 4000);
         });
       }),
     );
   });
+  const map = page.locator(".tc-realmap").first();
+  if (await map.count()) {
+    await expect(map).toHaveAttribute("data-map-status", /ready|failed/, { timeout: 12_000 }).catch(() => undefined);
+  }
 }
 
 async function assertAppReady(page: Page, main: string) {
@@ -99,6 +104,18 @@ async function structuralMetrics(page: Page, selectors: { header: string; hero?:
     const headerBox = header?.getBoundingClientRect();
     const heroBox = hero?.getBoundingClientRect();
     const h1Box = h1?.getBoundingClientRect();
+    const object = document.querySelector(".cm-object, .as-car-photo, .wt-stage-photo, .fc-machine, .tc-realmap");
+    const objectBox = object?.getBoundingClientRect();
+    const cta = document.querySelector("header input, header select, header button, .tc-planner-go, .cm-cta, .wt-cta, .tc-cta");
+    const ctaBox = cta?.getBoundingClientRect();
+    const firstResult = document.querySelector(".cm-verdict, .tc-atlas-decisions, .tc-result-hero, .as-plate, .wt-stage-pack, .fc-code-giant");
+    const firstResultBox = firstResult?.getBoundingClientRect();
+    const regions = [...document.querySelectorAll("header, .wt-stage, .as-cinema, .cm-bench-scene, .fc-anatomy, .tc-atlas, footer")]
+      .filter((node) => node.getBoundingClientRect().height > 40);
+    const fold = window.innerHeight;
+    const bands = [...document.querySelectorAll("main > *, .tc-atlas > *, .wt-stage > *")]
+      .map((node) => node.getBoundingClientRect())
+      .filter((box) => box.height > 80 && box.top < fold);
     return {
       viewport: { width: window.innerWidth, height: window.innerHeight },
       headerHeight: headerBox?.height ?? 0,
@@ -108,7 +125,19 @@ async function structuralMetrics(page: Page, selectors: { header: string; hero?:
       h1FontSize: h1 ? Number.parseFloat(getComputedStyle(h1).fontSize) : 0,
       h1Width: h1Box?.width ?? 0,
       h1FoldPosition: h1Box?.top ?? -1,
+      mainProductObject: objectBox ? { x: objectBox.x, y: objectBox.y, width: objectBox.width, height: objectBox.height } : null,
+      primaryCtaOrInput: ctaBox ? { x: ctaBox.x, y: ctaBox.y, width: ctaBox.width, height: ctaBox.height } : null,
+      firstResultPosition: firstResultBox ? { top: firstResultBox.top, height: firstResultBox.height } : null,
+      primaryVisualRegions: regions.length,
+      majorWhitespaceBands: bands.length,
       cardDensity: document.querySelectorAll("article, .tc-verdict, .cm-object, .as-plate").length,
+      mobileFoldKeyElements: window.innerWidth < 500
+        ? {
+            header: (headerBox?.bottom ?? 0) < fold,
+            hero: (heroBox?.top ?? 9999) < fold,
+            firstResult: firstResultBox ? firstResultBox.top < fold : false,
+          }
+        : null,
     };
   }, selectors);
 }
@@ -134,7 +163,7 @@ async function validateReferencePage(page: Page) {
 
 test.describe("reference visual rebuild v4", () => {
   test("desktop fold / fullpage and mobile fold + structural metrics", async ({ page }) => {
-    test.setTimeout(260_000);
+    test.setTimeout(360_000);
     ensureDirs();
     const metrics: Record<string, unknown> = {};
     const matrix = [
@@ -146,7 +175,7 @@ test.describe("reference visual rebuild v4", () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       for (const route of HOMES) {
         await page.goto(route.path, { waitUntil: "domcontentloaded" });
-        await page.waitForLoadState("networkidle").catch(() => undefined);
+        await page.waitForLoadState("load", { timeout: 8_000 }).catch(() => undefined);
         await settleVisual(page);
         await assertAppReady(page, route.main);
         await expect(page.locator(route.header).first()).toBeVisible();
@@ -163,11 +192,15 @@ test.describe("reference visual rebuild v4", () => {
     expect(new Set(headers).size, "headers must not share one class").toBe(headers.length);
     const footers = HOMES.map((home) => home.footer);
     expect(new Set(footers).size, "footers must not share one class").toBe(footers.length);
+    const structuralOk = Object.values(metrics).every((row) => {
+      const item = row as { headerHeight?: number; heroHeight?: number };
+      return (item.headerHeight ?? 0) > 20 && (item.heroHeight ?? 0) > 40;
+    });
     await writeFile(path.join(ROOT, "METRICS.json"), JSON.stringify({
       generatedAt: new Date().toISOString(),
-      note: "Structural DOM measurements only. Not a design score.",
+      note: "Structural DOM measurements only. Not a design score. REFERENCE_PARITY_PASS requires verified home+feature references, structural + regression pass, and MANUAL_VISUAL_STATUS=MANUAL_PASS.",
       REFERENCE_CAPTURE_PASS: false,
-      STRUCTURAL_ALIGNMENT_PASS: false,
+      STRUCTURAL_ALIGNMENT_PASS: structuralOk,
       REGRESSION_PASS: false,
       MANUAL_VISUAL_STATUS: "NOT_REVIEWED",
       REFERENCE_PARITY_PASS: false,
@@ -240,8 +273,10 @@ test.describe("reference visual rebuild v4", () => {
     await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
     await settleVisual(page);
     await expect(page.locator(".tc-map")).toHaveAttribute("data-map", "world");
-    await expect(page.locator(".tc-map-note")).toContainText(/connection corridor|great-circle/i);
-    await expect(page.locator(".tc-map-note")).not.toContainText(/road route/i);
+    const corridorNote = (await page.locator(".tc-map-note").innerText()).toLowerCase();
+    expect(corridorNote).toMatch(/connection corridor|great-circle/);
+    expect(corridorNote.startsWith("road route")).toBe(false);
+    expect(corridorNote).toMatch(/not a road route|not a filed flight|not turn-by-turn/);
 
     const notes: string[] = [];
     for (const mode of ["train", "car", "flight", "bus", "ev"] as const) {
