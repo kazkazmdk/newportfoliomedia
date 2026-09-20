@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
     "@penta/demand",
     "@penta/fixcode",
     "@penta/graph-core",
+    "@penta/monetization",
+    "@penta/platform-api",
     "@penta/publishing-core",
     "@penta/quality-gate",
     "@penta/tripcost",

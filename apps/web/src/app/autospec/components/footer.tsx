@@ -46,14 +46,13 @@ export function AutospecFooter() {
           </ul>
         </section>
         <section>
-          <p>Data</p>
+          <p>Garages</p>
           <ul>
-            <li><Link href="/autospec/garage">Sources</Link></li>
-            <li><Link href="/autospec">Methodology</Link></li>
-            <li><Link href="/autospec/garage">Corrections</Link></li>
-            <li><Link href="/autospec">Coverage</Link></li>
+            <li><Link href="/autospec/business">For garages</Link></li>
+            <li><Link href="/autospec/api">Vehicle API</Link></li>
+            <li><Link href="/autospec/data">Data licence inquiry</Link></li>
+            <li><Link href="/autospec/docs">Methodology</Link></li>
             <li><Link href="/privacy">Privacy</Link></li>
-            <li><Link href="/terms">Terms</Link></li>
             <li><CookieSettingsButton /></li>
           </ul>
         </section>

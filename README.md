@@ -50,6 +50,8 @@ packages/demand                                       DemandEvidence V2 / pre-la
 packages/publishing-core                              sitemaps, canonical, batches
 packages/ai-core                                      tools-first, audit, routing
 packages/analytics                                    PostHog-ready events
+packages/monetization                                 intent, leads, outbound, flywheel
+packages/platform-api                                 clés locales, meter, contrat v1
 packages/catalog                                      graphe assemblé + rapport
 ```
 
@@ -108,7 +110,7 @@ Voir `DATA_SOURCES.md`.
 
 ## APIs
 
-Rate-limited:
+First-party (UI, rate-limited, no key):
 
 - `POST /api/fixcode/diagnose`
 - `POST /api/autospec/vehicle`
@@ -117,6 +119,20 @@ Rate-limited:
 - `POST /api/tripcost/compare`
 - `GET /api/ops/report`
 - `GET /api/ops/entity?id=`
+
+B2B local (`Authorization: Bearer penta_local_<site>_…`, no rate card):
+
+- `POST /api/v1/{fixcode,autospec,wearthere,chargematch,tripcost}/…`
+- `POST /api/v1/events` · `leads` · `observations` · `keys`
+- `GET /api/v1/contract` · `meter` · `ops/readiness`
+
+Surfaces opérateur par produit : `/{produit}/developers|api|widgets|data|business|docs|contact-sales`.
+
+Widgets : `/widgets/{produit}` → iframe `/embed/{produit}`.
+
+Aucune boutique, aucun partenaire affilié, aucun tarif public. Voir `docs/MONETIZATION_READINESS.md`.
+
+Le store local `data/platform/*.json` est gitignoré. Rien n’est publié sur Vercel depuis cette passe.
 
 ## Tests
 

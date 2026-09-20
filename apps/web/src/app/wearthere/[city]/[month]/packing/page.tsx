@@ -9,6 +9,7 @@ import {
 } from "@penta/wearthere";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { NextAction } from "@/components/next-action";
 import { ViewportScene } from "@/components/creative";
 import { ClimateRibbon } from "../../../components/climate-ribbon";
 import { DestinationHero } from "../../../components/destination-hero";
@@ -73,7 +74,8 @@ export default async function PackingPage({ params }: { params: Promise<{ city: 
           Wear decision for the same period
         </Link>
         <div className="mt-10">
-          <Feedback site="wearthere" />
+          <NextAction site="wearthere" entityId={dest.id} />
+          <Feedback site="wearthere" entityId={dest.id} />
         </div>
       </ViewportScene>
     </main>

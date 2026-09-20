@@ -3,10 +3,20 @@ export const SHARED_EVENTS = [
   "search",
   "tool_started",
   "tool_completed",
+  "decision_viewed",
   "ai_query",
+  "outbound_click",
   "affiliate_click",
+  "lead_submitted",
+  "observation_submitted",
   "feedback_positive",
   "feedback_negative",
+  "api_called",
+  "widget_loaded",
+  "widget_completed",
+  "key_created",
+  "key_revoked",
+  "meter_exceeded",
 ] as const;
 
 export const FIXCODE_EVENTS = [

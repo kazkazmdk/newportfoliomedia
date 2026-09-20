@@ -50,12 +50,12 @@ export function TripcostFooter() {
           </ul>
         </section>
         <section>
-          <p className="tc-atlas-kicker">Method</p>
+          <p className="tc-atlas-kicker">Operators</p>
           <ul>
-            <li><Link href="/tripcost/paris/to/lyon#assumptions">Cost methodology</Link></li>
-            <li><Link href="/tripcost/paris/to/lyon#assumptions">Fuel assumptions</Link></li>
-            <li><Link href="/tripcost/paris/to/lyon#assumptions">EV assumptions</Link></li>
-            <li><Link href="/tripcost/paris/to/lyon#assumptions">Rail methodology</Link></li>
+            <li><Link href="/tripcost/business">For operators</Link></li>
+            <li><Link href="/tripcost/api">Corridor API</Link></li>
+            <li><Link href="/tripcost/widgets">Compare widget</Link></li>
+            <li><Link href="/tripcost/docs">Cost methodology</Link></li>
             <li><Link href="/tripcost/paris/to/lyon#assumptions">Sources</Link></li>
           </ul>
         </section>

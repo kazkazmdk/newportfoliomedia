@@ -3,6 +3,7 @@
 import { CABLES, DEVICES, allocate, compatibility, powerChain, type ChargerProfile, type DeviceProfile } from "@penta/chargematch";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { NextAction } from "@/components/next-action";
 import { ExpertToggle } from "../[device]/with/[charger]/expert-toggle";
 import { Faceplate } from "./faceplate";
 import { CablePath, ChargerObject, DeviceObject } from "./hardware";
@@ -12,9 +13,11 @@ import { PowerFlow } from "./power-flow";
 export function PairStudio({
   device,
   charger,
+  official,
 }: {
   device: DeviceProfile;
   charger: ChargerProfile;
+  official?: { href: string; label: string; sourceName: string };
 }) {
   const [port, setPort] = useState(charger.ports[0]?.id ?? "c1");
   const [plugged, setPlugged] = useState(1);
@@ -184,7 +187,8 @@ export function PairStudio({
           </div>
         </details>
         <div className="cm-feedback-wrap">
-          <Feedback site="chargematch" />
+          <NextAction site="chargematch" entityId={`${device.id}+${charger.id}`} official={official} />
+          <Feedback site="chargematch" entityId={`${device.id}+${charger.id}`} />
         </div>
       </section>
     </div>

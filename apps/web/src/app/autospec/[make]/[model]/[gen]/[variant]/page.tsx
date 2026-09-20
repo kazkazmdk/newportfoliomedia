@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { VEHICLES, allAutospecPages, getVehicle, serviceIntervalLabel, typicalServiceInterval, vehicleUrl } from "@penta/autospec";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { NextAction } from "@/components/next-action";
 import { IdentityStrip } from "../../../../components/identity-strip";
 import { OwnershipTimeline } from "../../../../components/ownership-timeline";
 import { VehicleStage } from "../../../../components/vehicle-stage";
@@ -126,7 +127,20 @@ export default async function VehicleHub({
           ))}
         </ul>
         <div className="mt-12">
-          <Feedback site="autospec" />
+          <NextAction
+            site="autospec"
+            entityId={v.id}
+            official={
+              v.recalls[0]?.source_url
+                ? {
+                    href: v.recalls[0].source_url,
+                    label: v.recalls[0].title,
+                    sourceName: "Recall portal on file",
+                  }
+                : undefined
+            }
+          />
+          <Feedback site="autospec" entityId={v.id} />
         </div>
       </section>
     </main>

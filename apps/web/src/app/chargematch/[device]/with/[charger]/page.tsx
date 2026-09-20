@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { CABLES, allChargematchPages, compatibility, getCharger, getDevice } from "@penta/chargematch";
 import { pageMeta } from "@/lib/seo";
+import { deviceOemSource } from "@penta/chargematch";
 import { PairStudio } from "../../../components/pair-studio";
 
 export function generateStaticParams() {
@@ -30,5 +31,20 @@ export default async function PairPage({ params }: { params: Promise<{ device: s
   const charger = getCharger(cSlug);
   if (!device || !charger) notFound();
   compatibility(device, charger, CABLES[0]);
-  return <PairStudio device={device} charger={charger} />;
+  const oem = deviceOemSource(device.id);
+  return (
+    <PairStudio
+      device={device}
+      charger={charger}
+      official={
+        oem?.source_url
+          ? {
+              href: oem.source_url,
+              label: "Check current manufacturer specs",
+              sourceName: oem.source_name ?? "Manufacturer document",
+            }
+          : undefined
+      }
+    />
+  );
 }

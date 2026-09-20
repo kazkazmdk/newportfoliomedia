@@ -4,6 +4,7 @@ import { breakEvenByTravellers, compareRoute, costLabel, routeCosts, sanitizeTra
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Feedback } from "@/components/feedback";
+import { NextAction } from "@/components/next-action";
 import { BreakEvenChart } from "./components/break-even";
 import { CostRace } from "./components/cost-race";
 import { DoorToDoorTimeline } from "./components/door-timeline";
@@ -265,7 +266,8 @@ export function RouteCompare({ route, initialTravellers }: { route: RouteRecord;
           ))}
         </ul>
         <div className="mt-10">
-          <Feedback site="tripcost" />
+          <NextAction site="tripcost" entityId={route.id} />
+          <Feedback site="tripcost" entityId={route.id} />
         </div>
       </section>
     </div>

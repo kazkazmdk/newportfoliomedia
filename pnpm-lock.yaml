@@ -144,6 +144,12 @@ importers:
       '@penta/graph-core':
         specifier: workspace:*
         version: link:../../packages/graph-core
+      '@penta/monetization':
+        specifier: workspace:*
+        version: link:../../packages/monetization
+      '@penta/platform-api':
+        specifier: workspace:*
+        version: link:../../packages/platform-api
       '@penta/publishing-core':
         specifier: workspace:*
         version: link:../../packages/publishing-core
@@ -257,6 +263,18 @@ importers:
       '@penta/data-provenance':
         specifier: workspace:*
         version: link:../data-provenance
+
+  packages/monetization:
+    dependencies:
+      '@penta/data-provenance':
+        specifier: workspace:*
+        version: link:../data-provenance
+
+  packages/platform-api:
+    dependencies:
+      '@penta/monetization':
+        specifier: workspace:*
+        version: link:../monetization
 
   packages/publishing-core:
     dependencies:

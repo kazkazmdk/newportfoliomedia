@@ -60,11 +60,10 @@ export function WearthereFooter() {
             <p>Masthead</p>
             <ul>
               <li><Link href="/wearthere">About</Link></li>
-              <li><Link href="/wearthere/trip">Methodology</Link></li>
-              <li><Link href="/wearthere/trip">Sources</Link></li>
+              <li><Link href="/wearthere/business">For publishers</Link></li>
+              <li><Link href="/wearthere/widgets">Capsule widget</Link></li>
+              <li><Link href="/wearthere/docs">Methodology</Link></li>
               <li><Link href="/privacy">Privacy</Link></li>
-              <li><Link href="/terms">Terms</Link></li>
-              <li><Link href="/cookies">Cookies</Link></li>
               <li><CookieSettingsButton /></li>
             </ul>
           </section>

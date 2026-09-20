@@ -46,12 +46,13 @@ export function ChargematchFooter() {
           </ul>
         </section>
         <section>
-          <p>Power model</p>
+          <p>Labs / makers</p>
           <ul>
+            <li><Link href="/chargematch/business">For labs</Link></li>
+            <li><Link href="/chargematch/api">Compatibility API</Link></li>
+            <li><Link href="/chargematch/widgets">Bench widget</Link></li>
+            <li><Link href="/chargematch/docs">Power model</Link></li>
             <li><Link href="/chargematch/kit">Methodology</Link></li>
-            <li><Link href="/chargematch">Power model</Link></li>
-            <li><Link href="/chargematch/kit">Data sources</Link></li>
-            <li><Link href="/chargematch/kit">Corrections</Link></li>
           </ul>
         </section>
       </div>

@@ -4,6 +4,7 @@ import { ALL_ERRORS, ALL_SYMPTOMS, buildDiagnosticTree, getError, getSymptom } f
 import { allFixcodePages } from "@penta/fixcode";
 import { pageMeta } from "@/lib/seo";
 import { Feedback } from "@/components/feedback";
+import { NextAction } from "@/components/next-action";
 import { ViewportScene } from "@/components/creative";
 import { CheckDiagram, checkKindFromText } from "../../../components/machine-diagrams";
 import { ErrorHero } from "../../../components/error-hero";
@@ -176,7 +177,20 @@ export default async function ErrorPage({
           </ul>
         ) : null}
         <div className="mt-12">
-          <Feedback site="fixcode" />
+          <NextAction
+            site="fixcode"
+            entityId={profile.id}
+            official={
+              profile.provenance.find((row) => row.source_url)?.source_url
+                ? {
+                    href: profile.provenance.find((row) => row.source_url)!.source_url!,
+                    label: profile.provenance.find((row) => row.source_url)?.source_name ?? "Open manufacturer source",
+                    sourceName: profile.provenance.find((row) => row.source_url)?.source_type ?? "SOURCE",
+                  }
+                : undefined
+            }
+          />
+          <Feedback site="fixcode" entityId={profile.id} />
         </div>
       </ViewportScene>
     </main>

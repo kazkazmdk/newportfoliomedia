@@ -474,3 +474,134 @@ body {
 .legal-footer p {
   margin: 0;
 }
+
+.px-b2b,
+.px-next,
+.px-lead,
+.px-key,
+.px-embed {
+  --px-line: color-mix(in srgb, currentColor 18%, transparent);
+  max-width: 46rem;
+}
+
+.px-b2b {
+  padding: 3rem 1.2rem 5rem;
+}
+
+.px-b2b-kicker,
+.px-next-kicker,
+.px-lead-kicker,
+.px-embed-mark {
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.px-b2b h1 {
+  margin: 0.6rem 0 1rem;
+  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  line-height: 0.95;
+}
+
+.px-b2b-lede,
+.px-next p,
+.px-lead-note {
+  max-width: 40rem;
+  line-height: 1.55;
+}
+
+.px-b2b-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  margin: 1.6rem 0 2.4rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--px-line);
+  border-bottom: 1px solid var(--px-line);
+}
+
+.px-b2b-nav a[aria-current="page"] {
+  text-decoration: underline;
+}
+
+.px-b2b-section {
+  margin: 2rem 0;
+}
+
+.px-b2b-section pre,
+.px-embed pre,
+.px-key-token code {
+  overflow: auto;
+  padding: 1rem;
+  border: 1px solid var(--px-line);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+}
+
+.px-next,
+.px-lead,
+.px-key,
+.px-embed-card {
+  margin-top: 1.6rem;
+  padding: 1.2rem;
+  border: 1px solid var(--px-line);
+  display: grid;
+  gap: 0.8rem;
+}
+
+.px-next-out,
+.px-next-lead,
+.px-lead button,
+.px-key button,
+.px-embed button {
+  justify-self: start;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  padding: 0.65rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.px-next-out small,
+.px-next-empty,
+.px-lead-ok,
+.px-lead-err,
+.px-embed-note,
+.px-embed-err {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.px-lead label,
+.px-key label,
+.px-embed input {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.px-lead input,
+.px-lead textarea,
+.px-key input,
+.px-embed input {
+  border: 1px solid var(--px-line);
+  background: transparent;
+  color: inherit;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+
+.px-embed {
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+@media (max-width: 640px) {
+  .px-b2b { padding: 1.6rem 1rem 3rem; }
+  .px-b2b h1 { font-size: 2.1rem; }
+}

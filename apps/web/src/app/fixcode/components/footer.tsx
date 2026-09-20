@@ -57,13 +57,14 @@ export function FixcodeFooter() {
           <SafetyLegend />
         </section>
         <section>
-          <p>Method</p>
+          <p>Workshops</p>
           <ul>
+            <li><Link href="/fixcode/business">For workshops</Link></li>
+            <li><Link href="/fixcode/api">Diagnostic API</Link></li>
+            <li><Link href="/fixcode/widgets">Bench widget</Link></li>
+            <li><Link href="/fixcode/docs">Engine docs</Link></li>
             <li><Link href="/fixcode/diagnose">Methodology</Link></li>
-            <li><Link href="/ops">Sources</Link></li>
-            <li><Link href="/ops">Corrections</Link></li>
             <li><Link href="/privacy">Privacy</Link></li>
-            <li><Link href="/terms">Terms</Link></li>
             <li><CookieSettingsButton /></li>
           </ul>
         </section>

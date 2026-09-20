@@ -13,4 +13,5 @@ agent-tools
 test-results
 playwright-report
 blob-report
+data/platform/*.json
 
