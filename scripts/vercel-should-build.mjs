@@ -146,6 +146,10 @@ export function isAllowedReleaseBranch(branch) {
   return ref === "main" || ref === "master" || ref.startsWith("release/");
 }
 
+export function hasSkipVercelMarker(message) {
+  return /\[skip vercel\]/i.test(String(message || ""));
+}
+
 export function decideBuild({
   product,
   branch,
@@ -153,9 +157,15 @@ export function decideBuild({
   previousSha = null,
   shaReliable = true,
   force = false,
+  skipVercel = false,
+  commitMessage = "",
 } = {}) {
   if (force) {
     return { action: "build", reason: "FORCE_VERCEL_BUILD is set" };
+  }
+
+  if (skipVercel || hasSkipVercelMarker(commitMessage)) {
+    return { action: "skip", reason: "commit requests [skip vercel]; GitHub only, no Vercel deploy" };
   }
 
   if (!branch) {
@@ -236,6 +246,7 @@ function parseCli(argv = process.argv.slice(2)) {
       "previous-sha": { type: "string" },
       "commit-sha": { type: "string" },
       force: { type: "boolean", default: false },
+      "commit-message": { type: "string" },
       json: { type: "boolean", default: false },
     },
     allowPositionals: true,
@@ -246,6 +257,8 @@ function parseCli(argv = process.argv.slice(2)) {
 export function runShouldBuild({ env = process.env, argv = process.argv.slice(2), git = true } = {}) {
   const cli = parseCli(argv);
   const force = Boolean(cli.force || env.FORCE_VERCEL_BUILD === "1" || env.VERCEL_FORCE_BUILD === "1");
+  const skipVercel = env.PENTA_SKIP_VERCEL === "1" || env.SKIP_VERCEL_DEPLOY === "1";
+  const commitMessage = cli["commit-message"] || env.VERCEL_GIT_COMMIT_MESSAGE || "";
   const product = resolveProduct({ product: cli.product, env });
   const branch = cli.branch || env.VERCEL_GIT_COMMIT_REF || "";
   const previousSha = cli["previous-sha"] || env.VERCEL_GIT_PREVIOUS_SHA || "";
@@ -278,6 +291,8 @@ export function runShouldBuild({ env = process.env, argv = process.argv.slice(2)
     previousSha,
     shaReliable,
     force,
+    skipVercel,
+    commitMessage,
   });
 
   return {

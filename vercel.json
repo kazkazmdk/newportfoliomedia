@@ -5,21 +5,6 @@
   "outputDirectory": "apps/web/.next",
   "ignoreCommand": "node scripts/vercel-should-build.mjs",
   "git": {
-    "deploymentEnabled": {
-      "cursor/*": false,
-      "cursor/**": false,
-      "claude/*": false,
-      "claude/**": false,
-      "codex/*": false,
-      "codex/**": false,
-      "agent/*": false,
-      "agent/**": false,
-      "qa/*": false,
-      "qa/**": false,
-      "design/*": false,
-      "design/**": false,
-      "fix/*": false,
-      "fix/**": false
-    }
+    "deploymentEnabled": false
   }
 }

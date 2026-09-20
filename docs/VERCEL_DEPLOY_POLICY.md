@@ -105,7 +105,7 @@ fix/**
 
 Any other non-`main` / non-`master` / non-`release/**` branch is also skipped. Vercel is not the QA environment.
 
-`vercel.json` also disables Git deployments for those agent prefixes. Unspecified branches still default to `true` on Vercel’s side; the ignore script is the complete gate.
+`vercel.json` currently sets `git.deploymentEnabled` to `false` so a GitHub push does not create a Vercel deployment. The ignore script also skips when the commit message contains `[skip vercel]`.
 
 ## Duplicate deployment audit
 

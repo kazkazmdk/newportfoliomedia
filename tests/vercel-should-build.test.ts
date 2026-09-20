@@ -111,6 +111,20 @@ describe("vercel-should-build decisions", () => {
     expect(result.action).toBe("build");
   });
 
+  it("skips every product when the commit asks [skip vercel]", () => {
+    const files = ["apps/web/src/lib/v1.ts", "packages/graph-core/src/index.ts"];
+    for (const product of ["fixcode", "autospec", "wearthere", "chargematch", "tripcost"]) {
+      expect(
+        decideBuild({
+          product,
+          branch: "main",
+          changedFiles: files,
+          commitMessage: "[skip vercel] github only",
+        }).action,
+      ).toBe("skip");
+    }
+  });
+
   it("never requires a Vercel build for a routine Cursor branch", () => {
     const files = ["apps/web/src/app/fixcode/page.tsx", "packages/graph-core/src/index.ts"];
     for (const product of ["fixcode", "autospec", "wearthere", "chargematch", "tripcost"]) {
