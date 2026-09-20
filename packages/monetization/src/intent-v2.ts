@@ -117,7 +117,7 @@ export function classifyIntentV2(input: { path: string }): IntentProfile {
     leadSuitability: "NONE",
     repeatPotential: "CONDITIONAL",
     dataValue: "NONE",
-    b2bRelevance: base.kind === "operator" ? "HIGH" : "NONE",
+    b2bRelevance: "NONE",
     commerceSurface: "none",
   };
 }

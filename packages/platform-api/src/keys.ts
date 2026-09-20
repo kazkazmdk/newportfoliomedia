@@ -101,4 +101,4 @@ export function allProductSites(): SiteId[] {
   return [...SITES];
 }
 
-export { KEY_SCOPES as ALL_KEY_SCOPES };
+export { KEY_SCOPES as ALL_KEY_SCOPES } from "./scopes";

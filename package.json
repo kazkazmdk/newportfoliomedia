@@ -39,6 +39,8 @@
   "dependencies": {
     "@penta/catalog": "workspace:*",
     "@penta/demand": "workspace:*",
+    "@penta/platform-api": "workspace:*",
+    "@penta/platform-data": "workspace:*",
     "@penta/tripcost": "workspace:*"
   },
   "devDependencies": {

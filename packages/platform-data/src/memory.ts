@@ -21,7 +21,7 @@ import {
 import type { OfferRow, PartnerRow, PlatformRepository, StoredLead, StoredObservation, WidgetInstallation } from "./repository";
 
 export class MemoryRepository implements PlatformRepository {
-  kind = "memory" as const;
+  kind: PlatformRepository["kind"] = "memory";
   orgs = new Map<string, Organization>();
   users = new Map<string, PlatformUser>();
   memberships: Membership[] = [];

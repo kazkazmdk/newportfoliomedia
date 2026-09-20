@@ -14,6 +14,12 @@ importers:
       '@penta/demand':
         specifier: workspace:*
         version: link:packages/demand
+      '@penta/platform-api':
+        specifier: workspace:*
+        version: link:packages/platform-api
+      '@penta/platform-data':
+        specifier: workspace:*
+        version: link:packages/platform-data
       '@penta/tripcost':
         specifier: workspace:*
         version: link:apps/tripcost
