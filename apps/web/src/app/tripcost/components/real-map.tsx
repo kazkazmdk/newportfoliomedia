@@ -91,6 +91,7 @@ export function RealWorldMap({
       try {
         const maplibre = await import("maplibre-gl");
         if (cancelled || !host.current) return;
+        maplibre.setWorkerUrl(new URL("/maplibre-gl-worker.mjs", window.location.origin).href);
         if (host.current.clientHeight < 8) {
           host.current.style.minHeight = "28rem";
         }

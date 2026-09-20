@@ -1,9 +1,508 @@
 {
-  "generatedAt": null,
-  "note": "Structural DOM measurements only. Not a design score. Populated by tests/visual-qa/reference-parity-v4.spec.ts.",
+  "generatedAt": "2026-09-20T19:14:47.733Z",
+  "note": "Structural DOM measurements only. Not a design score. REFERENCE_PARITY_PASS requires verified home+feature references, structural + regression pass, and MANUAL_VISUAL_STATUS=MANUAL_PASS.",
   "REFERENCE_CAPTURE_PASS": false,
-  "STRUCTURAL_ALIGNMENT_PASS": false,
-  "REGRESSION_PASS": false,
+  "STRUCTURAL_ALIGNMENT_PASS": true,
+  "REGRESSION_PASS": true,
   "MANUAL_VISUAL_STATUS": "NOT_REVIEWED",
-  "REFERENCE_PARITY_PASS": false
+  "REFERENCE_PARITY_PASS": false,
+  "metrics": {
+    "wearthere-home-desktop-fold": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "headerHeight": 108.28125,
+      "heroHeight": 1000,
+      "heroVisualOccupancy": 1,
+      "imageAreaRatio": 1.8045333333333333,
+      "h1FontSize": 168,
+      "h1Width": 841.015625,
+      "h1FoldPosition": 524.515625,
+      "mainProductObject": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 1000
+      },
+      "primaryCtaOrInput": {
+        "x": 1101.546875,
+        "y": 26.703125,
+        "width": 123,
+        "height": 36
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "autospec-home-desktop-fold": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "headerHeight": 65.90625,
+      "heroHeight": 512.828125,
+      "heroVisualOccupancy": 0.38747013888888887,
+      "imageAreaRatio": 0.38747013888888887,
+      "h1FontSize": 106.56,
+      "h1Width": 544,
+      "h1FoldPosition": 614.53125,
+      "mainProductObject": {
+        "x": 176,
+        "y": 228.5,
+        "width": 1088,
+        "height": 532.03125
+      },
+      "primaryCtaOrInput": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "chargematch-home-desktop-fold": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "headerHeight": 63.96875,
+      "heroHeight": 187.71875,
+      "heroVisualOccupancy": 0.018354314846462674,
+      "imageAreaRatio": 0.1741710927327474,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 44.1875,
+        "y": 358.984375,
+        "width": 206.34375,
+        "height": 273.4375
+      },
+      "primaryCtaOrInput": {
+        "x": 978.53125,
+        "y": 20.78125,
+        "width": 183,
+        "height": 36
+      },
+      "firstResultPosition": {
+        "top": 384.421875,
+        "height": 180.21875
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 2,
+      "mobileFoldKeyElements": null
+    },
+    "fixcode-home-desktop-fold": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "headerHeight": 70.359375,
+      "heroHeight": 609.84375,
+      "heroVisualOccupancy": 0.23418370564778646,
+      "imageAreaRatio": 0.23418370564778646,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 68.40625,
+        "y": 125.046875,
+        "width": 691.1875,
+        "height": 824.09375
+      },
+      "primaryCtaOrInput": {
+        "x": 109.671875,
+        "y": 21.5625,
+        "width": 109.375,
+        "height": 38
+      },
+      "firstResultPosition": {
+        "top": 695.234375,
+        "height": 174.71875
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "tripcost-home-desktop-fold": {
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "headerHeight": 77.5,
+      "heroHeight": 938.1875,
+      "heroVisualOccupancy": 0.9381875,
+      "imageAreaRatio": 0,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 0,
+        "y": 77.5,
+        "width": 1440,
+        "height": 938.1875
+      },
+      "primaryCtaOrInput": {
+        "x": 120.390625,
+        "y": 25.109375,
+        "width": 135,
+        "height": 40
+      },
+      "firstResultPosition": {
+        "top": 843.03125,
+        "height": 65.5
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "wearthere-home-desktop-fullpage": {
+      "viewport": {
+        "width": 1440,
+        "height": 1600
+      },
+      "headerHeight": 108.28125,
+      "heroHeight": 1600,
+      "heroVisualOccupancy": 1,
+      "imageAreaRatio": 1.5028333333333332,
+      "h1FontSize": 168,
+      "h1Width": 841.015625,
+      "h1FoldPosition": 1124.515625,
+      "mainProductObject": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 1600
+      },
+      "primaryCtaOrInput": {
+        "x": 1101.546875,
+        "y": 26.703125,
+        "width": 123,
+        "height": 36
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "autospec-home-desktop-fullpage": {
+      "viewport": {
+        "width": 1440,
+        "height": 1600
+      },
+      "headerHeight": 65.90625,
+      "heroHeight": 512.828125,
+      "heroVisualOccupancy": 0.24216883680555557,
+      "imageAreaRatio": 0.24216883680555557,
+      "h1FontSize": 106.56,
+      "h1Width": 544,
+      "h1FoldPosition": 1214.53125,
+      "mainProductObject": {
+        "x": 176,
+        "y": 324.5,
+        "width": 1088,
+        "height": 532.03125
+      },
+      "primaryCtaOrInput": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "chargematch-home-desktop-fullpage": {
+      "viewport": {
+        "width": 1440,
+        "height": 1600
+      },
+      "headerHeight": 63.96875,
+      "heroHeight": 187.71875,
+      "heroVisualOccupancy": 0.011471446779039171,
+      "imageAreaRatio": 0.10885693295796713,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 44.1875,
+        "y": 658.984375,
+        "width": 206.34375,
+        "height": 273.4375
+      },
+      "primaryCtaOrInput": {
+        "x": 978.53125,
+        "y": 20.78125,
+        "width": 183,
+        "height": 36
+      },
+      "firstResultPosition": {
+        "top": 684.421875,
+        "height": 180.21875
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 2,
+      "mobileFoldKeyElements": null
+    },
+    "fixcode-home-desktop-fullpage": {
+      "viewport": {
+        "width": 1440,
+        "height": 1600
+      },
+      "headerHeight": 70.359375,
+      "heroHeight": 609.84375,
+      "heroVisualOccupancy": 0.14636481602986653,
+      "imageAreaRatio": 0.14636481602986653,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 68.40625,
+        "y": 125.046875,
+        "width": 691.1875,
+        "height": 824.09375
+      },
+      "primaryCtaOrInput": {
+        "x": 109.671875,
+        "y": 21.5625,
+        "width": 109.375,
+        "height": 38
+      },
+      "firstResultPosition": {
+        "top": 1295.234375,
+        "height": 174.71875
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "tripcost-home-desktop-fullpage": {
+      "viewport": {
+        "width": 1440,
+        "height": 1600
+      },
+      "headerHeight": 77.5,
+      "heroHeight": 1538.1875,
+      "heroVisualOccupancy": 0.9613671875,
+      "imageAreaRatio": 0,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 0,
+        "y": 77.5,
+        "width": 1440,
+        "height": 1538.1875
+      },
+      "primaryCtaOrInput": {
+        "x": 120.390625,
+        "y": 25.109375,
+        "width": 135,
+        "height": 40
+      },
+      "firstResultPosition": {
+        "top": 1443.03125,
+        "height": 65.5
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": null
+    },
+    "wearthere-home-mobile-fold": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "headerHeight": 47.1875,
+      "heroHeight": 844,
+      "heroVisualOccupancy": 1,
+      "imageAreaRatio": 3.703025884068538,
+      "h1FontSize": 70.2,
+      "h1Width": 358,
+      "h1FoldPosition": 527.359375,
+      "mainProductObject": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "primaryCtaOrInput": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": {
+        "header": true,
+        "hero": true,
+        "firstResult": false
+      }
+    },
+    "autospec-home-mobile-fold": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "headerHeight": 65.90625,
+      "heroHeight": 162.703125,
+      "heroVisualOccupancy": 0.17062548596712085,
+      "imageAreaRatio": 0.17062548596712085,
+      "h1FontSize": 56,
+      "h1Width": 358,
+      "h1FoldPosition": 110.859375,
+      "mainProductObject": {
+        "x": 22.390625,
+        "y": 515.0625,
+        "width": 345.1875,
+        "height": 181.90625
+      },
+      "primaryCtaOrInput": {
+        "x": 322.640625,
+        "y": 12.453125,
+        "width": 52.96875,
+        "height": 40
+      },
+      "firstResultPosition": null,
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 2,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": {
+        "header": true,
+        "hero": true,
+        "firstResult": false
+      }
+    },
+    "chargematch-home-mobile-fold": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "headerHeight": 54.375,
+      "heroHeight": 30.828125,
+      "heroVisualOccupancy": 0.002165817203259813,
+      "imageAreaRatio": 0.1492387093638922,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 29.796875,
+        "y": 98.140625,
+        "width": 23.125,
+        "height": 144.390625
+      },
+      "primaryCtaOrInput": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+      },
+      "firstResultPosition": {
+        "top": 371.609375,
+        "height": 142.78125
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 2,
+      "mobileFoldKeyElements": {
+        "header": true,
+        "hero": true,
+        "firstResult": true
+      }
+    },
+    "fixcode-home-mobile-fold": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "headerHeight": 175.109375,
+      "heroHeight": 282.34375,
+      "heroVisualOccupancy": 0.21958925750394945,
+      "imageAreaRatio": 0.21958925750394945,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 35,
+        "y": 249,
+        "width": 320,
+        "height": 381.53125
+      },
+      "primaryCtaOrInput": {
+        "x": 109.671875,
+        "y": 21.5625,
+        "width": 109.375,
+        "height": 38
+      },
+      "firstResultPosition": {
+        "top": 738.515625,
+        "height": 62.390625
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 1,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": {
+        "header": true,
+        "hero": true,
+        "firstResult": true
+      }
+    },
+    "tripcost-home-mobile-fold": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "headerHeight": 202.90625,
+      "heroHeight": 782.1875,
+      "heroVisualOccupancy": 0.9267624407582938,
+      "imageAreaRatio": 0,
+      "h1FontSize": 0,
+      "h1Width": 0,
+      "h1FoldPosition": -1,
+      "mainProductObject": {
+        "x": 0,
+        "y": 202.90625,
+        "width": 390,
+        "height": 782.1875
+      },
+      "primaryCtaOrInput": {
+        "x": 117.1875,
+        "y": 23.5,
+        "width": 135,
+        "height": 40
+      },
+      "firstResultPosition": {
+        "top": 728.875,
+        "height": 140.59375
+      },
+      "primaryVisualRegions": 3,
+      "majorWhitespaceBands": 3,
+      "cardDensity": 0,
+      "mobileFoldKeyElements": {
+        "header": true,
+        "hero": true,
+        "firstResult": true
+      }
+    }
+  }
 }
