@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  destinationSeasonMedia,
   seasonOfMonth,
   seasonProfileOf,
   seasonalMediaCoverage,
@@ -23,5 +24,11 @@ describe("WearThere seasonal architecture", () => {
     const sydney = rows.find((row) => row.destination === "sydney");
     expect(sydney?.seasonProfile).toBe("southern-temperate");
     expect(sydney?.hemisphere).toBe("south");
+  });
+
+  it("maps tropical / desert / southern scenes away from the Tokyo rain fallback", () => {
+    expect(destinationSeasonMedia("singapore", 7).hero).not.toContain("tokyo-rain");
+    expect(destinationSeasonMedia("dubai", 7).hero).toContain("dubai");
+    expect(destinationSeasonMedia("sydney", 1).hero).toContain("sydney");
   });
 });

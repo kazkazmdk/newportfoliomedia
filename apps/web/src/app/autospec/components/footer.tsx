@@ -1,34 +1,63 @@
 import Link from "next/link";
 import { VEHICLES, vehicleUrl } from "@penta/autospec";
-import { FooterMeta } from "@/components/footer-meta";
+import { CookieSettingsButton } from "@/components/cookie-consent";
+
+const SYSTEMS = ["Body", "Engine", "Tyres", "Battery", "Service"];
 
 export function AutospecFooter() {
+  const makes = [...new Set(VEHICLES.map((vehicle) => vehicle.make))].slice(0, 10);
+  const models = VEHICLES.slice(0, 8);
+
   return (
-    <footer className="as-footer">
-      <div className="as-footer-intro">
-        <p className="as-eyebrow">Garage index</p>
-        <p className="as-display">Ownership, with the unknowns left visible.</p>
-        <p>Vehicle-graph reference plus the checks you choose to enter. No live connection is implied.</p>
+    <footer className="as-manual">
+      <div className="as-manual-plate">
+        <p>AutoSpec</p>
+        <strong>Vehicle database / service manual</strong>
+        <span>Graph identity only. No live telemetry.</span>
       </div>
-      <ul className="grid gap-2 sm:grid-cols-2">
-        {VEHICLES.slice(0, 8).map((v) => (
-          <li key={v.id}>
-            <Link href={vehicleUrl(v)} className="flex justify-between border-b border-[var(--as-line)] py-2 text-sm">
-              <span>
-                {v.make} {v.variant}
-              </span>
-              <span className="uppercase tracking-[0.12em] text-[var(--as-mute)]">{v.generation}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      <FooterMeta
-        product="AutoSpec"
-        homeHref="/autospec"
-        toolHref="/autospec/garage"
-        toolLabel="My garage"
-        note="Fitment is scoped to the identified generation, variant and engine. Confirm safety-critical work with the official source."
-      />
+      <div className="as-manual-grid">
+        <section>
+          <p>Explore</p>
+          <ul>
+            {makes.map((make) => {
+              const sample = VEHICLES.find((vehicle) => vehicle.make === make);
+              return (
+                <li key={make}>
+                  {sample ? <Link href={vehicleUrl(sample)}>{make}</Link> : make}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+        <section>
+          <p>Models on file</p>
+          <ul>
+            {models.map((vehicle) => (
+              <li key={vehicle.id}>
+                <Link href={vehicleUrl(vehicle)}>{vehicle.make} {vehicle.variant}</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section>
+          <p>Vehicle systems</p>
+          <ul className="as-manual-systems">
+            {SYSTEMS.map((system) => <li key={system}>{system}</li>)}
+          </ul>
+        </section>
+        <section>
+          <p>Data</p>
+          <ul>
+            <li><Link href="/autospec/garage">Sources</Link></li>
+            <li><Link href="/autospec">Methodology</Link></li>
+            <li><Link href="/autospec/garage">Corrections</Link></li>
+            <li><Link href="/autospec">Coverage</Link></li>
+            <li><Link href="/privacy">Privacy</Link></li>
+            <li><Link href="/terms">Terms</Link></li>
+            <li><CookieSettingsButton /></li>
+          </ul>
+        </section>
+      </div>
     </footer>
   );
 }

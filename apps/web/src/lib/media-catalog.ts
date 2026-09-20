@@ -266,13 +266,115 @@ const SEASONAL_MEDIA: Partial<Record<string, Partial<Record<SeasonId, Destinatio
   },
 };
 
+const CLIMATE_SCENES: Record<SeasonProfile, Partial<Record<SeasonKey, DestinationMedia>>> = {
+  "northern-temperate": {
+    winter: {
+      hero: "/media/wearthere/reykjavik-hero.webp",
+      detail: "/media/wearthere/nyc-rain-commons.jpg",
+      heroAlt: "Cold northern light and winter outerwear weather",
+      detailAlt: "Wet northern city street",
+      credit: "Illustrative temperate winter scene · Unsplash License / Wikimedia Commons",
+    },
+    spring: {
+      hero: "/media/wearthere/amsterdam-hero.webp",
+      detail: "/media/wearthere/paris-street-commons.jpg",
+      heroAlt: "Mild temperate street in clearer spring light",
+      detailAlt: "Temperate city street after rain",
+      credit: "Illustrative temperate spring scene",
+    },
+    summer: {
+      hero: "/media/wearthere/barcelona-hero.webp",
+      detail: "/media/wearthere/rome-hero.webp",
+      heroAlt: "Warm temperate city light",
+      detailAlt: "Warm street atmosphere",
+      credit: "Illustrative temperate summer scene",
+    },
+    autumn: {
+      hero: "/media/wearthere/paris-rain-commons.jpg",
+      detail: "/media/wearthere/london-rain-commons.jpg",
+      heroAlt: "Wet autumn road and fallen leaves",
+      detailAlt: "Temperate rain street",
+      credit: "Illustrative temperate autumn scene · Wikimedia Commons",
+    },
+  },
+  "southern-temperate": {
+    summer: DESTINATION_MEDIA.sydney,
+    autumn: {
+      hero: "/media/wearthere/sydney-alt.webp",
+      detail: "/media/wearthere/sydney-street-commons.jpg",
+      heroAlt: "Southern-hemisphere city evening light",
+      detailAlt: "Sydney street atmosphere",
+      credit: "Illustrative southern autumn scene",
+    },
+    winter: {
+      hero: "/media/wearthere/sydney-alt.webp",
+      detail: "/media/wearthere/lisbon-alt.webp",
+      heroAlt: "Cooler southern-hemisphere city street",
+      detailAlt: "Cool southern street light",
+      credit: "Illustrative southern winter scene · not a live forecast",
+    },
+    spring: {
+      hero: "/media/wearthere/sydney-street-commons.jpg",
+      detail: "/media/wearthere/lisbon-gold-commons.jpg",
+      heroAlt: "Southern spring street at dusk",
+      detailAlt: "Warm southern architectural street",
+      credit: "Illustrative southern spring scene",
+    },
+  },
+  tropical: {
+    wet: {
+      hero: "/media/wearthere/singapore-hero.webp",
+      detail: "/media/wearthere/hong-kong-hero.webp",
+      heroAlt: "Humid tropical city street",
+      detailAlt: "Humid night street",
+      credit: "Illustrative tropical wet-season scene · not live weather",
+    },
+    dry: {
+      hero: "/media/wearthere/singapore-alt.webp",
+      detail: "/media/wearthere/hong-kong-hero.webp",
+      heroAlt: "Tropical city in clearer humid light",
+      detailAlt: "Tropical night humidity",
+      credit: "Illustrative tropical dry-season scene · not live weather",
+    },
+    humid: {
+      hero: "/media/wearthere/hong-kong-hero.webp",
+      detail: "/media/wearthere/singapore-hero.webp",
+      heroAlt: "Humid tropical night street",
+      detailAlt: "Humid city street",
+      credit: "Illustrative tropical humidity scene",
+    },
+  },
+  desert: {
+    hot: {
+      hero: "/media/wearthere/dubai-hero.webp",
+      detail: "/media/wearthere/dubai-alt.webp",
+      heroAlt: "Hot desert-city evening light",
+      detailAlt: "Desert-city night atmosphere",
+      credit: "Illustrative hot-desert scene · not a live forecast",
+    },
+    mild: {
+      hero: "/media/wearthere/dubai-alt.webp",
+      detail: "/media/wearthere/lisbon-gold-commons.jpg",
+      heroAlt: "Milder desert-city evening",
+      detailAlt: "Warm dry street light",
+      credit: "Illustrative mild-desert scene · not a live forecast",
+    },
+  },
+};
+
+export function climateSceneOf(profile: SeasonProfile, season: SeasonKey): DestinationMedia | undefined {
+  return CLIMATE_SCENES[profile]?.[season];
+}
+
 export function destinationSeasonMedia(slug: string, month: number): DestinationMedia {
   const profile = seasonProfileOf(slug);
   const season = seasonOfMonth(month, profile);
   const temperate = season === "winter" || season === "spring" || season === "summer" || season === "autumn"
     ? season
     : undefined;
-  return (temperate ? SEASONAL_MEDIA[slug]?.[temperate] : undefined) ?? destinationMedia(slug);
+  const specific = temperate ? SEASONAL_MEDIA[slug]?.[temperate] : undefined;
+  if (specific) return specific;
+  return climateSceneOf(profile, season) ?? destinationMedia(slug);
 }
 
 export function seasonalMediaCoverage(): Array<{
@@ -285,12 +387,13 @@ export function seasonalMediaCoverage(): Array<{
   return DESTINATIONS.map((dest) => {
     const seasonProfile = seasonProfileOf(dest.slug);
     const seasonalMediaCount = Object.keys(SEASONAL_MEDIA[dest.slug] ?? {}).length;
+    const climateScenes = Object.keys(CLIMATE_SCENES[seasonProfile] ?? {}).length;
     return {
       destination: dest.slug,
       seasonProfile,
       hemisphere: hemisphereOf(dest.slug),
-      seasonalMediaCount,
-      fallbackUsed: seasonalMediaCount === 0,
+      seasonalMediaCount: seasonalMediaCount || climateScenes,
+      fallbackUsed: seasonalMediaCount === 0 && climateScenes === 0,
     };
   });
 }

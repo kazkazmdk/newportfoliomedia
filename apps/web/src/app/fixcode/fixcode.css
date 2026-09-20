@@ -992,6 +992,125 @@ button.fc-kicker:focus-visible,
   }
 }
 
+.fc-console {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.7rem;
+  align-items: end;
+  padding: 0.45rem 0.8rem 0.55rem;
+  background: #161513;
+  color: #efece6;
+  border-bottom: 2px solid #c9a227;
+}
+.fc-console-mark {
+  font-family: var(--font-fixcode-mono), monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  padding-bottom: 0.45rem;
+}
+.fc-console-search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: end;
+}
+.fc-console-search label { display: grid; gap: 0.12rem; }
+.fc-console-search span { font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9a958b; }
+.fc-console-search select,
+.fc-console-search input,
+.fc-console-search button {
+  min-height: 38px;
+  border: 1px solid #3a3732;
+  background: #1d1b18;
+  color: inherit;
+  font: inherit;
+  padding: 0 0.45rem;
+}
+.fc-console-search button { letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.62rem; }
+.fc-console-nav { display: flex; gap: 0.8rem; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; padding-bottom: 0.45rem; }
+.fc-console-nav a { color: inherit; text-decoration: none; }
+.fc-console-led {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-bottom: 0.45rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.fc-console-led i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #1f7a4a; }
+.fc-console-led[data-state="caution"] i { background: var(--fc-amber); }
+.fc-console-led[data-state="stop"] i { background: var(--fc-signal); }
+.fc-console-led a, .fc-console-led button { color: inherit; background: none; border: 0; font: inherit; cursor: pointer; }
+.fc-console-menu { display: none; min-height: 38px; border: 1px solid #efece6; background: none; color: inherit; font: inherit; letter-spacing: 0.12em; text-transform: uppercase; }
+.fc-machine-physical {
+  position: absolute;
+  inset: 8% 10% 18%;
+  opacity: 0.28;
+  pointer-events: none;
+}
+.fc-machine-photo { width: 100%; height: 100%; object-fit: contain; }
+.fc-machine-class {
+  position: absolute;
+  left: 0;
+  bottom: -1.4rem;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.fc-manual {
+  background: #1b1916;
+  color: #efece6;
+  padding: 1.6rem 1rem 2.2rem;
+}
+.fc-manual-word {
+  font-family: var(--font-fixcode-mono), monospace;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.fc-manual-alpha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 1rem 0 1.4rem;
+  font-family: var(--font-fixcode-mono), monospace;
+}
+.fc-manual-alpha a, .fc-manual-alpha span {
+  min-width: 1.6rem;
+  text-align: center;
+  padding: 0.2rem 0.25rem;
+  border: 1px solid #3a3732;
+}
+.fc-manual-alpha span { opacity: 0.35; }
+.fc-manual-cols { display: grid; gap: 1.2rem; }
+.fc-manual-cols p { font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: #9a958b; }
+.fc-manual-cols ul { display: grid; gap: 0.35rem; margin-top: 0.5rem; }
+.fc-manual-cols a, .fc-manual-cols button { color: inherit; background: none; border: 0; font: inherit; text-align: left; cursor: pointer; text-decoration: none; }
+@media (min-width: 900px) {
+  .fc-manual-cols { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 820px) {
+  .fc-console { grid-template-columns: auto 1fr auto; }
+  .fc-console-nav, .fc-console-led { display: none; }
+  .fc-console-nav.is-open {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    right: 0.6rem;
+    flex-direction: column;
+    padding: 0.8rem;
+    background: #161513;
+  }
+  .fc-console-menu { display: inline-flex; }
+  .fc-console-search label:nth-child(2) { display: none; }
+}
+
 @media (max-width: 560px) {
   .fc-appliance-grid { grid-template-columns: 1fr; }
   .fc-appliance-card { min-height: 14rem; }

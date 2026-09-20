@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { diagnosticPath, waterStepId, type MachineZone, type WaterStep, zoneFromText } from "./machine-path";
 
 export type { MachineZone, WaterStep };
@@ -52,9 +53,19 @@ export function MachineVisual({
     <div
       className="fc-machine"
       role="img"
-      aria-label={`${appliance} documented system schematic`}
+      aria-label={`${appliance} documented system schematic over a class-reference machine photograph`}
       data-water-step-active={activeWater || undefined}
     >
+      <div className="fc-machine-physical">
+        <Image
+          src="/media/fixcode/washer-machine-class.png"
+          alt=""
+          width={864}
+          height={1152}
+          className="fc-machine-photo"
+        />
+        <p className="fc-machine-class">Class reference · front-load washer · not this exact serial</p>
+      </div>
       <p className="fc-plate-mark" aria-hidden>
         System path / {focus}
       </p>

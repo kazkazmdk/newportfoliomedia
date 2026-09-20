@@ -172,6 +172,15 @@ function modelRoute(from: City, to: City): RouteRecord {
   };
 }
 
+export function cityCoordinates(slug: string): { lat: number; lon: number } | null {
+  const city = CITIES.find((item) => item.slug === slug);
+  return city ? { lat: city.lat, lon: city.lon } : null;
+}
+
+export function allCityCoordinates(): Record<string, { lat: number; lon: number }> {
+  return Object.fromEntries(CITIES.map((city) => [city.slug, { lat: city.lat, lon: city.lon }]));
+}
+
 export function scalePlaces(): Place[] {
   return CITIES.map(placeOf);
 }

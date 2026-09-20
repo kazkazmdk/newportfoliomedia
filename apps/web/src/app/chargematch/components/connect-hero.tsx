@@ -53,13 +53,19 @@ export function ConnectHero({
       <form onSubmit={onSubmit} className="cm-scene-form">
         <div className="cm-stack is-bench">
           <div className="cm-pick is-device">
-            <DeviceObject slug={d.slug} name={d.name} limit={chain.limitingComponent === "device"} />
+            <DeviceObject slug={d.slug} name={d.name} watts={d.max_watts} limit={chain.limitingComponent === "device"} />
           </div>
           <div className="cm-watt-flow">
-            <CablePath watts={chain.watts} limit={chain.limitingComponent === "cable"} axis={cableAxis} />
+            <CablePath
+              watts={Number.isFinite(chain.cableCap) ? chain.cableCap : chain.watts}
+              name={selectedCable.name}
+              limit={chain.limitingComponent === "cable"}
+              axis={cableAxis}
+            />
           </div>
           <div className="cm-pick is-charger">
             <ChargerObject
+              name={c.name}
               watts={c.total_watts}
               ports={c.ports.length}
               limit={chain.limitingComponent === "port" || chain.limitingComponent === "allocation"}

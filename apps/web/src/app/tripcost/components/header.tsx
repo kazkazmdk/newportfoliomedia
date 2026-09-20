@@ -1,43 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useTripSelection } from "./trip-selection";
 
 export function TripcostHeader() {
-  const pathname = usePathname();
+  const { from, to, fromName, toName, travellers, origins, destinations, go } = useTripSelection();
   const [open, setOpen] = useState(false);
-  const parts = pathname.split("/").filter(Boolean);
-  const live = parts[0] === "tripcost" && parts[2] === "to";
-  const from = live ? parts[1].replaceAll("-", " ") : null;
-  const to = live ? parts[3].replaceAll("-", " ") : null;
 
   return (
-    <header className="tc-mast">
-      <Link href="/tripcost" className="tc-mast-mark">
+    <header className="tc-planner">
+      <Link href="/tripcost" className="tc-planner-mark">
         TripCost
       </Link>
-      <p className="tc-mast-route">
-        {live ? (
-          <>
-            <span>{from}</span>
-            <i aria-hidden />
-            <span>{to}</span>
-          </>
-        ) : (
-          <span>Europe corridors</span>
-        )}
+      <form
+        className="tc-planner-route"
+        onSubmit={(event) => {
+          event.preventDefault();
+          go({});
+        }}
+      >
+        <label>
+          <span>From</span>
+          <select aria-label="Origin city" value={from} onChange={(event) => go({ from: event.target.value })}>
+            {origins.map((place) => (
+              <option key={place.slug} value={place.slug}>{place.name}</option>
+            ))}
+          </select>
+        </label>
+        <i aria-hidden="true" />
+        <label>
+          <span>To</span>
+          <select aria-label="Destination city" value={to} onChange={(event) => go({ to: event.target.value })}>
+            {destinations.map((place) => (
+              <option key={place.slug} value={place.slug}>{place.name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="tc-planner-people">
+          <span>Travellers</span>
+          <select aria-label="Number of travellers" value={travellers} onChange={(event) => go({ travellers: Number(event.target.value) })}>
+            {[1, 2, 3, 4, 5, 6].map((count) => (
+              <option key={count} value={count}>{count}</option>
+            ))}
+          </select>
+        </label>
+        <button className="tc-planner-go" type="submit">Compare</button>
+      </form>
+      <p className="tc-planner-live" aria-live="polite">
+        {fromName} → {toName}
       </p>
-      <Link href="/tripcost/paris/to/lyon" className="tc-mast-people">
-        {live ? "Routes" : "Routes"}
-      </Link>
-      <button type="button" className="tc-mast-menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        Route
+      <button type="button" className="tc-planner-menu" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        Atlas
       </button>
-      <nav className={`tc-mast-drawer ${open ? "is-open" : ""}`}>
-        <Link href="/tripcost" onClick={() => setOpen(false)}>Home</Link>
+      <nav className={`tc-planner-drawer ${open ? "is-open" : ""}`} aria-label="TripCost">
+        <Link href="/tripcost" onClick={() => setOpen(false)}>Planner</Link>
         <Link href="/tripcost/paris/to/lyon" onClick={() => setOpen(false)}>Paris → Lyon</Link>
-        <Link href="/tripcost/paris/to/lyon#assumptions" onClick={() => setOpen(false)}>Method</Link>
+        <Link href="/tripcost/paris/to/lyon#assumptions" onClick={() => setOpen(false)}>Cost methodology</Link>
       </nav>
     </header>
   );

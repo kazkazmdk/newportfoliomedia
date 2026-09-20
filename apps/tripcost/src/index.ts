@@ -2,7 +2,9 @@ import { provenance, type ConfidenceLevel } from "@penta/data-provenance";
 import { evaluatePageQuality, searchDemandScore } from "@penta/quality-gate";
 import type { PageRecord } from "@penta/graph-core";
 import { MORE_PLACES, moreRoutes } from "./routes-more";
-import { scaleCorridors, scalePlaces } from "./corridors-scale";
+import { allCityCoordinates, cityCoordinates, scaleCorridors, scalePlaces } from "./corridors-scale";
+
+export { allCityCoordinates, cityCoordinates };
 
 export type Place = { id: string; name: string; slug: string; country: string };
 

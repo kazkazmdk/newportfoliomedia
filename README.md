@@ -55,7 +55,9 @@ packages/catalog                                      graphe assemblé + rapport
 
 Les identités visuelles **ne sont pas partagées**. Seuls l’infra, le graphe, la provenance, le quality gate, l’analytics et l’observabilité le sont.
 
-La passe visual rebuild (composition, headers, scènes) est documentée dans `docs/reference-visual-rebuild/`.
+Les identités de chrome (header / footer / scène) restent propres à chaque produit. TripCost affiche le monde réel via MapLibre GL JS + tuiles OpenFreeMap (OpenStreetMap). Aucune clé client n’est requise. Si un fournisseur à token est ajouté plus tard, le token reste côté env et n’est pas embarqué dans le bundle.
+
+La passe visuelle v4 est documentée dans `docs/reference-visual-rebuild-v4/`. Les captures QA ne sont pas une preuve automatique de qualité esthétique.
 
 ## Indexation (Truth Gate V2.1)
 

@@ -1,0 +1,9 @@
+{
+  "generatedAt": null,
+  "note": "Structural DOM measurements only. Not a design score. Populated by tests/visual-qa/reference-parity-v4.spec.ts.",
+  "REFERENCE_CAPTURE_PASS": false,
+  "STRUCTURAL_ALIGNMENT_PASS": false,
+  "REGRESSION_PASS": false,
+  "MANUAL_VISUAL_STATUS": "NOT_REVIEWED",
+  "REFERENCE_PARITY_PASS": false
+}
