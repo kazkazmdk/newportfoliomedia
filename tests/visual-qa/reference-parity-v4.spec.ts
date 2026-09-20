@@ -80,6 +80,9 @@ async function settleVisual(page: Page) {
   const map = page.locator(".tc-realmap").first();
   if (await map.count()) {
     await expect(map).toHaveAttribute("data-map-status", /ready|failed/, { timeout: 12_000 }).catch(() => undefined);
+    if ((await map.getAttribute("data-map-status")) === "ready") {
+      await page.waitForTimeout(900);
+    }
   }
 }
 
@@ -273,6 +276,8 @@ test.describe("reference visual rebuild v4", () => {
     await page.goto("/tripcost", { waitUntil: "domcontentloaded" });
     await settleVisual(page);
     await expect(page.locator(".tc-map")).toHaveAttribute("data-map", "world");
+    const mapBox = await page.locator(".tc-realmap-canvas").first().boundingBox();
+    expect(mapBox?.height ?? 0, "world map canvas must occupy the scene").toBeGreaterThan(180);
     const corridorNote = (await page.locator(".tc-map-note").innerText()).toLowerCase();
     expect(corridorNote).toMatch(/connection corridor|great-circle/);
     expect(corridorNote.startsWith("road route")).toBe(false);

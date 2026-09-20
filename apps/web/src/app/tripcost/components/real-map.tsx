@@ -1,5 +1,6 @@
 "use client";
 
+import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useId, useRef, useState } from "react";
 import { coordOf, corridorKind, greatCircle } from "./geo";
 
@@ -84,12 +85,15 @@ export function RealWorldMap({
     if (!node) return;
     let cancelled = false;
     let map: import("maplibre-gl").Map | undefined;
+    let ro: ResizeObserver | undefined;
 
     (async () => {
       try {
         const maplibre = await import("maplibre-gl");
-        await import("maplibre-gl/dist/maplibre-gl.css");
         if (cancelled || !host.current) return;
+        if (host.current.clientHeight < 8) {
+          host.current.style.minHeight = "28rem";
+        }
         map = new maplibre.Map({
           container: host.current,
           style: STYLE_URL,
@@ -100,8 +104,12 @@ export function RealWorldMap({
         });
         map.addControl(new maplibre.NavigationControl({ showCompass: false }), "bottom-left");
         map.addControl(new maplibre.AttributionControl({ compact: true }), "bottom-right");
+        const resize = () => map?.resize();
+        ro = new ResizeObserver(resize);
+        ro.observe(host.current);
         map.on("load", () => {
           if (cancelled || !map) return;
+          resize();
           applyTripCostPaint(map);
           map.addSource("tc-corridor", {
             type: "geojson",
@@ -148,6 +156,7 @@ export function RealWorldMap({
 
     return () => {
       cancelled = true;
+      ro?.disconnect();
       map?.remove();
       mapRef.current = null;
     };
