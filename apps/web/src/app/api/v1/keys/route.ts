@@ -19,13 +19,14 @@ export async function POST(request: Request) {
   if (blocked) return blocked;
   const parsed = await readJsonBody<{ site?: string; label?: string }>(request);
   if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
-  if (!parsed.value.site || !isSiteId(parsed.value.site)) {
+  const site = parsed.value.site;
+  if (!site || !isSiteId(site)) {
     return NextResponse.json({ error: "unknown_site" }, { status: 400 });
   }
   const issued = mutateStore((store) => {
     const next = issueLocalKey({
-      site: parsed.value.site!,
-      label: parsed.value.label ?? `${parsed.value.site} local`,
+      site,
+      label: parsed.value.label ?? `${site} local`,
     });
     store.keys.push(next.record);
     return next;

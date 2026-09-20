@@ -48,7 +48,7 @@ export function Feedback({ site, entityId }: { site: SiteId | string; entityId?:
         <button type="submit" className="justify-self-start border px-3 py-2 text-sm">
           Store locally
         </button>
-        {state === "error" ? <p className="text-sm">{note}</p> : null}
+        {note ? <p className="text-sm">{note}</p> : null}
       </form>
     );
   }
